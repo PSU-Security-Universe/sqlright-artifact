@@ -1,0 +1,6 @@
+black
+GitPython
+black
+pathlib
+loguru
+rich
