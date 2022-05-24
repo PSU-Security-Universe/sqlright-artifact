@@ -34,9 +34,8 @@ RUN useradd -ms /bin/bash mysql
 
 # build normal AFL
 WORKDIR /home/mysql
-RUN git clone git@github.com:SteveLeungYL/AFL.git
+COPY AFL /home/mysql/AFL
 WORKDIR /home/mysql/AFL 
-RUN git checkout block_cov
 RUN make
 WORKDIR /home/mysql/AFL/llvm_mode
 ENV LLVM_CONFIG=llvm-config-6.0
@@ -70,7 +69,7 @@ RUN mkdir -p /home/mysql/fuzzing/fuzz_root
 RUN chown -R mysql:mysql /home/mysql/fuzzing/
 USER mysql
 COPY afl-fuzz /home/mysql/fuzzing/afl-fuzz
-COPY init_lib/ /home/mysql/fuzzing/fuzz_root/init_lib/
+COPY init_lib /home/mysql/fuzzing/fuzz_root/init_lib
 COPY input/ /home/mysql/fuzzing/fuzz_root/crashes/
 COPY init_lib/ /home/mysql/fuzzing/fuzz_root/mysql_initlib/
 COPY global_data_lib_mysql /home/mysql/fuzzing/fuzz_root/
