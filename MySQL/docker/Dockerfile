@@ -1,5 +1,8 @@
 FROM ubuntu:20.04
-MAINTAINER "dobigthing"
+MAINTAINER "PSU-Security-Universe"
+
+ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt -y update
 RUN apt -y upgrade
