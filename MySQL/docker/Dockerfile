@@ -4,6 +4,7 @@ MAINTAINER "PSU-Security-Universe"
 ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+
 RUN apt -y update
 RUN apt -y upgrade
 RUN apt -y install bison
@@ -30,7 +31,13 @@ RUN apt -y install screen
 RUN apt -y install watch
 RUN pip install libtmux
 
+RUN apt -y install llvm
+RUN apt -y install clang
+
 RUN useradd -ms /bin/bash mysql
+
+ENV CC=clang
+ENV CXX=clang++
 
 # build normal AFL
 WORKDIR /home/mysql
@@ -38,7 +45,7 @@ COPY AFL /home/mysql/AFL
 WORKDIR /home/mysql/AFL 
 RUN make
 WORKDIR /home/mysql/AFL/llvm_mode
-ENV LLVM_CONFIG=llvm-config-6.0
+# ENV LLVM_CONFIG=llvm-config-6.0
 RUN make 
 
 # build MySQL instrumented by afl-clang-fast

@@ -78,61 +78,7 @@ bool AFLCoverage::runOnModule(Module &M) {
 
   std::string cur_file_name = M.getSourceFileName();
 
-  //std::cerr << "\n\n\nCurrent file name is: " << cur_file_name << "\n\n\n";
-
-//  if (cur_file_name.find("/sql_") == std::string::npos) {
-//	  return false;
-//  }
-
-//  /* Remove from blacklist */
-//  if (cur_file_name.find("binlog.cc") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("log_builtins.cc") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("storage/innobase/") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("storage/myisam") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("storage/perfschema") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("storage/perfschema") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("sql_plugin.cc") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("plugin/x/") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("sql/auth/") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("mysys/") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("sql/dd/impl/") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("/boost/") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("sql/rpl_") != std::string::npos) {
-//    return false;
-//  }
-//  if (cur_file_name.find("sql/srv_") != std::string::npos) {
-//    return false;
-//  }
-
-
-
-
-
-
+  std::cerr << "\n\n\nCurrent file name is: " << cur_file_name << "\n\n\n";
 
   IntegerType *Int8Ty  = IntegerType::getInt8Ty(C);
   IntegerType *Int32Ty = IntegerType::getInt32Ty(C);
@@ -252,3 +198,5 @@ static RegisterStandardPasses RegisterAFLPass(
 
 static RegisterStandardPasses RegisterAFLPass0(
     PassManagerBuilder::EP_EnabledOnOptLevel0, registerAFLPass);
+
+
