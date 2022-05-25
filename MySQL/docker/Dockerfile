@@ -4,7 +4,6 @@ MAINTAINER "PSU-Security-Universe"
 ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-
 RUN apt -y update
 RUN apt -y upgrade
 RUN apt -y install bison
@@ -29,7 +28,9 @@ RUN apt -y install xinetd
 RUN apt -y install zlib1g-dev 
 RUN apt -y install screen
 RUN apt -y install watch
+RUN apt -y install unzip
 RUN pip install libtmux
+RUN apt -y install wget
 
 RUN apt -y install llvm
 RUN apt -y install clang
@@ -39,7 +40,7 @@ RUN useradd -ms /bin/bash mysql
 ENV CC=clang
 ENV CXX=clang++
 
-# build normal AFL
+# build block-coverage AFL
 WORKDIR /home/mysql
 COPY AFL /home/mysql/AFL
 WORKDIR /home/mysql/AFL 
@@ -51,16 +52,18 @@ RUN make
 # build MySQL instrumented by afl-clang-fast
 USER mysql
 WORKDIR /home/mysql/
-RUN git clone https://github.com/mysql/mysql-server.git
+RUN wget https://github.com/mysql/mysql-server/archive/refs/tags/mysql-8.0.27.zip
+RUN unzip mysql-8.0.27.zip
+RUN mv mysql-server-mysql-8.0.27 mysql-server
 WORKDIR /home/mysql/mysql-server
 # MySQL version 8.0.27
-RUN git checkout 3290a66c89eb1625a7058e0ef732432b6952b435 
+# RUN git checkout 3290a66c89eb1625a7058e0ef732432b6952b435 
 RUN mkdir bld
 WORKDIR /home/mysql/mysql-server/bld
 ENV CC=/home/mysql/AFL/afl-clang-fast
 ENV CXX=/home/mysql/AFL/afl-clang-fast++
 RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost -DWITH_DEBUG=1
-RUN make -j15
+RUN make -j$(nproc)
 
 # set up MySQL
 USER root
@@ -70,12 +73,32 @@ RUN bin/mysql_ssl_rsa_setup --datadir=data
 RUN mkdir data_all
 RUN mv data data_all/ori_data
 
+# Install mysql-client related libraries, for the compilation of sqlright.
+USER root
+ENV CC=clang
+ENV CXX=clang++
+RUN pip3 install psutil
+RUN pip3 install mysql-connector-python mysql-connector-python
+RUN apt -y install libmysqlclient-dev
+RUN pip3 install mysqlclient
+
+# Install SQLRight MySQL
+COPY src /home/mysql/src
+WORKDIR /home/mysql/src/parser
+RUN cp /home/mysql/mysql-8.0.27.zip ./ && unzip mysql-8.0.27.zip && mv mysql-server-mysql-8.0.27 mysql-server
+WORKDIR /home/mysql/src
+RUN make
+
+USER mysql
+ENV LC_ALL="en_US.UTF-8"
+WORKDIR /home/mysql/fuzzing/fuzz_root
+
 # set up fuzzing
 USER root
 RUN mkdir -p /home/mysql/fuzzing/fuzz_root
 RUN chown -R mysql:mysql /home/mysql/fuzzing/
 USER mysql
-COPY afl-fuzz /home/mysql/fuzzing/afl-fuzz
+#COPY afl-fuzz /home/mysql/fuzzing/afl-fuzz/fuzz_root
 COPY init_lib /home/mysql/fuzzing/fuzz_root/init_lib
 COPY input/ /home/mysql/fuzzing/fuzz_root/crashes/
 COPY init_lib/ /home/mysql/fuzzing/fuzz_root/mysql_initlib/
@@ -85,11 +108,8 @@ COPY run_parallel.py /home/mysql/fuzzing/fuzz_root/run_parallel.py
 COPY afl_config.py /home/mysql/fuzzing/fuzz_root/afl_config.py 
 COPY mysql_rebooter.py /home/mysql/fuzzing/fuzz_root/mysql_rebooter.py
 
-USER mysql
-ENV LC_ALL="en_US.UTF-8"
-WORKDIR /home/mysql/fuzzing/fuzz_root
+RUN cp /home/mysql/src/afl-fuzz /home/mysql/fuzzing/fuzz_root/afl-fuzz
 
-USER root
 ENTRYPOINT bash
 
 #ENTRYPOINT python run.py
