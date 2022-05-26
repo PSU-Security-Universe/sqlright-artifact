@@ -36,7 +36,7 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
 #CPPFLAGS += "-Wno-write-strings"
 
-COMPILE.c = $(CXX) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -I ./include/
+COMPILE.c = $(CXX) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -I ./include/ -fPIC
 
 parser.o: parser.cpp bison_parser.cpp flex_lexer.cpp
 	g++ $< -o $@ -c -I ./include/ $(DEBUG) $(OPT)
