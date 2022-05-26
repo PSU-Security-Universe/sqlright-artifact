@@ -43,13 +43,20 @@ def check_pid(pid:int):
 output_dir_str = ""
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "o:", ["odir="])
+    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:", ["odir=", "start-core=", "num-concurrent="])
 except getopt.GetoptError:
     print("Arguments parsing error")
 for opt, arg in opts:
     if opt in ("-o", "--odir"):
         output_dir_str = arg
         print("Using output dir: %s" % (output_dir_str))
+    elif opt in ("-c", "--start-core"):
+        starting_core_id = int(arg)
+        print("Using starting_core_id: %d" % (starting_core_id))
+    elif opt in ("-n", "--num-concurrent"):
+        parallel_num = int(arg)
+        print("Using num-concurrent: %d" % (parallel_num))
+
 
 if os.path.isfile(os.path.join(os.getcwd(), "shm_env.txt")):
     os.remove(os.path.join(os.getcwd(), "shm_env.txt"))
