@@ -1,12 +1,11 @@
 #!/bin/bash -e
 
-# This file is used for start the SQLRight MySQL fuzzing inside the Docker env. 
+# This file is used for start the SQLRight MySQL fuzzing inside the Docker env.
 # entrypoint: bash
 
-chown -R postgres:postgres /home/postgres/fuzzing/fuzz_root/outputs
+chown -R postgres:postgres /home/postgres/fuzzing/fuzz_root
 
-su postgres
-
+SCRIPT_EXEC=$(cat << EOF
 # Setup data folder
 cd /home/postgres/postgres/bld
 ./bin/initdb -D ./data
@@ -20,6 +19,13 @@ cd /home/postgres/fuzzing/fuzz_root
 
 cp /home/postgres/src/afl-fuzz ./
 
-python3 run_parallel.py -o $(pwd)/outputs
+echo "\n\n\n\nStart fuzzing. \n\n\n\n\n"
+
+python3 run_parallel.py -o /home/postgres/fuzzing/fuzz_root/outputs $@
+
+EOF
+)
+
+su -c "$SCRIPT_EXEC" postgres
 
 echo "Finished\n"

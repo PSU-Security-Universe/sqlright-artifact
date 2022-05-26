@@ -95,9 +95,48 @@ USER postgres
 WORKDIR /home/postgres/src
 RUN make -j$(nproc)
 
+# Setup other SQLRight configurations. 
+
+## Setup No_Ctx_Valid configuration. 
+
+USER postgres
+WORKDIR /home/postgres
+RUN mkdir -p Validaty_Components_Config
+
+USER root
+COPY Validaty_Components_Config/No_Ctx_Valid /home/postgres/Validaty_Components_Config/No_Ctx_Valid
+RUN chown -R postgres:postgres /home/postgres/Validaty_Components_Config
+
+USER postgres
+WORKDIR /home/postgres/Validaty_Components_Config/No_Ctx_Valid/src
+RUN make -j$(nproc)
+
+## Setup No_DB_Par_Ctx_Valid:
+USER root
+COPY Validaty_Components_Config/No_Ctx_Valid /home/postgres/Validaty_Components_Config/No_DB_Par_Ctx_Valid
+RUN chown -R postgres:postgres /home/postgres/Validaty_Components_Config
+
+USER postgres
+WORKDIR /home/postgres/Validaty_Components_Config/No_DB_Par_Ctx_Valid/src
+RUN make -j$(nproc)
+
+## Setup Squirrel_Oracle:
+USER root
+COPY Validaty_Components_Config/No_Ctx_Valid /home/postgres/Validaty_Components_Config/Squirrel_Oracle
+RUN chown -R postgres:postgres /home/postgres/Validaty_Components_Config
+
+USER postgres
+WORKDIR /home/postgres/Validaty_Components_Config/Squirrel_Oracle/src
+RUN make -j$(nproc)
+
+## Finished setup of the SQLRight Validity Configurations.
+
+
+
 # Setup the fuzzing context.
 RUN mkdir /home/postgres/fuzzing/
 RUN mkdir /home/postgres/fuzzing/fuzz_root
+RUN mkdir /home/postgres/fuzzing/outputs
 # COPY afl-fuzz /home/postgres/fuzzing/afl-fuzz
 COPY fuzz_root/postgres_initlib /home/postgres/fuzzing/fuzz_root/postgres_initlib/
 COPY fuzz_root/safe_generate_type /home/postgres/fuzzing/fuzz_root/
@@ -105,9 +144,17 @@ COPY fuzz_root/global_data_lib /home/postgres/fuzzing/fuzz_root/
 COPY fuzz_root/inputs /home/postgres/fuzzing/fuzz_root/inputs
 COPY fuzz_root/run_parallel.py /home/postgres/fuzzing/fuzz_root/
 
+# Setup the Docker run script
+USER root
+COPY scripts /home/postgres/scripts
+RUN chown -R postgres:postgres /home/postgres/scripts
+
 USER root
 RUN chown -R postgres:postgres /home/postgres/fuzzing/
 
-ENTRYPOINT bash
+WORKDIR /home/postgres/fuzzing/
+
 #ENTRYPOINT ../afl-fuzz -t 2000 -m 2000 -i ./crashes -o ../output /usr/local/pgsql/bin/postgres --single -D /usr/local/pgsql/data main 
+
+USER root
 
