@@ -73,10 +73,15 @@ RUN bin/mysql_ssl_rsa_setup --datadir=data
 RUN mkdir data_all
 RUN mv data data_all/ori_data
 
+# TODO::Move the top of the Dockerfile later
+USER root
+RUN apt -y install g++-9
+RUN apt -y install gcc-9
+
 # Install mysql-client related libraries, for the compilation of sqlright.
 USER root
-ENV CC=clang
-ENV CXX=clang++
+ENV CC=gcc-9
+ENV CXX=g++-9
 RUN pip3 install psutil
 RUN pip3 install mysql-connector-python mysql-connector-python
 RUN apt -y install libmysqlclient-dev
@@ -86,6 +91,18 @@ RUN pip3 install mysqlclient
 COPY src /home/mysql/src
 WORKDIR /home/mysql/src/parser
 RUN cp /home/mysql/mysql-8.0.27.zip ./ && unzip mysql-8.0.27.zip && mv mysql-server-mysql-8.0.27 mysql-server
+
+# Add SQLRight modification to the MySQL source code.
+WORKDIR /home/mysql/src/parser/patches
+RUN python3 ./symlink-to-mysql.py
+
+# Compile the build-in MySQL source code.
+WORKDIR /home/mysql/src/parser/mysql-server
+RUN mkdir bld
+WORKDIR /home/mysql/src/parser/mysql-server/bld
+RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost
+RUN make # The make could only be single threaded. Seems to be some racing condition in the compilation process.
+
 WORKDIR /home/mysql/src
 RUN make
 
@@ -100,8 +117,8 @@ RUN chown -R mysql:mysql /home/mysql/fuzzing/
 USER mysql
 #COPY afl-fuzz /home/mysql/fuzzing/afl-fuzz/fuzz_root
 COPY init_lib /home/mysql/fuzzing/fuzz_root/init_lib
-COPY input/ /home/mysql/fuzzing/fuzz_root/crashes/
-COPY init_lib/ /home/mysql/fuzzing/fuzz_root/mysql_initlib/
+COPY input /home/mysql/fuzzing/fuzz_root/input
+COPY init_lib /home/mysql/fuzzing/fuzz_root/mysql_initlib
 COPY global_data_lib_mysql /home/mysql/fuzzing/fuzz_root/
 COPY safe_generate_type_mysql /home/mysql/fuzzing/fuzz_root/
 COPY run_parallel.py /home/mysql/fuzzing/fuzz_root/run_parallel.py

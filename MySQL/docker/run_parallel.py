@@ -8,6 +8,7 @@ import atexit
 import signal
 import psutil
 import MySQLdb
+import getopt
 
 from afl_config import *
 
@@ -27,6 +28,18 @@ def check_pid_exist(pid: int):
     else:
         return True
 
+# Parse the command line arguments:
+output_dir_str = ""
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "o:", ["odir="])
+except getopt.GetoptError:
+    print("Arguments parsing error")
+for opt, arg in opts:
+    if opt in ("-o", "--odir"):
+        output_dir_str = arg
+        print("Using output dir: %s" % (output_dir_str))
+
 # signal.signal(signal.SIGTERM, exit_handler)
 # signal.signal(signal.SIGINT, exit_handler)
 # signal.signal(signal.SIGQUIT, exit_handler)
@@ -45,7 +58,11 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     shutil.copytree(mysql_src_data_dir, cur_mysql_data_dir_str)
 
     # Set up SQLRight output folder
-    cur_output_dir_str = "./outputs_" + str(cur_inst_id - starting_core_id)
+    cur_output_dir_str = ""
+    if output_dir_str != "":
+        cur_output_dir_str = output_dir_str + "/outputs_"  + str(cur_inst_id - starting_core_id)
+    else:
+        cur_output_dir_str = "./outputs/outputs_" + str(cur_inst_id - starting_core_id)
     if not os.path.isdir(cur_output_dir_str):
         os.mkdir(cur_output_dir_str)
 
@@ -163,5 +180,6 @@ all_prev_shut_time_file.close()
 
 print("Finished launching the fuzzing. Now monitor the mysql process. ")
 
+# Avoid script exist
 while True:
     time.sleep(100)
