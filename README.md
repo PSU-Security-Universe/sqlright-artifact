@@ -42,12 +42,31 @@ Our paper presents `SQLRight`, a tool that combines coverage-based guidance, val
 - (2) The paper's final version. 
 - (3) Information and the script to reproduce the evaluated benchmarks. 
 
+## 2. Build the Docker environment to run the evaluations:
+
+### SQLRight Postgres:
+
+Run 
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash ./setup_postgres.sh
+```
 
 ## 2. Comparison between different tools
 
 ### Comparison between different tools in `SQLite` with `NoREC` oracle: (Figure 6 a, c, f, i)
 
-To run 
+### Comparison between different tools in `Postgres` with `NoREC` oracle:
+
+Run
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash ./run_postgres_fuzzing.sh
+```
+
+Wait the running process for 72 hours. The results output will be dumped inside `<sqlright_root>/PostgreSQL/Results/`
 
 
 
