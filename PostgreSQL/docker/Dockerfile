@@ -77,8 +77,12 @@ RUN ../configure --enable-debug --prefix=$(pwd) --exec-prefix=$(pwd) --enable-ca
 # RUN mkdir -p data_all
 # RUN mv data data_all/ori_data 
 
-ENV CXX=clang++
-ENV CC=clang
+USER root
+RUN apt install -y g++-9
+RUN apt install -y gcc-9
+
+ENV CXX=g++-9
+ENV CC=gcc-9
 
 # Install SQLRight Postgres
 USER root
@@ -97,7 +101,7 @@ RUN mkdir /home/postgres/fuzzing/fuzz_root
 COPY fuzz_root/postgres_initlib /home/postgres/fuzzing/fuzz_root/postgres_initlib/
 COPY fuzz_root/safe_generate_type /home/postgres/fuzzing/fuzz_root/
 COPY fuzz_root/global_data_lib /home/postgres/fuzzing/fuzz_root/
-COPY fuzz_root/input /home/postgres/fuzzing/fuzz_root/crashes
+COPY fuzz_root/inputs /home/postgres/fuzzing/fuzz_root/inputs
 COPY fuzz_root/run_parallel.py /home/postgres/fuzzing/fuzz_root/
 
 USER root
