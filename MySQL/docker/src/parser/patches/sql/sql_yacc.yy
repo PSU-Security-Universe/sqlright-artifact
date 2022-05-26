@@ -30,7 +30,8 @@
 %code requires {
 #include <vector>
 using std::vector;
-#include "sql/sql_lex.h"
+//#include "sql/sql_lex.h"
+class IR;
 }
 
 %{
@@ -150,7 +151,7 @@ Note: YYTHD is passed as an argument to yyparse(), and subsequently to yylex().
 #include "sql/sql_get_diagnostics.h"               // Sql_cmd_get_diagnostics
 #include "sql/sql_handler.h"                       // Sql_cmd_handler_*
 #include "sql/sql_import.h"                        // Sql_cmd_import_table
-// #include "sql/sql_lex.h"
+#include "sql/sql_lex.h"
 #include "sql/sql_list.h"
 #include "sql/sql_parse.h"                        /* comp_*_creator */
 #include "sql/sql_plugin.h"                      // plugin_is_ready

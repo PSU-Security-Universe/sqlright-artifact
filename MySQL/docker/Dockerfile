@@ -35,6 +35,12 @@ RUN apt -y install wget
 RUN apt -y install llvm
 RUN apt -y install clang
 
+USER root
+RUN apt -y install g++-9
+RUN apt -y install gcc-9
+
+RUN apt -y install libnuma-dev
+
 RUN useradd -ms /bin/bash mysql
 
 ENV CC=clang
@@ -73,10 +79,6 @@ RUN bin/mysql_ssl_rsa_setup --datadir=data
 RUN mkdir data_all
 RUN mv data data_all/ori_data
 
-# TODO::Move the top of the Dockerfile later
-USER root
-RUN apt -y install g++-9
-RUN apt -y install gcc-9
 
 # Install mysql-client related libraries, for the compilation of sqlright.
 USER root
@@ -94,14 +96,14 @@ RUN cp /home/mysql/mysql-8.0.27.zip ./ && unzip mysql-8.0.27.zip && mv mysql-ser
 
 # Add SQLRight modification to the MySQL source code.
 WORKDIR /home/mysql/src/parser/patches
-RUN python3 ./symlink-to-mysql.py
+RUN bash ./replace-changed-code.sh
 
 # Compile the build-in MySQL source code.
 WORKDIR /home/mysql/src/parser/mysql-server
 RUN mkdir bld
 WORKDIR /home/mysql/src/parser/mysql-server/bld
 RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost
-RUN make # The make could only be single threaded. Seems to be some racing condition in the compilation process.
+RUN make -j$(nproc) # The make could only be single threaded. Seems to be some racing condition in the compilation process.
 
 WORKDIR /home/mysql/src
 RUN make
@@ -127,6 +129,8 @@ COPY mysql_rebooter.py /home/mysql/fuzzing/fuzz_root/mysql_rebooter.py
 
 RUN cp /home/mysql/src/afl-fuzz /home/mysql/fuzzing/fuzz_root/afl-fuzz
 
+USER root
+WORKDIR /home/mysql/fuzzing/fuzz_root
 ENTRYPOINT bash
 
 #ENTRYPOINT python run.py
