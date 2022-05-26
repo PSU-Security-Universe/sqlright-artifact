@@ -37,10 +37,14 @@ RUN apt -y install wget
 RUN apt -y install llvm
 RUN apt -y install clang
 
+RUN apt install -y g++-9
+RUN apt install -y gcc-9
+
 
 RUN useradd -ms /bin/bash postgres
 USER postgres
-RUN pip install libtmux
+
+RUN pip3 install libtmux
 
 WORKDIR /home/postgres
 
@@ -77,9 +81,6 @@ RUN ../configure --enable-debug --prefix=$(pwd) --exec-prefix=$(pwd) --enable-ca
 # RUN mkdir -p data_all
 # RUN mv data data_all/ori_data 
 
-USER root
-RUN apt install -y g++-9
-RUN apt install -y gcc-9
 
 ENV CXX=g++-9
 ENV CC=gcc-9
@@ -88,9 +89,9 @@ ENV CC=gcc-9
 USER root
 COPY src /home/postgres/src
 RUN chown -R postgres:postgres /home/postgres/src
-WORKDIR /home/postgres/src
 
 # Compile SQLRight postgres.
+USER postgres
 WORKDIR /home/postgres/src
 RUN make -j$(nproc)
 

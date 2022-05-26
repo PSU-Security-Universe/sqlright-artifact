@@ -4,12 +4,14 @@ import os
 import shutil
 import subprocess
 import atexit
+import getopt
+import sys
 
 postgres_root_dir = "/home/postgres/postgres/bld/"
 postgres_src_data_dir = os.path.join(postgres_root_dir, "data_all/ori_data")
 current_workdir = os.getcwd()
 
-starting_core_id = 5
+starting_core_id = 0
 parallel_num = 5
 port_starting_num = 7000
 
@@ -17,12 +19,12 @@ all_fuzzing_p_list = []
 all_postgres_p_list = []
 shm_env_list = []
 
-def exit_handler():
-    for fuzzing_instance in all_fuzzing_p_list:
-        fuzzing_instance.kill()
-    for postgre_instance in all_postgres_p_list:
-        postgre_instance.kill()
-    return
+#def exit_handler():
+#    for fuzzing_instance in all_fuzzing_p_list:
+#        fuzzing_instance.kill()
+#    for postgre_instance in all_postgres_p_list:
+#        postgre_instance.kill()
+#    return
 
 
 def check_pid(pid:int):
@@ -34,7 +36,20 @@ def check_pid(pid:int):
     else:
         return True
 
-atexit.register(exit_handler)
+#atexit.register(exit_handler)
+
+
+# Parse the command line arguments:
+output_dir_str = ""
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "o:", ["odir="])
+except getopt.GetoptError:
+    print("Arguments parsing error")
+for opt, arg in opts:
+    if opt in ("-o", "--odir"):
+        output_dir_str = arg
+        print("Using output dir: %s" % (output_dir_str))
 
 if os.path.isfile(os.path.join(os.getcwd(), "shm_env.txt")):
     os.remove(os.path.join(os.getcwd(), "shm_env.txt"))
@@ -48,7 +63,11 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
         shutil.copytree(postgres_src_data_dir, cur_postgre_data_dir_str)
 
     # Set up SQLRight output folder
-    cur_output_dir_str = "./outputs_" + str(cur_inst_id - starting_core_id)
+    cur_output_dir_str = ""
+    if output_dir_str != "":
+        cur_output_dir_str = output_dir_str + "/outputs_"  + str(cur_inst_id - starting_core_id)
+    else:
+        cur_output_dir_str = "./outputs/outputs_" + str(cur_inst_id - starting_core_id)
     if not os.path.isdir(cur_output_dir_str):
         os.mkdir(cur_output_dir_str)
 

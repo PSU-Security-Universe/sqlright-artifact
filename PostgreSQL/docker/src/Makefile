@@ -31,15 +31,12 @@ $(SUB_DIRS): parser
 
 afl-fuzz: $(SUB_DIRS)
 	$(CC) $(CFLAGS) $(AFL_OBJS) -I$(PGSQL_INCLUDE_PATH) -L$(PGSQL_LIB_PATH) -o $@ $(LDFLAGS)
-	cp afl-fuzz ./fuzz_root
 
 test-parser: $(SUB_DIRS)
 	$(CC) $(CFLAGS) $(TEST_OBJS) -I$(PGSQL_INCLUDE_PATH) -L$(PGSQL_LIB_PATH) -o $@ $(LDFLAGS)
-	cp test-parser ./fuzz_root
 
 generate_inputs: $(SUB_DIRS)
 	$(CC) $(CFLAGS) $(GEN_OBJS) -I$(PGSQL_INCLUDE_PATH) -L$(PGSQL_LIB_PATH) -o $@ $(LDFLAGS)
-	cp generate_inputs ./fuzz_root
 
 debug: DEBUG = -g
 debug: OPT = -O0
