@@ -152,6 +152,38 @@ RUN chown -R postgres:postgres /home/postgres/scripts
 USER root
 RUN chown -R postgres:postgres /home/postgres/fuzzing/
 
+
+# Finished setting the SQLRight fuzzing configurations.
+# Setup SQLancer. 
+
+USER root
+RUN apt -y install openjdk-11-jdk
+#RUN apt install -y software-properties-common 
+#RUN add-apt-repository ppa:linuxuprising/java && \
+#    apt update && \
+#    apt -y install openjdk-11-jdk
+
+RUN apt -y install maven
+
+WORKDIR /home/postgres/
+RUN mkdir -p sqlancer
+WORKDIR /home/postgres/sqlancer
+COPY sqlancer/sqlancer /home/postgres/sqlancer/sqlancer
+COPY sqlancer/sqlancer_cov_src /home/postgres/sqlancer/sqlancer_cov_src
+COPY sqlancer/sqlancer_cov /home/postgres/sqlancer/sqlancer_cov
+RUN chown -R postgres:postgres /home/postgres/sqlancer
+
+USER postgres
+WORKDIR /home/postgres/sqlancer/sqlancer
+RUN mvn package -DskipTests
+
+WORKDIR /home/postgres/sqlancer/sqlancer_cov_src/PostgreSQL
+RUN make
+
+RUN cp ./afl-fuzz /home/postgres/sqlancer/sqlancer_cov/afl-fuzz
+
+# Finished setting up SQLancer.
+
 WORKDIR /home/postgres/fuzzing/
 
 #ENTRYPOINT ../afl-fuzz -t 2000 -m 2000 -i ./crashes -o ../output /usr/local/pgsql/bin/postgres --single -D /usr/local/pgsql/data main 
