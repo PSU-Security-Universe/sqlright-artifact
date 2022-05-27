@@ -78,7 +78,7 @@ bool AFLCoverage::runOnModule(Module &M) {
 
   std::string cur_file_name = M.getSourceFileName();
 
-  std::cerr << "\n\n\nCurrent file name is: " << cur_file_name << "\n\n\n";
+  //std::cerr << "\n\n\nCurrent file name is: " << cur_file_name << "\n\n\n";
 
   IntegerType *Int8Ty  = IntegerType::getInt8Ty(C);
   IntegerType *Int32Ty = IntegerType::getInt32Ty(C);
@@ -89,7 +89,7 @@ bool AFLCoverage::runOnModule(Module &M) {
 
   if (isatty(2) && !getenv("AFL_QUIET")) {
 
-    SAYF(cCYA "afl-llvm-pass " cBRI VERSION cRST " by <lszekeres@google.com>\n");
+    SAYF(cCYA "afl-llvm-pass " cBRI VERSION cRST " by <luy70@psu.edu>. Block coverage. \n");
 
   } else be_quiet = 1;
 
