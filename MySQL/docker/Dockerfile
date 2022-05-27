@@ -83,7 +83,6 @@ RUN bin/mysql_ssl_rsa_setup --datadir=data
 RUN mkdir data_all
 RUN mv data data_all/ori_data
 
-
 # Install mysql-client related libraries, for the compilation of sqlright.
 USER root
 ENV CC=gcc-9
@@ -125,6 +124,10 @@ RUN cp /home/mysql/src/parser/mysql-server/bld/library_output_directory/libserve
 USER root
 COPY fuzz_root /home/mysql/fuzzing/fuzz_root
 RUN chown -R mysql:mysql /home/mysql/fuzzing/
+
+# Not sure why, but user Postgres doesn't have the permission to open the database.
+RUN chown -R /home/mysql/
+
 
 USER root
 WORKDIR /home/mysql/fuzzing/fuzz_root
