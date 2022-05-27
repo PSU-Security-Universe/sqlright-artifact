@@ -7,21 +7,44 @@ if [ $# > 4 ] && [ "$1" == "SQLRight" ]; then
     if [ ! -d "./Results" ]; then
         mkdir -p Results
     fi
+
+    resoutdir="sqlright_postgres"
+    for var in "$@"
+    do
+        if [ "$var" == "drop_all" ]; then
+            resoutdir="$resoutdir""_drop_all"
+        elif [ "$var" == "random_save" ]; then
+            resoutdir="$resoutdir""_random_save"
+        elif [ "$var" == "save_all" ]; then
+            resoutdir="$resoutdir""_save_all"
+        fi
+    done
+
+    for var in "$@"
+    do
+        if [ "$var" == "NOREC" ]; then
+            resoutdir="$resoutdir""_NOREC"
+        elif [ "$var" == "TLP" ]; then
+            resoutdir="$resoutdir""_TLP"
+        fi
+    done
+
+    bugoutdir="$resoutdir""_bugs"
     
     cd Results
     
-    if [ -d "./sqlright_postgres" ]; then
-        echo "Detected Results/sqlright_postgres folder existed. Please cleanup the output folder and then retry. "
+    if [ -d "./$resoutdir" ]; then
+        echo "Detected Results/$resoutdir folder existed. Please cleanup the output folder and then retry. "
         exit 5
     fi
-    if [ -d "./sqlright_postgres_bugs" ]; then
-        echo "Detected Results/sqlright_postgres_bugs folder existed. Please cleanup the output folder and then retry. "
+    if [ -d "./$bugoutdir" ]; then
+        echo "Detected Results/$bugoutdir folder existed. Please cleanup the output folder and then retry. "
         exit 5
     fi
     
     sudo docker run -i --rm \
-        -v $(pwd)/sqlright_postgres:/home/postgres/fuzzing/fuzz_root/outputs \
-        -v $(pwd)/sqlright_postgres_bugs:/home/postgres/fuzzing/Bug_Analysis \
+        -v $(pwd)/$resoutdir:/home/postgres/fuzzing/fuzz_root/outputs \
+        -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
         sqlright_postgres /bin/bash /home/postgres/scripts/run_sqlright_postgres_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "no-ctx-valid" ]; then
@@ -31,21 +54,34 @@ elif [ $# > 4 ] && [ "$1" == "no-ctx-valid" ]; then
     if [ ! -d "./Results" ]; then
         mkdir -p Results
     fi
+
+    resoutdir="sqlright_postgres_no_ctx_valid"
+
+    for var in "$@"
+    do
+        if [ "$var" == "NOREC" ]; then
+            resoutdir="$resoutdir""_NOREC"
+        elif [ "$var" == "TLP" ]; then
+            resoutdir="$resoutdir""_TLP"
+        fi
+    done
+
+    bugoutdir="$resoutdir""_bugs"
     
     cd Results
-    
-    if [ -d "./sqlright_postgres_no_ctx_valid" ]; then
-        echo "Detected 'Results/sqlright_postgres_no_ctx_valid' folder existed. Please cleanup the output folder and then retry."
+
+    if [ -d "./$resoutdir" ]; then
+        echo "Detected Results/$resoutdir folder existed. Please cleanup the output folder and then retry. "
         exit 5
     fi
-    if [ -d "./sqlright_postgres_no_ctx_valid_bugs" ]; then
-        echo "Detected 'Results/sqlright_postgres_no_ctx_valid_bugs' folder existed. Please cleanup the output folder and then retry."
+    if [ -d "./$bugoutdir" ]; then
+        echo "Detected Results/$bugoutdir folder existed. Please cleanup the output folder and then retry. "
         exit 5
     fi
     
     sudo docker run -i --rm \
-        -v $(pwd)/sqlright_postgres_no_ctx_valid:/home/postgres/fuzzing/fuzz_root/outputs \
-        -v $(pwd)/sqlright_postgres_no_ctx_valid_bugs:/home/postgres/fuzzing/Bug_Analysis \
+        -v $(pwd)/$resoutdir:/home/postgres/fuzzing/fuzz_root/outputs \
+        -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
         sqlright_postgres /bin/bash /home/postgres/scripts/run_no_ctx_valid_postgres_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "no-db-par-ctx-valid" ]; then
@@ -56,20 +92,34 @@ elif [ $# > 4 ] && [ "$1" == "no-db-par-ctx-valid" ]; then
         mkdir -p Results
     fi
     
-    cd Results
+    resoutdir="sqlright_postgres_no_db_par_ctx_valid"
+
+    for var in "$@"
+    do
+        if [ "$var" == "NOREC" ]; then
+            resoutdir="$resoutdir""_NOREC"
+        elif [ "$var" == "TLP" ]; then
+            resoutdir="$resoutdir""_TLP"
+        fi
+    done
+
+    bugoutdir="$resoutdir""_bugs"
     
-    if [ -d "./sqlright_postgres_no_db_par_ctx_valid" ]; then
-        echo "Detected 'Results/sqlright_postgres_no_db_par_ctx_valid' folder existed. Please cleanup the output folder and then retry."
+    cd Results
+
+    if [ -d "./$resoutdir" ]; then
+        echo "Detected Results/$resoutdir folder existed. Please cleanup the output folder and then retry. "
         exit 5
     fi
-    if [ -d "./sqlright_postgres_no_db_par_ctx_valid_bugs" ]; then
-        echo "Detected 'Results/sqlright_postgres_no_db_par_ctx_valid_bugs' folder existed. Please cleanup the output folder and then retry."
+    if [ -d "./$bugoutdir" ]; then
+        echo "Detected Results/$bugoutdir folder existed. Please cleanup the output folder and then retry. "
         exit 5
     fi
+    
     
     sudo docker run -i --rm \
-        -v $(pwd)/sqlright_postgres_no_db_par_ctx_valid:/home/postgres/fuzzing/fuzz_root/outputs \
-        -v $(pwd)/sqlright_postgres_no_db_par_ctx_valid_bugs:/home/postgres/fuzzing/Bug_Analysis \
+        -v $(pwd)/$resoutdir:/home/postgres/fuzzing/fuzz_root/outputs \
+        -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
         sqlright_postgres /bin/bash /home/postgres/scripts/run_no_ctx_valid_postgres_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
@@ -79,21 +129,34 @@ elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
     if [ ! -d "./Results" ]; then
         mkdir -p Results
     fi
+
+    resoutdir="squirrel_oracle"
+
+    for var in "$@"
+    do
+        if [ "$var" == "NOREC" ]; then
+            resoutdir="$resoutdir""_NOREC"
+        elif [ "$var" == "TLP" ]; then
+            resoutdir="$resoutdir""_TLP"
+        fi
+    done
+
+    bugoutdir="$resoutdir""_bugs"
     
     cd Results
-    
-    if [ -d "./squirrel_oracle" ]; then
-        echo "Detected 'Results/squirrel_oracle' folder existed. Please cleanup the output folder and then retry."
+
+    if [ -d "./$resoutdir" ]; then
+        echo "Detected Results/$resoutdir folder existed. Please cleanup the output folder and then retry. "
         exit 5
     fi
-    if [ -d "./squirrel_oracle_bugs" ]; then
-        echo "Detected 'Results/squirrel_oracle_bugs' folder existed. Please cleanup the output folder and then retry."
+    if [ -d "./$bugoutdir" ]; then
+        echo "Detected Results/$bugoutdir folder existed. Please cleanup the output folder and then retry. "
         exit 5
     fi
     
     sudo docker run -i --rm \
-        -v $(pwd)/squirrel_oracle:/home/postgres/fuzzing/fuzz_root/outputs \
-        -v $(pwd)/squirrel_oracle_bugs:/home/postgres/fuzzing/Bug_Analysis \
+        -v $(pwd)/$resoutdir:/home/postgres/fuzzing/fuzz_root/outputs \
+        -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
         sqlright_postgres /bin/bash /home/postgres/scripts/run_no_ctx_valid_postgres_fuzzing_helper.sh ${@:2}
 
 else
