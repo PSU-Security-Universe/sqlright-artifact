@@ -28,8 +28,6 @@ java -jar sqlancer-1.1.0.jar --log-execution-time false --num-threads 1 --num-tr
 
 cd /home/postgres/sqlancer/sqlancer_cov
 
-sleep (5)
-
 printf "\n\n\n\nStart fuzzing. \n\n\n\n\n"
 
 python3 run_coverage.py
