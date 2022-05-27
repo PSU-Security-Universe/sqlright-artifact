@@ -57,16 +57,78 @@ bash ./setup_postgres.sh
 
 ### Comparison between different tools in `SQLite` with `NoREC` oracle: (Figure 6 a, c, f, i)
 
-### Comparison between different tools in `Postgres` with `NoREC` oracle:
+### Run `SQLRight Postgres` with `NoREC` oracle:
 
 Run
 
 ```sh
 cd <sqlright_root>/PostgreSQL/scripts
-bash ./run_postgres_fuzzing.sh
+bash run_postgres_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
-Wait the running process for 72 hours. The results output will be dumped inside `<sqlright_root>/PostgreSQL/Results/`
+Wait the running process for 72 hours. The results output will be dumped inside `<sqlright_root>/PostgreSQL/Results/sqlright_postgres` and `<sqlright_root>/PostgreSQL/Results/sqlright_postgres_bugs`.
 
+## 3. Contribution of code coverage feedback:
 
+### Run `SQLRight Postgres` with `NoREC` oracle, but use `drop_all` feedback:
+
+Run 
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash run_postgres_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback drop_all
+```
+
+Wait the running process for 72 hours. The results output will be dumped inside `<sqlright_root>/PostgreSQL/Results/sqlright_postgres_drop_all` and `<sqlright_root>/PostgreSQL/Results/sqlright_postgres_drop_all_bugs`.
+
+### Run `SQLRight Postgres` with `NoREC` oracle, but use `random_save` feedback:
+
+Run 
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash run_postgres_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback random_save
+```
+
+Wait the running process for 72 hours. The results output will be dumped inside `<sqlright_root>/PostgreSQL/Results/sqlright_postgres_random_save` and `<sqlright_root>/PostgreSQL/Results/sqlright_postgres_random_save_bugs`.
+
+### Run `SQLRight Postgres` with `NoREC` oracle, but use `save_all` feedback:
+
+Run 
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash run_postgres_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback save_all
+```
+
+Wait the running process for 72 hours. The results output will be dumped inside `<sqlright_root>/PostgreSQL/Results/sqlright_postgres_save_all` and `<sqlright_root>/PostgreSQL/Results/sqlright_postgres_save_all_bugs`.
+
+## 4. Contribution of Validity components:
+
+### Run `SQLRight Postgres no-ctx-valid` configuration with `NoREC` oracle:
+
+Run
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash run_postgres_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle NOREC
+```
+
+### Run `SQLRight Postgres no-db-par-ctx-valid` configuration with `NoREC` oracle:
+
+Run
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash run_postgres_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle NOREC
+```
+
+### Run `SQLRight Postgres squirrel-oracle` configuration with `NoREC` oracle:
+
+Run
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash run_postgres_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle NOREC
+```
 
