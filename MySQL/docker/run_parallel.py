@@ -9,6 +9,7 @@ import signal
 import psutil
 import MySQLdb
 import getopt
+import sys
 
 from afl_config import *
 

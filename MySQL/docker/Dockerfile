@@ -103,13 +103,13 @@ WORKDIR /home/mysql/src/parser/mysql-server
 RUN mkdir bld
 WORKDIR /home/mysql/src/parser/mysql-server/bld
 RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost
-RUN make -j$(nproc) # The make could only be single threaded. Seems to be some racing condition in the compilation process.
+RUN make -j$(nproc) 
 
 WORKDIR /home/mysql/src
 RUN make
 
 USER mysql
-ENV LC_ALL="en_US.UTF-8"
+#ENV LC_ALL="en_US.UTF-8"
 WORKDIR /home/mysql/fuzzing/fuzz_root
 
 # set up fuzzing
@@ -119,7 +119,7 @@ RUN chown -R mysql:mysql /home/mysql/fuzzing/
 USER mysql
 #COPY afl-fuzz /home/mysql/fuzzing/afl-fuzz/fuzz_root
 COPY init_lib /home/mysql/fuzzing/fuzz_root/init_lib
-COPY input /home/mysql/fuzzing/fuzz_root/input
+COPY input /home/mysql/fuzzing/fuzz_root/inputs
 COPY init_lib /home/mysql/fuzzing/fuzz_root/mysql_initlib
 COPY global_data_lib_mysql /home/mysql/fuzzing/fuzz_root/
 COPY safe_generate_type_mysql /home/mysql/fuzzing/fuzz_root/
@@ -127,11 +127,7 @@ COPY run_parallel.py /home/mysql/fuzzing/fuzz_root/run_parallel.py
 COPY afl_config.py /home/mysql/fuzzing/fuzz_root/afl_config.py 
 COPY mysql_rebooter.py /home/mysql/fuzzing/fuzz_root/mysql_rebooter.py
 
-RUN cp /home/mysql/src/afl-fuzz /home/mysql/fuzzing/fuzz_root/afl-fuzz
-
 USER root
 WORKDIR /home/mysql/fuzzing/fuzz_root
-ENTRYPOINT bash
 
-#ENTRYPOINT python run.py
 #ENTRYPOINT ../afl-fuzz -t 2000 -m 2000 -i ./crashes -o ../output /usr/local/pgsql/bin/postgres --single -D /usr/local/pgsql/data main 
