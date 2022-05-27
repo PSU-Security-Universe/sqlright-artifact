@@ -35,7 +35,6 @@ RUN apt -y install wget
 RUN apt -y install llvm
 RUN apt -y install clang
 
-USER root
 RUN apt -y install g++-9
 RUN apt -y install gcc-9
 
@@ -46,9 +45,14 @@ RUN useradd -ms /bin/bash mysql
 ENV CC=clang
 ENV CXX=clang++
 
+RUN chown -R mysql:mysql /home/mysql
+
 # build block-coverage AFL
 WORKDIR /home/mysql
 COPY AFL /home/mysql/AFL
+RUN chown -R mysql:mysql /home/mysql
+
+USER mysql
 WORKDIR /home/mysql/AFL 
 RUN make
 WORKDIR /home/mysql/AFL/llvm_mode
@@ -72,7 +76,7 @@ RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost -DWITH_DEBUG=1
 RUN make -j$(nproc)
 
 # set up MySQL
-USER root
+USER mysql
 RUN mkdir data
 RUN bin/mysqld --initialize-insecure --user=mysql --datadir=data
 RUN bin/mysql_ssl_rsa_setup --datadir=data
@@ -93,8 +97,11 @@ RUN pip3 install mysqlclient
 COPY src /home/mysql/src
 WORKDIR /home/mysql/src/parser
 RUN cp /home/mysql/mysql-8.0.27.zip ./ && unzip mysql-8.0.27.zip && mv mysql-server-mysql-8.0.27 mysql-server
+RUN chown -R mysql:mysql /home/mysql/src
+
 
 # Add SQLRight modification to the MySQL source code.
+USER mysql
 WORKDIR /home/mysql/src/parser/patches
 RUN bash ./replace-changed-code.sh
 
@@ -108,24 +115,16 @@ RUN make -j$(nproc)
 WORKDIR /home/mysql/src
 RUN make
 
-USER mysql
+USER root
+RUN cp /home/mysql/src/parser/mysql-server/bld/library_output_directory/libserver_unittest_library.so /usr/lib/
+
+#USER mysql
 #ENV LC_ALL="en_US.UTF-8"
-WORKDIR /home/mysql/fuzzing/fuzz_root
 
 # set up fuzzing
 USER root
-RUN mkdir -p /home/mysql/fuzzing/fuzz_root
+COPY fuzz_root /home/mysql/fuzzing/fuzz_root
 RUN chown -R mysql:mysql /home/mysql/fuzzing/
-USER mysql
-#COPY afl-fuzz /home/mysql/fuzzing/afl-fuzz/fuzz_root
-COPY init_lib /home/mysql/fuzzing/fuzz_root/init_lib
-COPY input /home/mysql/fuzzing/fuzz_root/inputs
-COPY init_lib /home/mysql/fuzzing/fuzz_root/mysql_initlib
-COPY global_data_lib_mysql /home/mysql/fuzzing/fuzz_root/
-COPY safe_generate_type_mysql /home/mysql/fuzzing/fuzz_root/
-COPY run_parallel.py /home/mysql/fuzzing/fuzz_root/run_parallel.py
-COPY afl_config.py /home/mysql/fuzzing/fuzz_root/afl_config.py 
-COPY mysql_rebooter.py /home/mysql/fuzzing/fuzz_root/mysql_rebooter.py
 
 USER root
 WORKDIR /home/mysql/fuzzing/fuzz_root
