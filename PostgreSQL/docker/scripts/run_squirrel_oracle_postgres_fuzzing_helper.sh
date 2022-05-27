@@ -20,7 +20,7 @@ cd /home/postgres/fuzzing/fuzz_root
 ######### Remember to copy from the correct source. Double check.
 cp /home/postgres/Validaty_Components_Config/Squirrel_Oracle/src/afl-fuzz ./
 
-echo "\n\n\n\nStart fuzzing with Squirrel_Oracle configuration. \n\n\n\n\n"
+printf "\n\n\n\nStart fuzzing with Squirrel_Oracle configuration. \n\n\n\n\n"
 
 python3 run_parallel.py -o /home/postgres/fuzzing/fuzz_root/outputs $@
 

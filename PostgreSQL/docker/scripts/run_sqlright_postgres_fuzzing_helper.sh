@@ -19,7 +19,7 @@ cd /home/postgres/fuzzing/fuzz_root
 
 cp /home/postgres/src/afl-fuzz ./
 
-echo "\n\n\n\nStart fuzzing. \n\n\n\n\n"
+printf "\n\n\n\nStart fuzzing. \n\n\n\n\n"
 
 python3 run_parallel.py -o /home/postgres/fuzzing/fuzz_root/outputs $@
 

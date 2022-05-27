@@ -41,9 +41,11 @@ def check_pid(pid:int):
 
 # Parse the command line arguments:
 output_dir_str = ""
+oracle_str = "NOREC"
+feedback_str = ""
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:", ["odir=", "start-core=", "num-concurrent="])
+    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:", ["odir=", "start-core=", "num-concurrent=", "oracle=", "feedback="])
 except getopt.GetoptError:
     print("Arguments parsing error")
 for opt, arg in opts:
@@ -56,7 +58,17 @@ for opt, arg in opts:
     elif opt in ("-n", "--num-concurrent"):
         parallel_num = int(arg)
         print("Using num-concurrent: %d" % (parallel_num))
+    elif opt in ("-O", "--oracle"):
+        oracle_str = arg
+        print("Using oracle: %s " % (oracle_str))
+    elif opt in ("-F", "--feedback"):
+        feedback_str = arg
+        print("Using feedback: %s " % (feedback_str))
+    else:
+        print("Error. Input arguments not supported. \n")
+        exit(1)
 
+sys.stdout.flush()
 
 if os.path.isfile(os.path.join(os.getcwd(), "shm_env.txt")):
     os.remove(os.path.join(os.getcwd(), "shm_env.txt"))
@@ -85,14 +97,20 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     cur_port_num = port_starting_num + cur_inst_id - starting_core_id
 
     # Start running the SQLRight fuzzer. 
-    fuzzing_command = "AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 ./afl-fuzz -t 2000 -m 2000 " \
+    fuzzing_command = "./afl-fuzz -t 2000 -m 2000 " \
                         + " -P " + str(cur_port_num) \
                         + " -i ./inputs " \
                         + " -o " + cur_output_dir_str \
                         + " -c " + str(cur_inst_id) \
-                        + " aaa " \
-                        + " & "
+                        + " -O " + oracle_str
+
+    if feedback_str != "":
+        fuzzing_command += " -F " + feedback_str
+
+    fuzzing_command +=  " aaa " + " & "
+
     print("Running fuzzing command: " + fuzzing_command)
+
     p = subprocess.Popen(
                         [fuzzing_command],
                         cwd=os.getcwd(),
@@ -131,31 +149,34 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     all_postgres_p_list.append(p)
     os.chdir(ori_workdir)
 
-print("Finished launching the fuzzing. Now monitor the postgres process. ")
+    sys.stdout.flush()
+
+print("Finished launching the fuzzing. ")
+sys.stdout.flush()
 
 while True:
-    for idx in range(len(all_postgres_p_list)):
-        cur_postgre_p = all_postgres_p_list[idx]
-        cur_postgre_pid = cur_postgre_p.pid
-        if not check_pid(cur_postgre_pid):
-
-            # PostgreS process crashed. Restart Postgres. 
-            all_postgres_p_list.remove(cur_postgre_p)
-            cur_shm_str = shm_env_list[idx]
-            cur_postgre_data_dir_str = os.path.join(postgres_root_dir, "data_all/data_" + str(idx))
-
-            postgre_command = "__AFL_SHM_ID=" + cur_shm_str +  " ./bin/postgres -D " + cur_postgre_data_dir_str + " & "
-            print("PostgreS PID: " + str(cur_postgre_pid) + " crashed. ")
-            print("Restarting postgres command: " + fuzzing_command, end="\n\n")
-            p = subprocess.Popen(
-                                [postgre_command],
-                                cwd=postgres_root_dir,
-                                shell=False,
-                                stderr=subprocess.DEVNULL,
-                                stdout=subprocess.DEVNULL,
-                                stdin=subprocess.DEVNULL,
-                                )
-            all_postgres_p_list.insert(idx, p)
+#    for idx in range(len(all_postgres_p_list)):
+#        cur_postgre_p = all_postgres_p_list[idx]
+#        cur_postgre_pid = cur_postgre_p.pid
+#        if not check_pid(cur_postgre_pid):
+#
+#            # PostgreS process crashed. Restart Postgres. 
+#            all_postgres_p_list.remove(cur_postgre_p)
+#            cur_shm_str = shm_env_list[idx]
+#            cur_postgre_data_dir_str = os.path.join(postgres_root_dir, "data_all/data_" + str(idx))
+#
+#            postgre_command = "__AFL_SHM_ID=" + cur_shm_str +  " ./bin/postgres -D " + cur_postgre_data_dir_str + " & "
+#            print("PostgreS PID: " + str(cur_postgre_pid) + " crashed. ")
+#            print("Restarting postgres command: " + fuzzing_command, end="\n\n")
+#            p = subprocess.Popen(
+#                                [postgre_command],
+#                                cwd=postgres_root_dir,
+#                                shell=False,
+#                                stderr=subprocess.DEVNULL,
+#                                stdout=subprocess.DEVNULL,
+#                                stdin=subprocess.DEVNULL,
+#                                )
+#            all_postgres_p_list.insert(idx, p)
     
     # Check postgres every 10 seconds. 
-    time.sleep(10)
+    time.sleep(1000)
