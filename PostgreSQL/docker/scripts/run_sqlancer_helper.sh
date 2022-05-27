@@ -5,6 +5,17 @@
 
 chown -R postgres:postgres /home/postgres/sqlancer
 
+oracle_str='NoREC'
+
+for var in "$@":
+do
+    if [ "$var" == "NoREC" ]; then
+        oracle_str='NoREC'
+    elif [ "$var" == "TLP" ]; then
+        oracle_str='QUERY_PARTITIONING'
+    fi
+done
+
 SCRIPT_EXEC=$(cat << EOF
 # Setup data folder
 cd /home/postgres/postgres/bld
@@ -24,7 +35,7 @@ cd /home/postgres/sqlancer/sqlancer/target
 
 mkdir -p logs
 
-java -jar sqlancer-1.1.0.jar --log-execution-time false --num-threads 1 --num-tries 999999 --timeout-seconds 999999 postgres --oracle NoREC > ./logs/output.txt &
+java -jar sqlancer-1.1.0.jar --log-execution-time false --num-threads 1 --num-tries 999999 --timeout-seconds 999999 postgres --oracle $oracle_str > ./logs/output.txt &
 
 cd /home/postgres/sqlancer/sqlancer_cov
 

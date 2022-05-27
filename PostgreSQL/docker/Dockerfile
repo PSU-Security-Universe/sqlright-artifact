@@ -144,10 +144,6 @@ COPY fuzz_root/global_data_lib /home/postgres/fuzzing/fuzz_root/
 COPY fuzz_root/inputs /home/postgres/fuzzing/fuzz_root/inputs
 COPY fuzz_root/run_parallel.py /home/postgres/fuzzing/fuzz_root/
 
-# Setup the Docker run script
-USER root
-COPY scripts /home/postgres/scripts
-RUN chown -R postgres:postgres /home/postgres/scripts
 
 USER root
 RUN chown -R postgres:postgres /home/postgres/fuzzing/
@@ -183,6 +179,11 @@ RUN make
 RUN cp ./afl-fuzz /home/postgres/sqlancer/sqlancer_cov/afl-fuzz
 
 # Finished setting up SQLancer.
+
+# At last, setup the Docker run script
+USER root
+COPY scripts /home/postgres/scripts
+RUN chown -R postgres:postgres /home/postgres/scripts
 
 WORKDIR /home/postgres/fuzzing/
 
