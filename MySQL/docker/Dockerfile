@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 AS sqlright_mysql_tools
 MAINTAINER "PSU-Security-Universe"
 
 ENV TZ=America/New_York
@@ -40,6 +40,13 @@ RUN apt -y install gcc-9
 
 RUN apt -y install libnuma-dev
 
+
+# Install mysql-client related libraries, for the compilation of sqlright.
+RUN pip3 install psutil
+RUN pip3 install mysql-connector-python mysql-connector-python
+RUN apt -y install libmysqlclient-dev
+RUN pip3 install mysqlclient
+
 RUN useradd -ms /bin/bash mysql
 
 ENV CC=clang
@@ -59,6 +66,8 @@ WORKDIR /home/mysql/AFL/llvm_mode
 # ENV LLVM_CONFIG=llvm-config-6.0
 RUN make 
 
+FROM sqlright_mysql_tools AS sqlright_mysql_source_build
+
 # build MySQL instrumented by afl-clang-fast
 USER mysql
 WORKDIR /home/mysql/
@@ -75,22 +84,10 @@ ENV CXX=/home/mysql/AFL/afl-clang-fast++
 RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost -DWITH_DEBUG=1
 RUN make -j$(nproc)
 
-# set up MySQL
-USER mysql
-RUN mkdir data
-RUN bin/mysqld --initialize-insecure --user=mysql --datadir=data
-RUN bin/mysql_ssl_rsa_setup --datadir=data
-RUN mkdir data_all
-RUN mv data data_all/ori_data
-
-# Install mysql-client related libraries, for the compilation of sqlright.
-USER root
 ENV CC=gcc-9
 ENV CXX=g++-9
-RUN pip3 install psutil
-RUN pip3 install mysql-connector-python mysql-connector-python
-RUN apt -y install libmysqlclient-dev
-RUN pip3 install mysqlclient
+
+FROM sqlright_mysql_source_build AS sqlright_src
 
 # Install SQLRight MySQL
 COPY src /home/mysql/src
@@ -99,7 +96,6 @@ RUN wget https://github.com/mysql/mysql-server/archive/refs/tags/mysql-8.0.27.zi
 RUN unzip mysql-8.0.27.zip 
 RUN mv mysql-server-mysql-8.0.27 mysql-server
 RUN chown -R mysql:mysql /home/mysql/src
-
 
 # Add SQLRight modification to the MySQL source code.
 USER mysql
@@ -119,6 +115,10 @@ RUN make
 USER root
 RUN cp /home/mysql/src/parser/mysql-server/bld/library_output_directory/libserver_unittest_library.so /usr/lib/
 
+
+# Final setup.
+FROM sqlright_src
+
 # Finished setup the SQLRight source code.
 
 # Copy all the required helper script to the container.
@@ -126,13 +126,23 @@ USER root
 COPY scripts /home/mysql/scripts
 RUN chown -R mysql:mysql /home/mysql/scripts
 
-# Further setup the database info
-
-
 # set up fuzzing
 USER root
 COPY fuzz_root /home/mysql/fuzzing/fuzz_root
 RUN chown -R mysql:mysql /home/mysql/fuzzing/
+
+# set up MySQL database
+USER mysql
+RUN mkdir data
+RUN bin/mysqld --initialize-insecure --user=mysql --datadir=data
+RUN bin/mysql_ssl_rsa_setup --datadir=data
+RUN mkdir data_all
+RUN mv data data_all/ori_data
+
+# Further setup the database info
+USER mysql
+WORKDIR /home/mysql/scripts
+RUN python3 setup_database.py
 
 # Not sure why, but user Postgres doesn't have the permission to open the database.
 RUN chown -R mysql:mysql /home/mysql/mysql-server/bld/
