@@ -95,7 +95,9 @@ RUN pip3 install mysqlclient
 # Install SQLRight MySQL
 COPY src /home/mysql/src
 WORKDIR /home/mysql/src/parser
-RUN cp /home/mysql/mysql-8.0.27.zip ./ && unzip mysql-8.0.27.zip && mv mysql-server-mysql-8.0.27 mysql-server
+RUN wget https://github.com/mysql/mysql-server/archive/refs/tags/mysql-8.0.27.zip
+RUN unzip mysql-8.0.27.zip 
+RUN mv mysql-server-mysql-8.0.27 mysql-server
 RUN chown -R mysql:mysql /home/mysql/src
 
 
@@ -117,8 +119,15 @@ RUN make
 USER root
 RUN cp /home/mysql/src/parser/mysql-server/bld/library_output_directory/libserver_unittest_library.so /usr/lib/
 
-#USER mysql
-#ENV LC_ALL="en_US.UTF-8"
+# Finished setup the SQLRight source code.
+
+# Copy all the required helper script to the container.
+USER root
+COPY scripts /home/mysql/scripts
+RUN chown -R mysql:mysql /home/mysql/scripts
+
+# Further setup the database info
+
 
 # set up fuzzing
 USER root
@@ -126,8 +135,7 @@ COPY fuzz_root /home/mysql/fuzzing/fuzz_root
 RUN chown -R mysql:mysql /home/mysql/fuzzing/
 
 # Not sure why, but user Postgres doesn't have the permission to open the database.
-RUN chown -R /home/mysql/
-
+RUN chown -R mysql:mysql /home/mysql/mysql-server/bld/
 
 USER root
 WORKDIR /home/mysql/fuzzing/fuzz_root

@@ -61,7 +61,7 @@ for prev_shutdown_time_idx in range(len(all_prev_shutdown_time)):
                  passwd="",  # your password
                  port=cur_port_num,
                  unix_socket=socket_path,
-                 db="fuck")        # name of the data base
+                 db="test_init")        # name of the data base
         except MySQLdb._exceptions.OperationalError:
             print("MYSQL server down, not recovered yet. \n\n\n")
             continue
@@ -89,7 +89,7 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
                  passwd="",  # your password
                  port=cur_port_num,
                  unix_socket=socket_path,
-                 db="fuck")        # name of the data base
+                 db="test_init")        # name of the data base
         db.close()
     except MySQLdb._exceptions.OperationalError:
         is_server_down = True
@@ -130,19 +130,13 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     # Start the MYSQL instance
     ori_workdir = os.getcwd()
     mysql_command = [
-        "screen",
-        "-dmS",
-        "test" + str(cur_inst_id),
-        "bash", "-c", 
-        "'",    # left quote
         mysql_bin_dir,
         "--basedir=" + mysql_root_dir,
         "--datadir=" + cur_mysql_data_dir_str,
         "--port=" + str(cur_port_num),
         "--socket=" + socket_path,
         "--performance_schema=OFF",
-        "&>", cur_output_file,
-        "'"  # right quote
+        "&>", cur_output_file
     ]
     mysql_modi_env = dict()
     mysql_modi_env["__AFL_SHM_ID"] = cur_shm_str

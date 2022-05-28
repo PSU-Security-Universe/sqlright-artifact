@@ -31,15 +31,31 @@ def check_pid_exist(pid: int):
 
 # Parse the command line arguments:
 output_dir_str = ""
+oracle_str = "NOREC"
+feedback_str = ""
+parallel_num = 5
+starting_core_id = 0
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "o:", ["odir="])
+    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:", ["odir=", "start-core=", "num-concurrent=", "oracle="])
 except getopt.GetoptError:
     print("Arguments parsing error")
 for opt, arg in opts:
     if opt in ("-o", "--odir"):
         output_dir_str = arg
         print("Using output dir: %s" % (output_dir_str))
+    elif opt in ("-c", "--start-core"):
+        starting_core_id = int(arg)
+        print("Using starting_core_id: %d" % (starting_core_id))
+    elif opt in ("-n", "--num-concurrent"):
+        parallel_num = int(arg)
+        print("Using num-concurrent: %d" % (parallel_num))
+    elif opt in ("-O", "--oracle"):
+        oracle_str = arg
+        print("Using oracle: %s " % (oracle_str))
+    else:
+        print("Error. Input arguments not supported. \n")
+        exit(1)
 
 # signal.signal(signal.SIGTERM, exit_handler)
 # signal.signal(signal.SIGINT, exit_handler)
@@ -97,6 +113,7 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
         "-i", "./inputs",
         "-o", cur_output_dir_str,
         "-c", str(cur_inst_id),
+        "-O", oracle_str,
         "aaa" , "&"
         ]
     fuzzing_command = " ".join(fuzzing_command)
