@@ -30,7 +30,8 @@
 %code requires {
 #include <vector>
 using std::vector;
-#include "sql/sql_lex.h"
+//#include "sql/sql_lex.h"
+class IR;
 }
 
 %{
@@ -150,7 +151,7 @@ Note: YYTHD is passed as an argument to yyparse(), and subsequently to yylex().
 #include "sql/sql_get_diagnostics.h"               // Sql_cmd_get_diagnostics
 #include "sql/sql_handler.h"                       // Sql_cmd_handler_*
 #include "sql/sql_import.h"                        // Sql_cmd_import_table
-// #include "sql/sql_lex.h"
+#include "sql/sql_lex.h"
 #include "sql/sql_list.h"
 #include "sql/sql_parse.h"                        /* comp_*_creator */
 #include "sql/sql_plugin.h"                      // plugin_is_ready
@@ -20089,7 +20090,7 @@ opt_table_alias:
 
     | opt_as ident {
         auto tmp1 = $1;
-        auto tmp2 = new IR(kIdentifier, to_string($2), kDataAliasName, 0, kDefine);
+        auto tmp2 = new IR(kIdentifier, to_string($2), kDataAliasTableName, 0, kDefine);
         ir_vec.push_back(tmp2);
         res = new IR(kOptTableAlias, OP3("", "", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
