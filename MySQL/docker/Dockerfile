@@ -90,6 +90,7 @@ ENV CXX=g++-9
 FROM sqlright_mysql_source_build AS sqlright_src
 
 # Install SQLRight MySQL
+USER root
 COPY src /home/mysql/src
 WORKDIR /home/mysql/src/parser
 RUN wget https://github.com/mysql/mysql-server/archive/refs/tags/mysql-8.0.27.zip
