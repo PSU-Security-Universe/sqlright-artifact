@@ -113,7 +113,7 @@ RUN make -j$(nproc)
 
 ## Setup No_DB_Par_Ctx_Valid:
 USER root
-COPY Validaty_Components_Config/No_Ctx_Valid /home/postgres/Validaty_Components_Config/No_DB_Par_Ctx_Valid
+COPY Validaty_Components_Config/No_DB_Par_Ctx_Valid /home/postgres/Validaty_Components_Config/No_DB_Par_Ctx_Valid
 RUN chown -R postgres:postgres /home/postgres/Validaty_Components_Config
 
 USER postgres
@@ -122,7 +122,7 @@ RUN make -j$(nproc)
 
 ## Setup Squirrel_Oracle:
 USER root
-COPY Validaty_Components_Config/No_Ctx_Valid /home/postgres/Validaty_Components_Config/Squirrel_Oracle
+COPY Validaty_Components_Config/Squirrel_Oracle /home/postgres/Validaty_Components_Config/Squirrel_Oracle
 RUN chown -R postgres:postgres /home/postgres/Validaty_Components_Config
 
 USER postgres
