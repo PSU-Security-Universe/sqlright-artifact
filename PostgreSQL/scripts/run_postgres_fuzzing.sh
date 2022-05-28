@@ -159,7 +159,7 @@ elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
         -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
         sqlright_postgres /bin/bash /home/postgres/scripts/run_no_ctx_valid_postgres_fuzzing_helper.sh ${@:2}
 
-elif [ $# > 4 ] && [ "$1" == "sqlancer" ]; then
+elif [ "$1" == "sqlancer" ]; then
 
     cd "$(dirname "$0")"/.. 
     
@@ -241,6 +241,8 @@ elif [ $# > 4 ] && [ "$1" == "sqlancer" ]; then
             sqlright_postgres /bin/bash /home/postgres/scripts/run_sqlancer_helper.sh ${@:2} &
 
     done
+
+    echo "Finished launching the SQLancer processes."
     
 else
     echo "Usage: bash run_postgres_fuzzing.sh <config> --start-core <num> --num-concurrent <num> -O <oracle> [-F <feedback>] "
