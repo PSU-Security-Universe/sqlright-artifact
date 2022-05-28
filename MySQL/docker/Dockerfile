@@ -66,6 +66,7 @@ WORKDIR /home/mysql/AFL/llvm_mode
 # ENV LLVM_CONFIG=llvm-config-6.0
 RUN make 
 
+# ---------------------------------------------------------------------------------------------------------------
 FROM sqlright_mysql_tools AS sqlright_mysql_source_build
 
 # build MySQL instrumented by afl-clang-fast
@@ -84,9 +85,12 @@ ENV CXX=/home/mysql/AFL/afl-clang-fast++
 RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost -DWITH_DEBUG=1
 RUN make -j$(nproc)
 
+# Recover the original compiler. 
 ENV CC=gcc-9
 ENV CXX=g++-9
 
+
+# ---------------------------------------------------------------------------------------------------------------
 FROM sqlright_mysql_source_build AS sqlright_src
 
 # Install SQLRight MySQL
@@ -117,8 +121,71 @@ USER root
 RUN cp /home/mysql/src/parser/mysql-server/bld/library_output_directory/libserver_unittest_library.so /usr/lib/
 
 
-# Final setup.
-FROM sqlright_src
+# Setup other SQLRight configurations.
+
+# ---------------------------------------------------------------------------------------------------------------
+
+FROM sqlright_src AS sqlright_no_ctx_valid
+## Setup No_Ctx_Valid configuration.
+
+USER mysql
+WORKDIR /home/mysql
+RUN mkdir -p Validaty_Components_Config
+
+USER root
+COPY Validaty_Components_Config/No_Ctx_Valid /home/mysql/Validaty_Components_Config/No_Ctx_Valid
+RUN chown -R mysql:mysql /home/mysql/Validaty_Components_Config/
+
+USER mysql
+WORKDIR /home/mysql/Validaty_Components_Config/No_Ctx_Valid/src/parser
+RUN wget https://github.com/mysql/mysql-server/archive/refs/tags/mysql-8.0.27.zip
+RUN unzip mysql-8.0.27.zip 
+RUN mv mysql-server-mysql-8.0.27 mysql-server
+
+# Add SQLRight modification to the MySQL source code.
+USER mysql
+WORKDIR /home/mysql/Validaty_Components_Config/No_Ctx_Valid/src/parser/patches
+RUN bash ./replace-changed-code.sh
+
+# Compile the build-in MySQL source code.
+WORKDIR /home/mysql/Validaty_Components_Config/No_Ctx_Valid/src/parser/mysql-server
+RUN mkdir bld
+WORKDIR /home/mysql/Validaty_Components_Config/No_Ctx_Valid/src/parser/mysql-server/bld
+RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost
+RUN make -j$(nproc) 
+WORKDIR /home/mysql/Validaty_Components_Config/No_Ctx_Valid/src
+RUN make -j$(nproc)
+
+# ---------------------------------------------------------------------------------------------------------------
+
+FROM sqlright_no_ctx_valid AS sqlright_no_db_par_ctx_valid
+## Setup No_DB_Par_Ctx_Valid:
+USER root
+COPY Validaty_Components_Config/No_DB_Par_Ctx_Valid /home/mysql/Validaty_Components_Config/No_DB_Par_Ctx_Valid
+RUN chown -R mysql:mysql /home/mysql/Validaty_Components_Config/No_DB_Par_Ctx_Valid
+
+USER mysql
+WORKDIR /home/mysql/Validaty_Components_Config/No_DB_Par_Ctx_Valid/src
+RUN make -j$(nproc)
+
+FROM sqlright_no_db_par_ctx_valid AS squirrel_oracle
+
+# ---------------------------------------------------------------------------------------------------------------
+## Setup Squirrel_Oracle:
+USER root
+COPY Validaty_Components_Config/Squirrel_Oracle /home/mysql/Validaty_Components_Config/Squirrel_Oracle
+RUN chown -R mysql:mysql /home/mysql/Validaty_Components_Config/Squirrel_Oracle
+
+USER mysql
+WORKDIR /home/mysql/Validaty_Components_Config/Squirrel_Oracle/src
+RUN make -j$(nproc)
+
+## Finished setup of the SQLRight Validity Configurations.
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Final setup. Setup all the remaining fuzzing settings.
+FROM squirrel_oracle
 
 # Finished setup the SQLRight source code.
 
