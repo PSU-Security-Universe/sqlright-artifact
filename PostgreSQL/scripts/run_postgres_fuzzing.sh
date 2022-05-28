@@ -167,36 +167,81 @@ elif [ $# > 4 ] && [ "$1" == "sqlancer" ]; then
         mkdir -p Results
     fi
 
-    resoutdir="sqlancer_postgres"
+    cd Results
 
+    if [ ! -d "./sqlancer_postgres" ]; then
+        mkdir -p sqlancer_postgres
+    fi
+
+    cd sqlancer_postgres
+
+    # Get concurrent number from arguments.
+    check=0
+    num_concurrent=5
     for var in "$@"
     do
-        if [ "$var" == "NOREC" ]; then
-            resoutdir="$resoutdir""_NOREC"
-        elif [ "$var" == "TLP" ]; then
-            resoutdir="$resoutdir""_TLP"
+        if [ check == 1 ]; then
+            num_concurrent=$((var))
+            check=0
+        elif [ "$var" == "num-concurrent" ]; then
+            check=1
         fi
     done
 
-    covoutdir="$resoutdir""_cov"
-    resoutdir="$resoutdir""_raw"
-    
-    cd Results
+    echo "Running with num-concurrent = $num_concurrent"
 
-    if [ -d "./$resoutdir" ]; then
-        echo "Detected Results/$resoutdir folder existed. Please cleanup the output folder and then retry. "
-        exit 5
-    fi
-    if [ -d "./$covoutdir" ]; then
-        echo "Detected Results/$covoutdir folder existed. Please cleanup the output folder and then retry. "
-        exit 5
-    fi
-    
-    sudo docker run -i --rm \
-        -v $(pwd)/$resoutdir:/home/postgres/sqlancer/sqlancer/target/logs \
-        -v $(pwd)/$covoutdir:/home/postgres/sqlancer/sqlancer_cov/outputs_0 \
-        sqlright_postgres /bin/bash /home/postgres/scripts/run_sqlancer_helper.sh ${@:2}
+    for i in $(seq 1 $num_concurrent);
+    do
+        resoutdir="sqlancer_postgres"
 
+        for var in "$@"
+        do
+            if [ "$var" == "NOREC" ]; then
+                resoutdir="$resoutdir""_NOREC"
+            elif [ "$var" == "TLP" ]; then
+                resoutdir="$resoutdir""_TLP"
+            fi
+        done
+
+        covoutdir="$resoutdir""_cov_$i"
+        resoutdir="$resoutdir""_raw_$i"
+        
+
+        if [ -d "./$resoutdir" ]; then
+            echo "Detected Results/$resoutdir folder existed. Please cleanup the output folder and then retry. "
+            exit 5
+        fi
+        if [ -d "./$covoutdir" ]; then
+            echo "Detected Results/$covoutdir folder existed. Please cleanup the output folder and then retry. "
+            exit 5
+        fi
+
+    done
+
+    for i in $(seq 1 $num_concurrent);
+    do
+
+        resoutdir="sqlancer_postgres"
+
+        for var in "$@"
+        do
+            if [ "$var" == "NOREC" ]; then
+                resoutdir="$resoutdir""_NOREC"
+            elif [ "$var" == "TLP" ]; then
+                resoutdir="$resoutdir""_TLP"
+            fi
+        done
+
+        covoutdir="$resoutdir""_cov_$i"
+        resoutdir="$resoutdir""_raw_$i"
+        
+        sudo docker run -i --rm \
+            -v $(pwd)/$resoutdir:/home/postgres/sqlancer/sqlancer/target/logs \
+            -v $(pwd)/$covoutdir:/home/postgres/sqlancer/sqlancer_cov/outputs_0 \
+            sqlright_postgres /bin/bash /home/postgres/scripts/run_sqlancer_helper.sh ${@:2} &
+
+    done
+    
 else
     echo "Usage: bash run_postgres_fuzzing.sh <config> --start-core <num> --num-concurrent <num> -O <oracle> [-F <feedback>] "
 fi
