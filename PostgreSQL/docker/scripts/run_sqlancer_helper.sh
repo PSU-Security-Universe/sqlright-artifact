@@ -30,12 +30,14 @@ mv data data_all/ori_data
 cp -r data_all/ori_data data_all/data_100
 
 ./bin/postgres -D ./data_all/data_100 -p 5432 &
+sleep 5
 
 cd /home/postgres/sqlancer/sqlancer/target
 
 mkdir -p logs
 
 java -jar sqlancer-1.1.0.jar --log-execution-time false --num-threads 1 --num-tries 999999 --timeout-seconds 999999 postgres --oracle $oracle_str > ./logs/output.txt &
+sleep 5
 
 cd /home/postgres/sqlancer/sqlancer_cov
 
