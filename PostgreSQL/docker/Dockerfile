@@ -143,6 +143,8 @@ COPY fuzz_root/safe_generate_type /home/postgres/fuzzing/fuzz_root/
 COPY fuzz_root/global_data_lib /home/postgres/fuzzing/fuzz_root/
 COPY fuzz_root/inputs /home/postgres/fuzzing/fuzz_root/inputs
 COPY fuzz_root/run_parallel.py /home/postgres/fuzzing/fuzz_root/
+RUN mkdir /home/postgres/fuzzing/Bug_Analysis
+RUN mkdir /home/postgres/fuzzing/Bug_Analysis/bug_samples
 
 
 USER root

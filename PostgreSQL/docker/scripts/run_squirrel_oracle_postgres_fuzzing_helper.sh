@@ -3,7 +3,7 @@
 # This file is used for start the SQLRight MySQL fuzzing inside the Docker env.
 # entrypoint: bash
 
-chown -R postgres:postgres /home/postgres/fuzzing/fuzz_root
+chown -R postgres:postgres /home/postgres/fuzzing
 
 SCRIPT_EXEC=$(cat << EOF
 # Setup data folder
