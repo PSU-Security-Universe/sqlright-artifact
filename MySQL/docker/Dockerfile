@@ -182,10 +182,34 @@ RUN make -j$(nproc)
 
 ## Finished setup of the SQLRight Validity Configurations.
 
+FROM squirrel_oracle AS sqlancer
+# Setup SQLancer. 
+USER root
+RUN apt -y install openjdk-11-jdk
+RUN apt -y install maven
+
+WORKDIR /home/mysql/
+RUN mkdir -p sqlancer
+WORKDIR /home/mysql/sqlancer
+COPY sqlancer/sqlancer /home/mysql/sqlancer/sqlancer
+COPY sqlancer/sqlancer_cov_src /home/mysql/sqlancer/sqlancer_cov_src
+COPY sqlancer/sqlancer_cov /home/mysql/sqlancer/sqlancer_cov
+RUN chown -R mysql:mysql /home/mysql/sqlancer
+
+USER mysql
+WORKDIR /home/mysql/sqlancer/sqlancer
+RUN mvn package -DskipTests
+
+WORKDIR /home/myqsl/sqlancer/sqlancer_cov_src/MySQL
+RUN make
+
+RUN cp ./afl-fuzz /home/mysql/sqlancer/sqlancer_cov/afl-fuzz
+
+# Finished setting up SQLancer.
 
 # ---------------------------------------------------------------------------------------------------------------
 # Final setup. Setup all the remaining fuzzing settings.
-FROM squirrel_oracle
+FROM sqlancer
 
 # Finished setup the SQLRight source code.
 
@@ -216,29 +240,6 @@ RUN python3 setup_database.py
 # Not sure why, but user Postgres doesn't have the permission to open the database.
 RUN chown -R mysql:mysql /home/mysql/mysql-server/bld/data_all
 
-# Setup SQLancer. 
-USER root
-RUN apt -y install openjdk-11-jdk
-RUN apt -y install maven
-
-WORKDIR /home/mysql/
-RUN mkdir -p sqlancer
-WORKDIR /home/mysql/sqlancer
-COPY sqlancer/sqlancer /home/mysql/sqlancer/sqlancer
-COPY sqlancer/sqlancer_cov_src /home/mysql/sqlancer/sqlancer_cov_src
-COPY sqlancer/sqlancer_cov /home/mysql/sqlancer/sqlancer_cov
-RUN chown -R mysql:mysql /home/mysql/sqlancer
-
-USER mysql
-WORKDIR /home/mysql/sqlancer/sqlancer
-RUN mvn package -DskipTests
-
-WORKDIR /home/myqsl/sqlancer/sqlancer_cov_src/MySQL
-RUN make
-
-RUN cp ./afl-fuzz /home/mysql/sqlancer/sqlancer_cov/afl-fuzz
-
-# Finished setting up SQLancer.
 
 USER root
 WORKDIR /home/mysql/fuzzing/fuzz_root
