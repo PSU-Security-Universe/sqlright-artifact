@@ -136,7 +136,7 @@ RUN make -j$(nproc)
 # Setup the fuzzing context.
 RUN mkdir /home/postgres/fuzzing/
 RUN mkdir /home/postgres/fuzzing/fuzz_root
-RUN mkdir /home/postgres/fuzzing/outputs
+RUN mkdir /home/postgres/fuzzing/fuzz_root/outputs
 # COPY afl-fuzz /home/postgres/fuzzing/afl-fuzz
 COPY fuzz_root/postgres_initlib /home/postgres/fuzzing/fuzz_root/postgres_initlib/
 COPY fuzz_root/safe_generate_type /home/postgres/fuzzing/fuzz_root/
