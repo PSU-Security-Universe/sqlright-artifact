@@ -120,7 +120,7 @@ elif [ $# > 4 ] && [ "$1" == "no-db-par-ctx-valid" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/postgres/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
-        sqlright_postgres /bin/bash /home/postgres/scripts/run_no_ctx_valid_postgres_fuzzing_helper.sh ${@:2}
+        sqlright_postgres /bin/bash /home/postgres/scripts/run_no_db_par_ctx_valid_postgres_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
 
@@ -157,7 +157,7 @@ elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/postgres/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
-        sqlright_postgres /bin/bash /home/postgres/scripts/run_no_ctx_valid_postgres_fuzzing_helper.sh ${@:2}
+        sqlright_postgres /bin/bash /home/postgres/scripts/run_squirrel_oracle_postgres_fuzzing_helper.sh ${@:2}
 
 elif [ "$1" == "sqlancer" ]; then
 
