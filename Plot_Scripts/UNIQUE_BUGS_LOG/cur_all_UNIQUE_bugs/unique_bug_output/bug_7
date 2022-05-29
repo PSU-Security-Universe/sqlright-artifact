@@ -1,0 +1,26 @@
+-------------------------------
+
+Bug ID: 7, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( v1); 
+INSERT INTO v0 VALUES ( 255); 
+ALTER TABLE v0 ADD COLUMN v3 AS ( NULL) NOT NULL; 
+
+
+
+SELECT "--------- 1   SELECT COUNT ( * ) FROM v0 WHERE v3 NOT IN ( SELECT count ( * ) FROM v0);      SELECT TOTAL ( CAST ( (v3 NOT IN ( SELECT count ( * ) FROM v0)) AS BOOL) != 0) FROM v0;     
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:c27ea2ae8df4207e6b2479b46904c73d7cd1775f
+
+First correct (or crashing) commit ID:7e508f1ee2d671976fd1dbe4a8fdbc840ba39b97
+
+
+
+

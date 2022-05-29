@@ -1,0 +1,224 @@
+-------------------------------
+
+Bug ID: 6, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 );  
+CREATE INDEX i2 ON v0 ( c1, c1, c1, c1, c1, c1, c1, c1, c1, c1 > 18446744071562067968 AND c1 OR 18446744073709551488 );  
+INSERT INTO v0 VALUES ( 87 );  
+INSERT INTO v0 SELECT c1 + 4294967295 FROM v0 AS a3;  
+ATTACH DATABASE 'bA' AS sqlite_master;  
+INSERT INTO v0 SELECT c1 + 0.000000 FROM v0 AS a4;  
+DELETE FROM v0 WHERE c1 = 0 AND c1 = 18446744073709551488 AND c1 = 561;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551488;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a16 WHERE a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 );        SELECT TOTAL ( ( CAST ( a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a16;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+2
+RES 1: 
+4
+First buggy commit ID:aac39e1ded6af9ae93fd7315c2622972c240b241
+
+First correct (or crashing) commit ID:edb04ed946673e8c8f1d50df81edc94f0be485d6
+
+
+
+
+-------------------------------
+
+Bug ID: 6, count: 2 
+
+Query 0: 
+CREATE TABLE v0 ( c1 );  
+CREATE INDEX i2 ON v0 ( c1, c1, c1, c1, c1, c1, c1, c1, c1, c1 > 18446744073709551488 AND c1 = 18446744073709551488 );  
+INSERT INTO v0 VALUES ( 74.074000 );  
+INSERT INTO v0 SELECT c1 + 18446744071562067968 FROM v0 AS a3;  
+ATTACH DATABASE 'abcdefghi' AS sqlite_master;  
+INSERT INTO v0 SELECT COUNT ( * ) FROM v0 AS a4 WHERE ( c1 BETWEEN 18446744073709518848 AND 8 ) OR ( c1 = 18446744073709551488 ) OR ( c1 = 127 ) OR ( c1 = 255 ) OR ( c1 = 8 ) OR ( c1 BETWEEN 18446744073709551615 AND 127 ) OR ( c1 BETWEEN 127 AND 4294967295 ) OR ( c1 AND c1 <= c1 BETWEEN 9223372036854775807 AND 18446744073709551615 ) OR ( c1 = 127 ) OR ( ( c1 % 255 ) == 79 BETWEEN 18446744073709551488 AND 18446744073709551488 ) OR ( c1 = 16 ) OR ( c1 = 18446744073709551615 );  
+DELETE FROM v0 WHERE c1 = 127 AND c1 = 0 AND c1 = 18446744073709551615;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551615;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a16 WHERE a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 );        SELECT TOTAL ( ( CAST ( a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a16;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+3
+First buggy commit ID:aac39e1ded6af9ae93fd7315c2622972c240b241
+
+First correct (or crashing) commit ID:edb04ed946673e8c8f1d50df81edc94f0be485d6
+
+
+
+
+-------------------------------
+
+Bug ID: 6, count: 3 
+
+Query 0: 
+CREATE TABLE v0 ( c1 );  
+CREATE INDEX i2 ON v0 ( c1, c1, c1, c1, c1, c1, c1, c1, c1, c1 > 0 AND c1 = 8 );  
+INSERT INTO v0 VALUES ( 127 );  
+INSERT INTO v0 SELECT c1 + 100.000000 FROM v0 AS a3;  
+ATTACH DATABASE 'onex' AS sqlite_master;  
+INSERT INTO v0 SELECT c1 + 132 FROM v0 AS a4;  
+DELETE FROM v0 WHERE c1 = 9223372036854775807 AND c1 = 127 AND c1 = 0;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551615 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a16 WHERE a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 );        SELECT TOTAL ( ( CAST ( a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a16;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:aac39e1ded6af9ae93fd7315c2622972c240b241
+
+First correct (or crashing) commit ID:edb04ed946673e8c8f1d50df81edc94f0be485d6
+
+
+
+
+-------------------------------
+
+Bug ID: 6, count: 4 
+
+Query 0: 
+CREATE TABLE v0 ( c1 );  
+CREATE INDEX i2 ON v0 ( c1, c1, c1, c1, c1, c1, c1, c1, c1, c1 > 0 AND c1 = 18446744073709551488 );  
+INSERT INTO v0 VALUES ( 9223372036854775807 );  
+INSERT INTO v0 SELECT c1 + 1123 FROM v0 AS a3;  
+ATTACH DATABASE 'good' AS sqlite_master;  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v0 AS a4;  
+DELETE FROM v0 WHERE c1 = 18446744073709551615 AND c1 = 18446744073709551488 AND c1 = 9223372036854775807;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ) GROUP BY c1, c1, c1 HAVING ( c1 IS 4294967295 ) OR ( c1 IS 255 ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551488;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a16 WHERE a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 );        SELECT TOTAL ( ( CAST ( a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a16;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:aac39e1ded6af9ae93fd7315c2622972c240b241
+
+First correct (or crashing) commit ID:edb04ed946673e8c8f1d50df81edc94f0be485d6
+
+
+
+
+-------------------------------
+
+Bug ID: 6, count: 5 
+
+Query 0: 
+CREATE TABLE v0 ( c1 );  
+CREATE INDEX i2 ON v0 ( c1, c1, c1, c1, c1, c1, c1, c1, c1, c1 > 18446744073709551615 AND c1 = 4294967295 );  
+INSERT INTO v0 VALUES ( 2147483647 );  
+INSERT INTO v0 SELECT c1 + 127 FROM v0 AS a3;  
+ATTACH DATABASE 'x' AS sqlite_master;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a4;  
+DELETE FROM v0 WHERE c1 = 92 AND c1 = 18446744073709551488 AND c1 = 0;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551488;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a16 WHERE a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 );        SELECT TOTAL ( ( CAST ( a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a16;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:aac39e1ded6af9ae93fd7315c2622972c240b241
+
+First correct (or crashing) commit ID:edb04ed946673e8c8f1d50df81edc94f0be485d6
+
+
+
+
+-------------------------------
+
+Bug ID: 6, count: 6 
+
+Query 0: 
+CREATE TABLE v0 ( c1 );  
+CREATE INDEX i2 ON v0 ( c1, c1, c1, c1, c1, c1, c1, abs ( c1 ) < 8, c1, c1 > 0 AND c1 = 18446744073709551615 );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a3;  
+ATTACH DATABASE 'x' AS sqlite_master;  
+INSERT INTO v0 SELECT c1 + 4294967295 FROM v0 AS a4;  
+DELETE FROM v0 WHERE c1 = 18446744073709551488 AND c1 = 127 AND c1 = 18446744073709518848;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551615;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a16 WHERE a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 );        SELECT TOTAL ( ( CAST ( a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a16;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+3
+First buggy commit ID:aac39e1ded6af9ae93fd7315c2622972c240b241
+
+First correct (or crashing) commit ID:edb04ed946673e8c8f1d50df81edc94f0be485d6
+
+
+
+
+-------------------------------
+
+Bug ID: 6, count: 7 
+
+Query 0: 
+CREATE TABLE v0 ( c1 );  
+CREATE INDEX i2 ON v0 ( c1, c1, c1, c1, c1, c1, c1, c1, c1, c1 > 18446744071562067968 AND c1 = 0 );  
+INSERT INTO v0 VALUES ( 127 );  
+INSERT INTO v0 SELECT c1 + 127 FROM v0 AS a3;  
+ATTACH DATABASE 'v1' AS sqlite_master;  
+INSERT INTO v0 SELECT c1 + 2147483647 FROM v0 AS a4;  
+DELETE FROM v0 WHERE c1 = 8 AND c1 = 9223372036854775807 AND c1 = 18446744073709551615;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT c1, SUM ( c1 * c1 ) AS y; END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551488;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a16 WHERE a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 );        SELECT TOTAL ( ( CAST ( a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a16;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:aac39e1ded6af9ae93fd7315c2622972c240b241
+
+First correct (or crashing) commit ID:edb04ed946673e8c8f1d50df81edc94f0be485d6
+
+
+
+

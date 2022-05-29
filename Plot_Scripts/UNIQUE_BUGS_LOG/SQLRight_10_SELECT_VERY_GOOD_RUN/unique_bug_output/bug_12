@@ -1,0 +1,97 @@
+-------------------------------
+
+Bug ID: 12, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 );  
+CREATE INDEX i2 ON v0 ( c1, c1, c1, c1, c1, c1, c1, c1, c1, zeroblob ( 3203.200000 * + ( c1 = 255 ) OR ( c1 = 9223372036854775807 ) OR ( c1 = 0 ) OR ( c1 BETWEEN 18446744073709551615 AND 18446744073709551488 ) OR ( c1 = 0 ) OR ( c1 BETWEEN 16 AND 0 ) OR ( c1 = 132 ) OR ( 18446744073709551488 ) IN ( 255, 'v0', 'UTF-16le', 'v1', 'v0', 16, 0, 'bad', 0, 0, 18446744073709551488, 18446744073709551488, 18446744073709551488 ) ) );  
+INSERT INTO v0 VALUES ( 9223372036854775807 );  
+INSERT INTO v0 SELECT c1 + 255 FROM v0 AS a3;  
+ATTACH DATABASE 'v1' AS sqlite_master;  
+INSERT INTO v0 SELECT c1 + 127 FROM v0 AS a4;  
+DELETE FROM v0 WHERE c1 = 0 AND c1 = 18446744073709551615 AND c1 = 0;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744071562067968;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a16 WHERE a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 );        SELECT TOTAL ( ( CAST ( a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a16;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+3
+RES 1: 
+4
+First buggy commit ID:8b8446fc21c194dbd92c57fe2527b1ec08067077
+
+First correct (or crashing) commit ID:b1d607de25eae569ccdf6b56f5b648124bc4def3
+
+
+
+
+-------------------------------
+
+Bug ID: 12, count: 2 
+
+Query 0: 
+CREATE TABLE v0 ( c1 );  
+CREATE INDEX i2 ON v0 ( c1, c1, c1, c1, c1, c1, c1, c1, c1, c1 > 18446744073709551488 AND c1 = 18446744073709551488 );  
+INSERT INTO v0 VALUES ( 9223372036854775807 );  
+INSERT INTO v0 SELECT c1 + 31 FROM v0 AS a3;  
+ATTACH DATABASE 'def' AS sqlite_master;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a4;  
+DELETE FROM v0 WHERE c1 = 18446744071562067968 AND c1 = 34 AND c1 = 18446744073709551488;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744071562067968;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a16 WHERE a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 );        SELECT TOTAL ( ( CAST ( a16.c1 >= ( SELECT * FROM v0 AS a17 WHERE a16.c1 = a17.c1 OR a16.c1 < a17.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a16;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:8b8446fc21c194dbd92c57fe2527b1ec08067077
+
+First correct (or crashing) commit ID:b1d607de25eae569ccdf6b56f5b648124bc4def3
+
+
+
+
+-------------------------------
+
+Bug ID: 12, count: 3 
+
+Query 0: 
+CREATE TABLE v0 ( c1 );  
+INSERT INTO v0 VALUES ( 9223372036854775807 );  
+INSERT INTO v0 SELECT c1 + 473 FROM v0 AS a2, v0 AS a3, v0 AS a4, v0 AS a5, v0 AS a6, v0 AS a7;  
+CREATE INDEX i8 ON v0 ( c1, - 0 );  
+INSERT INTO v0 SELECT c1 + 900 FROM v0 AS a9;  
+INSERT INTO v0 SELECT c1 + 18446744071562067968 FROM v0 AS a10;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a11;  
+BEGIN;  
+END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551488;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a21 WHERE a21.c1 >= ( SELECT * FROM v0 AS a22 WHERE a21.c1 = a22.c1 OR a21.c1 < a22.c1 );        SELECT TOTAL ( ( CAST ( a21.c1 >= ( SELECT * FROM v0 AS a22 WHERE a21.c1 = a22.c1 OR a21.c1 < a22.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a21;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:8b8446fc21c194dbd92c57fe2527b1ec08067077
+
+First correct (or crashing) commit ID:b1d607de25eae569ccdf6b56f5b648124bc4def3
+
+
+
+

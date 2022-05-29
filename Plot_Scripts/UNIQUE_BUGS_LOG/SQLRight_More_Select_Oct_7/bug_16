@@ -1,0 +1,27 @@
+-------------------------------
+
+Bug ID: 16, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INT PRIMARY KEY ) WITHOUT ROWID;  
+INSERT INTO v0 VALUES ( NULL, 2147483647, 2147483647, 2147483647, 2147483647 );  
+INSERT INTO v0 ( c1 ) VALUES ( 2147483647 );  
+ALTER TABLE v0 ADD COLUMN c2 INT;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM ( SELECT * FROM v0 AS a19, v0 AS a20 WHERE a20.c2 IS NULL AND a20.c1 = a19.c1 ) AS y WHERE ( c1 LIKE 2147483647 ) AND c1;        SELECT TOTAL ( ( CAST ( ( c1 LIKE 2147483647 ) AND c1 AS BOOL ) ) != 0 ) FROM ( SELECT * FROM v0 AS a19, v0 AS a20 WHERE a20.c2 IS NULL AND a20.c1 = a19.c1 ) AS y;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+0
+RES 1: 
+1
+First buggy commit ID:54ac445d53512b3215ed41f8594815a46f9005cc
+
+First correct (or crashing) commit ID:45e7d7dd1c50a99a1a9b989ece56e4b7533b386e
+
+
+
+

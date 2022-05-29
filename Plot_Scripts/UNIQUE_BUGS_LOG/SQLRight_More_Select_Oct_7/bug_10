@@ -1,0 +1,62 @@
+-------------------------------
+
+Bug ID: 10, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1, c2, c3, c4, PRIMARY KEY ( c3, c1 ) ) WITHOUT ROWID;  
+CREATE INDEX i5 ON v0 ( c4, c3 );  
+INSERT INTO v0 VALUES ( 'x', 'x', 'v1', 'This is a test' );  
+INSERT INTO v0 VALUES ( 'v0', 'v1', 'v0', 'x' );  
+INSERT INTO v0 VALUES ( 'x', 've', 'f', 'world' );  
+INSERT INTO v0 VALUES ( 'id.2', 'v0', 'aux', 'patriot' );  
+UPDATE v0 SET c3 = 18446744073709551488 WHERE c3 = 'v0';  
+ANALYZE;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a117, v0 AS a118, v0 AS a119 WHERE a118.c3 IN ( SELECT a119.c2 + 18446744073709551488 FROM ( SELECT DISTINCT a117.c3 / ( a119.c3 * a119.c2 ) AS y ) AS y );        SELECT TOTAL ( ( CAST ( a118.c3 IN ( SELECT a119.c2 + 18446744073709551488 FROM ( SELECT DISTINCT a117.c3 / ( a119.c3 * a119.c2 ) AS y ) AS y ) AS BOOL ) ) != 0 ) FROM v0 AS a117, v0 AS a118, v0 AS a119;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+16
+First buggy commit ID:f761d937c233ab7e1ac1a187a80c45846a8d1c52
+
+First correct (or crashing) commit ID:68cf0ace3d160c8b3c12ee692c337f0d47e079d7
+
+
+
+
+-------------------------------
+
+Bug ID: 10, count: 2 
+
+Query 0: 
+CREATE TABLE v0 ( c1, c2, c3, c4, PRIMARY KEY ( c3, c1 ) ) WITHOUT ROWID;  
+CREATE INDEX i5 ON v0 ( c2, c2 );  
+INSERT INTO v0 VALUES ( 'x', 'v1', 'v0', 'x' );  
+INSERT INTO v0 VALUES ( 'v1', '12345 4', 'x', 'v0' );  
+INSERT INTO v0 VALUES ( 'SHIP', 'v1', 'x', 'v0' );  
+INSERT INTO v0 VALUES ( 'x', 'x', 'C1.3', 'v1' );  
+UPDATE v0 SET c2 = 0 WHERE c4 = 'x';  
+ANALYZE;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a29, v0 AS a30, v0 AS a31 WHERE a31.c2 IN ( SELECT a30.c3 + 0 FROM v0 AS a32, v0 AS a33, v0 AS a34, v0 AS a35 );        SELECT TOTAL ( ( CAST ( a31.c2 IN ( SELECT a30.c3 + 0 FROM v0 AS a32, v0 AS a33, v0 AS a34, v0 AS a35 ) AS BOOL ) ) != 0 ) FROM v0 AS a29, v0 AS a30, v0 AS a31;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+4
+RES 1: 
+16
+First buggy commit ID:f761d937c233ab7e1ac1a187a80c45846a8d1c52
+
+First correct (or crashing) commit ID:68cf0ace3d160c8b3c12ee692c337f0d47e079d7
+
+
+
+

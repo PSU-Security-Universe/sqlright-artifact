@@ -1,0 +1,31 @@
+-------------------------------
+
+Bug ID: 9, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 PRIMARY KEY, c2 );  
+INSERT INTO v0 VALUES ( 'v0', 18446744071562067968 );  
+INSERT INTO v0 VALUES ( 'x', - 18446744071562067968 );  
+CREATE TABLE v3 ( c4 INTEGER PRIMARY KEY, c5, c6, c7 );  
+INSERT INTO v0 VALUES ( 18446744071562067968, 9223372036854775807, 'g', 18446744071562067968 );  
+INSERT INTO v0 VALUES ( 2147483647, 18446744071562067968, 'x', c2 AND c1 || 'abcdefghij' COLLATE y = 'MAIL' COLLATE y );  
+INSERT INTO v3 VALUES ( 4294967295, 10, 'v1', 18446744071562067968 );  
+CREATE TABLE v8 ( c9 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a30, v0 AS a31 ON likely ( a31.c1 = a31.c2 ) AND a31.c2 = 'v0' WHERE a31.c2;        SELECT TOTAL ( ( CAST ( a31.c2 AS BOOL ) ) != 0 ) FROM v0 AS a30, v0 AS a31 ON likely ( a31.c1 = a31.c2 ) AND a31.c2 = 'v0';      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+0
+RES 1: 
+2
+First buggy commit ID:efad2e23668ea5cbd744b6abde43058de45fb53a
+
+First correct (or crashing) commit ID:7de7602eb7deac00e4bb5c2f44f82f5389cbcb83
+
+
+
+

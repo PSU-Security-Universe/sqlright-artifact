@@ -1,0 +1,118 @@
+-------------------------------
+
+Bug ID: 9, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY, c2 UNIQUE, c3 );  
+CREATE INDEX i4 ON v0 ( c1 );  
+ANALYZE;  
+INSERT INTO v0 SELECT c1 + 4294967295, SUM ( CASE WHEN c2 != 'v0' AND c1 != 'v1' THEN 4294967295 ELSE 4294967295 END ) AS y, c3 + 18446744073709551488 FROM v0 AS a5;  
+INSERT INTO v0 SELECT c1 + 4294967295, c1 + 4294967295, c2 + 10 FROM v0 AS a6;  
+INSERT INTO v0 SELECT c3 + 4294967295, c3 + 18446744073709551488, c1 + 18446744073709551488 FROM v0 AS a7;  
+INSERT INTO v0 SELECT printf ( 'x', 't2d', 'wvu' );  
+INSERT INTO v0 SELECT c1 + 18446744073709551488, c2 + 4294967295, c2 + 18446744073709518848 FROM v0 AS a8;  
+ANALYZE v0;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a70, v0 AS a71 WHERE a70.c1 = 'x' >= ( a71.c1 = 'v0' AND a71.c3 IS 'tres' = 0 ) OR ( a70.c1 = 16 );        SELECT TOTAL ( ( CAST ( a70.c1 = 'x' >= ( a71.c1 = 'v0' AND a71.c3 IS 'tres' = 0 ) OR ( a70.c1 = 16 ) AS BOOL ) ) != 0 ) FROM v0 AS a70, v0 AS a71;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:f761d937c233ab7e1ac1a187a80c45846a8d1c52
+
+First correct (or crashing) commit ID:68cf0ace3d160c8b3c12ee692c337f0d47e079d7
+
+
+
+
+-------------------------------
+
+Bug ID: 9, count: 2 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY, c2, c3, c4, c5, c6, c7 );  
+WITH v8 ( c9 ) AS ( VALUES ( 4294967295 ) UNION SELECT c9 + 4294967295 FROM v8 AS a10 WHERE c9 < 4294967295 ) INSERT INTO v8 VALUES ( 4294967295, 18446744073709551615, 4294967295, 4294967295, 4294967295, 'view', 'x' );  
+INSERT INTO v0 VALUES ( 18446744073709551615, NULL, 4294967295, 4294967295, 4294967295, 'v0', 'v0' );  
+INSERT INTO v0 VALUES ( 4294967295, 18446744073709551615, NULL, 4294967295, 4294967295, 'v0', 'v1' );  
+INSERT INTO v0 VALUES ( 4294967295, 4294967295, 8, NULL, 4294967295, 'x', 'v1' );  
+INSERT INTO v0 VALUES ( 8, 18446744073709551615, 18446744073709551615, 4294967295, NULL, 'v1', 'IV' );  
+INSERT INTO v0 VALUES ( 4294967295, 18446744073709551615, 100, 0, 4294967295, NULL, 'x' );  
+INSERT INTO main . v0 VALUES ( 4294967295, 4294967295, 4294967295, 18446744073709551615, 8, 'bad', NULL );  
+INSERT INTO v0 VALUES ( 127, NULL, NULL, 4294967295, 100, 'v0', 'x' );  
+INSERT INTO v0 VALUES ( 8, 8, 4294967295, NULL, NULL, 'x', 'x' );  
+INSERT INTO v0 VALUES ( 18446744073709518848, 127, 4294967295, 4294967295, 100, NULL, NULL );  
+INSERT INTO v0 VALUES ( 0, NULL, NULL, NULL, NULL, NULL, NULL );  
+CREATE INDEX i11 ON v0 ( c6 );  
+CREATE INDEX i12 ON v0 ( c2 );  
+CREATE INDEX i13 ON v0 ( c5 );  
+CREATE INDEX i14 ON v0 ( c1 );  
+CREATE INDEX i15 ON v0 ( c7 );  
+CREATE INDEX i16 ON v0 ( c2 );  
+CREATE TABLE v17 ( c18 INTEGER PRIMARY KEY, c19, c20, c21, c22, c23, c24 );  
+INSERT INTO v17 SELECT * FROM v0 AS a25;  
+CREATE INDEX i26 ON v17 ( c19, c19 );  
+CREATE INDEX i27 ON v17 ( c19 DESC, c23 );  
+CREATE INDEX i28 ON v17 ( c22, c20 );  
+CREATE INDEX i29 ON v17 ( c21, c22, c19 );  
+CREATE INDEX i30 ON v17 ( c22, c21, c23, c23 );  
+CREATE INDEX i31 ON v0 ( c4, c7 );  
+CREATE TABLE v32 ( c33, c34 );  
+INSERT INTO v17 VALUES ( 18446744073709551488, 18446744071562067968 );  
+INSERT INTO v32 VALUES ( 4294967295, 4294967295 );  
+INSERT INTO v0 SELECT * FROM v0 AS a35;  
+ANALYZE main . v0;  
+CREATE INDEX i36 ON v0 ( c5 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a139, main . v0 AS a140 WHERE a140.c1 IN ( SELECT COUNT ( * ) FROM v17 AS a141 WHERE a141.c22 = 0 AND a139.c1 BETWEEN 100 AND 4294967295 );        SELECT TOTAL ( ( CAST ( a140.c1 IN ( SELECT COUNT ( * ) FROM v17 AS a141 WHERE a141.c22 = 0 AND a139.c1 BETWEEN 100 AND 4294967295 ) AS BOOL ) ) != 0 ) FROM v0 AS a139, main . v0 AS a140;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:f761d937c233ab7e1ac1a187a80c45846a8d1c52
+
+First correct (or crashing) commit ID:68cf0ace3d160c8b3c12ee692c337f0d47e079d7
+
+
+
+
+-------------------------------
+
+Bug ID: 9, count: 3 
+
+Query 0: 
+CREATE TABLE v0 ( c1, c2, c3, c4, PRIMARY KEY ( c4, c1 ) ) WITHOUT ROWID;  
+CREATE INDEX i5 ON v0 ( c1, c4 );  
+INSERT INTO v0 VALUES ( 'v0', 'v0', 'v0', 'A' );  
+INSERT INTO v0 VALUES ( 'v1', 'v0', 'x', '|' ) ON CONFLICT DO NOTHING;  
+INSERT INTO v0 VALUES ( 'v0', 'v1', 'C2.1', 'v1' );  
+INSERT INTO v0 VALUES ( 'AMERICA', 'v0', 'x', 'x' );  
+UPDATE v0 SET c3 = 255;  
+ANALYZE;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a157, v0 AS a158, v0 AS a159 WHERE a158.c4 IN ( 255, '1995-09-01', 'x', 'ii', 'v0', 'v1', 'av4 c', 'x', 'jkl', 'BBB', 'xxx', 'x', 'd', 'v1', 'x', 'and_the_Word_was_with_God', 'v0', 'v0', 'x', NULL, NULL, NULL, NULL, NULL, NULL );        SELECT TOTAL ( ( CAST ( a158.c4 IN ( 255, '1995-09-01', 'x', 'ii', 'v0', 'v1', 'av4 c', 'x', 'jkl', 'BBB', 'xxx', 'x', 'd', 'v1', 'x', 'and_the_Word_was_with_God', 'v0', 'v0', 'x', NULL, NULL, NULL, NULL, NULL, NULL ) AS BOOL ) ) != 0 ) FROM v0 AS a157, v0 AS a158, v0 AS a159;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+8
+RES 1: 
+32
+First buggy commit ID:f761d937c233ab7e1ac1a187a80c45846a8d1c52
+
+First correct (or crashing) commit ID:68cf0ace3d160c8b3c12ee692c337f0d47e079d7
+
+
+
+

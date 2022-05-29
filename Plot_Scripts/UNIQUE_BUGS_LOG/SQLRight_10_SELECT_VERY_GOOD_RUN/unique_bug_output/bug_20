@@ -1,0 +1,198 @@
+-------------------------------
+
+Bug ID: 20, count: 1 
+
+Query 0: 
+CREATE VIRTUAL TABLE v0 USING rtree ( c1, c2, c3, c4, c5, c6, c7 );  
+INSERT INTO v0 VALUES ( 18446744073709551488, 8, 9223372036854775807, 8, 18446744073709551488, 'v1', 'abc' );  
+INSERT INTO v0 VALUES ( 4294967295, NULL, 0, 18446744073709551488, 0, '.DEF', 'hello' );  
+UPDATE main . v0 SET c2 = 9223372036854775807 FROM v0 AS a8, v0 AS a9, v0 AS a10;  
+INSERT INTO v0 VALUES ( 9223372036854775807, 18446744073709518848, NULL, 255, 0, 'v0', 'ghi' );  
+INSERT INTO v0 VALUES ( 9223372036854775807, 18446744073709551615, 127, NULL, 0, 'u', 'x' );  
+UPDATE v0 SET c4 = 9223372036854775807 WHERE 4294967295 OR c5 > 9223372036854775807;  
+INSERT INTO v0 VALUES ( 18446744071562067968, 4294967295, 18446744073709551488, 627, 127, '456', NULL );  
+INSERT INTO v0 ( c1 ) VALUES ( 'v1' ), ( 'goodbye' ), ( 'v1' ), ( 'xyz' ), ( 'av2 a' ), ( 'xyzabcdef' ), ( 'v1' ), ( 'v1' ), ( 'v0' ), ( 'x' ), ( 'v0' ), ( 'v0' ), ( 'x' ), ( 'x' ), ( 'two' ), ( 'and_the_Word' ), ( 'main' ), ( 't2' ), ( '35c' ), ( 'v1' ), ( 'v0' ), ( 'amy' ), ( 'onmlkji' ), ( 'v0' ), ( '333' ), ( 'world' ), ( 'helena' ), ( 'fedcbaz' ), ( 'v1' ), ( 'v0' ), ( '0' ), ( 'v1' ), ( 'v0' ), ( 'fghijklmn' ), ( 'v0' ), ( 'v1' ), ( 'v1' ), ( 'v0' ), ( 'v1' ), ( 'x' ), ( 'v0' ), ( 'x' ), ( 'LG PKG' ), ( 'x' ), ( 'x' ), ( 'v0' ), ( 'v1' ), ( 'v1' ), ( 'v0' ), ( 'x' );  
+CREATE VIEW v11 AS SELECT NTILE ( 18446744073709551488 ) OVER ( ORDER BY NOT EXISTS ( SELECT COUNT ( * ) FROM v0 AS a13 WHERE c2 BETWEEN 'onmlkji' AND 'v0' OR c5 BETWEEN 'x' AND 'x' OR c6 = 'v0' ) NULLS LAST ) - 18446744073709551488 AS y FROM v0 AS a12;  
+INSERT INTO v11 VALUES ( 0, 18446744073709551615, 18446744073709518848, NULL, NULL, 'v1', 'v0' );  
+INSERT INTO v11 VALUES ( 18446744071562067968, 18446744073709551615, 127, 127, 0, NULL, NULL );  
+CREATE TABLE v14 ( c15 INTEGER NOT NULL PRIMARY KEY, c16 TEXT, c17 );  
+INSERT INTO v14 VALUES ( 18446744073709551615, NULL, NULL, NULL, NULL, NULL, NULL );  
+CREATE INDEX i18 ON v11 ( c5 );  
+CREATE INDEX i19 ON v14 ( c16 );  
+CREATE INDEX i20 ON v0 ( ( x'56', 8 ) != ( c1, 0 ) );  
+CREATE INDEX i21 ON v11 ( c1 );  
+CREATE INDEX i22 ON v14 ( c17 );  
+CREATE INDEX i23 ON v14 ( c15 );  
+CREATE TABLE v24 ( c25 INTEGER PRIMARY KEY DESC, c26, c27, c28, c29, c30, c31 );  
+INSERT INTO v0 SELECT * FROM v24 AS a32;  
+CREATE INDEX i33 ON v24 ( c27, c27 );  
+CREATE INDEX i34 ON v11 ( c5, c1 DESC );  
+CREATE INDEX i35 ON v11 ( c5, c7 );  
+CREATE INDEX i36 ON v14 ( c17, c15, c16 );  
+CREATE INDEX i37 ON v0 ( c6, c3, c3, c4 );  
+INSERT INTO v14 ( c17, c17 ) SELECT zipfile ( 18446744073709551488, - NULL, 18446744073709551488, ( c15 = 8 ) OR ( ( c1 = 18446744073709551615 ) OR c7 = 'Cindy' AND 18446744073709551488 ) OR x'9b' = 'v1' ), c15 + 45.045000 FROM v11 AS a38;  
+ANALYZE;  
+CREATE VIEW v39 AS SELECT c26 FROM v24 AS a40 WHERE c25 != 'v0' ORDER BY c31;  
+CREATE INDEX i41 ON v24 ( c28, c25 );  
+CREATE TABLE v42 ( c43, c44 );  
+INSERT INTO v42 VALUES ( 127, 4294967295 );  
+CREATE VIRTUAL TABLE v45 USING fts4 ( c46 );  
+CREATE TABLE v47 ( c48 INTEGER PRIMARY KEY UNIQUE ON CONFLICT ROLLBACK, c49, c50, c51, c52, c53, c54 );  
+INSERT INTO v11 SELECT * FROM v11 AS a55;  
+CREATE INDEX i56 ON v47 ( c51 );  
+CREATE INDEX i57 ON v11 ( c7 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a68 WHERE a68.c2 == 9223372036854775807;        SELECT TOTAL ( ( CAST ( a68.c2 == 9223372036854775807 AS BOOL ) ) != 0 ) FROM v0 AS a68;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:e7cf8fdd17c50ab8e46fa8a39b336ed1b0cb9d58
+
+First correct (or crashing) commit ID:576d5a8634851f3762c0ee527511ca53016eab7e
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 2 
+
+Query 0: 
+CREATE VIRTUAL TABLE v0 USING rtree ( c1, c2, c3, c4, c5, c6, c7 );  
+INSERT INTO v0 VALUES ( 18446744073709551488, 0, 18446744073709551488, 16, 18446744071562067968, 'v0', 'journal' );  
+INSERT INTO v0 VALUES ( 18446744073709551488, NULL, 127, 8, 18446744071562067968, 'ijklmnopq', 'v1' );  
+UPDATE main . v0 SET c2 = 9223372036854775807 FROM v0 AS a8, v0 AS a9, v0 AS a10;  
+INSERT INTO v0 SELECT c6 + 18446744073709518848 FROM v0 AS a11 GROUP BY nth_value ( c3, 18446744073709551615 ) OVER ( ORDER BY c3 );  
+REPLACE INTO v0 ( c2 ) VALUES ( 'v1' ), ( 'v0' ), ( 'v1' ), ( 'wvutsrq' ), ( 'v1' ), ( 'v1' ), ( 'v1' ), ( 'v0' ), ( 'v0' ), ( 'opqrstuvw' ), ( 'v0' ), ( 'x' ), ( '**%s**' ), ( 'v1' ), ( 'x' ), ( 'v0' ), ( 'SAUDI ARABIA' ), ( 'x' ), ( 'v0' ), ( 'LG PKG' ), ( 'v1' ), ( 'x' ), ( 'v1' ), ( 'command' ), ( 'patriot' ), ( 'x' ), ( 'v0' ), ( 'x' ), ( 'v1' ), ( 'patriot' ), ( 't2' ), ( 'v1' ), ( 'f*' ), ( 'v1' ), ( 'SM PKG' ), ( 'v0' ), ( 'x' ), ( 'x' ), ( 'abcdefghij' ), ( 'rqp' ), ( 'v0' ), ( 'jkl' ), ( '1995-01-01' ), ( 'x' ), ( 'v1' ), ( 'v0' ), ( 'x' ), ( 'x' ), ( 'Ba' ), ( 'phone' );  
+INSERT INTO v0 VALUES ( 18446744073709551488, 803, 18446744073709518848, NULL, 0, 'v0', 'v1' );  
+UPDATE v0 SET c4 = 18446744073709551615, c1 = 18446744073709551615, c4 = 0, c3 = 18446744073709551488, c4 = 0, c5 = 858;  
+INSERT INTO v0 VALUES ( ( ( c2 AND 18446744073709551615 ) OR ( c4 = 18446744071562067968 ) OR c7 = 'v1' IS NOT NULL ) OR ( c2 BETWEEN 18446744073709551488 AND 18446744073709518848 ) OR ( c7 BETWEEN c1 >= 'v0' AND c5 < DATEADD ( c5, 18446744073709551615, CAST ( 'v0' AS DATETIME ) ) AND 9223372036854775807 ) OR ( c1 BETWEEN 8 AND 18446744071562067968 ) OR ( c3 = 18446744073709551488 ) OR ( c6 BETWEEN 18446744073709551488 AND 127 ) OR ( c1 = 0 ) OR ( c7 = 18446744073709551615 ) + c1, 924, 0, 18446744073709551488, 127, 'o', NULL );  
+INSERT INTO v0 ( c6 ) VALUES ( 'v1' ), ( 'v1' ), ( 'v0' ), ( 'v0' ), ( 'v0' ), ( '1993-10-01' ), ( 'v1' ), ( 'Cindy' ), ( 'v1' ), ( 'v1' ), ( 'VIII' ), ( 'd' ), ( 'x' ), ( 'v0' ), ( 'v0' ), ( 'juliet' ), ( '+/' ), ( 'v1' ), ( 'v1' ), ( 'v0' ), ( 'v1' ), ( 'x' ), ( 'tuvwxyzab' ), ( 'C1.1' ), ( 'dos' ), ( 'v0' ), ( 'x' ), ( 'funny' ), ( 'v1' ), ( 'eight' ), ( 'v1' ), ( 'abcdefghi' ), ( 'abc' ), ( 't1x1' ), ( 'x' ), ( 'v1' ), ( 'v0' ), ( 'v0' ), ( 'x' ), ( 'v1' ), ( 'x' ), ( 'x' ), ( 'v1' ), ( 'v0' ), ( 'v1' ), ( 'DDD' ), ( 'v1' ), ( 'x' ), ( 'x' ), ( 'Ab' );  
+CREATE VIEW v12 AS SELECT NTILE ( 9223372036854775807 ) OVER ( ORDER BY 'XYZ' AND c4 > c6 AND EXISTS ( SELECT * FROM v0 AS a14 WHERE c7 = c2 AND c4 != c3 ) AND NOT EXISTS ( SELECT * FROM v0 AS a15 WHERE c4 = c4 AND c2 != c4 AND c7 > c5 ) AND c4 = c3 AND c5 = 'six' ) - 0 AS y FROM v0 AS a13;  
+INSERT INTO v0 VALUES ( 18446744071562067968, 18446744073709518848, 100.000000, NULL, NULL, 'v0', 'and_without_him_was_not_any_thing_made_that_was_made' );  
+INSERT INTO v12 VALUES ( 18446744073709551488, 9223372036854775807, 0, 0, 60.060000, NULL, NULL );  
+CREATE TABLE v16 ( c17 INTEGER NOT NULL PRIMARY KEY, c18 VARCHAR(80), c19 );  
+INSERT INTO v12 VALUES ( 22, NULL, NULL, NULL, NULL, NULL, NULL );  
+CREATE INDEX i20 ON v0 ( c4 );  
+CREATE INDEX i21 ON v12 ( c2 );  
+CREATE INDEX i22 ON v12 ( ( x'56', 16 ) != ( c2, 127 ) );  
+CREATE INDEX i23 ON v0 ( c2 );  
+CREATE INDEX i24 ON v0 ( c2 );  
+CREATE INDEX i25 ON v0 ( c1 );  
+INSERT INTO v12 SELECT * FROM v12 AS a26;  
+CREATE INDEX i27 ON v12 ( c4, c5 );  
+CREATE INDEX i28 ON v12 ( c1, ( c2 = 18446744073709551488 ) OR ( c3 BETWEEN 0 AND 127 ) OR ( c4 = 18446744073709551615 ) OR c2 = 'v1' DESC );  
+CREATE INDEX i29 ON v0 ( c3, c7 );  
+CREATE INDEX i30 ON v16 ( c18, c19, c17 );  
+CREATE INDEX i31 ON v16 ( c19, c19, c19, c18 );  
+ANALYZE;  
+CREATE VIEW v32 AS SELECT c4 FROM v0 AS a33 WHERE c2 != '2-HIGH' ORDER BY c7;  
+CREATE INDEX i34 ON v16 ( c17, c19 );  
+CREATE TABLE v35 ( c36, c37 );  
+INSERT INTO v0 VALUES ( 0, 18446744073709551615 );  
+CREATE VIRTUAL TABLE v38 USING fts4 ( c39 );  
+CREATE TABLE v40 ( c41 INTEGER PRIMARY KEY, c42, c43, c44, c45, c46, c47 );  
+INSERT INTO v35 SELECT * FROM v16 AS a48;  
+CREATE INDEX i49 ON v32 ( c17 );  
+CREATE INDEX i50 ON v35 ( c36 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a72 WHERE a72.c7 = 0 AND a72.c2 = 9223372036854775807 ORDER BY substr ( a72.c4, 0, NULL AND a72.c2 IS ( a72.c3 BETWEEN 127 AND 0 ) OR ( a72.c3 = 2147483647 ) OR ( a72.c3 BETWEEN 16 AND 913 ) OR ( a72.c1 = 2147483647 ) OR ( a72.c6 = 18446744073709551615 ) OR a72.c5 IN ( ) ) DESC;        SELECT TOTAL ( ( CAST ( a72.c7 = 0 AND a72.c2 = 9223372036854775807 AS BOOL ) ) != 0 ) FROM v0 AS a72 ORDER BY substr ( a72.c4, 0, NULL AND a72.c2 IS ( a72.c3 BETWEEN 127 AND 0 ) OR ( a72.c3 = 2147483647 ) OR ( a72.c3 BETWEEN 16 AND 913 ) OR ( a72.c1 = 2147483647 ) OR ( a72.c6 = 18446744073709551615 ) OR a72.c5 IN ( ) ) DESC;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:e7cf8fdd17c50ab8e46fa8a39b336ed1b0cb9d58
+
+First correct (or crashing) commit ID:576d5a8634851f3762c0ee527511ca53016eab7e
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 3 
+
+Query 0: 
+CREATE VIRTUAL TABLE v0 USING rtree ( c1, c2, c3 );  
+CREATE INDEX i4 ON v0 ( c2 );  
+CREATE INDEX i5 ON v0 ( c2 );  
+UPDATE OR REPLACE v0 SET c2 = 18446744071562067968 FROM v0 AS a6, v0 AS a7, v0 AS a8, v0 AS a9;  
+INSERT INTO v0 VALUES ( 18446744073709551488, 'id.2', 'v1' );  
+INSERT INTO v0 VALUES ( 18446744073709551488, 'x', 'v0' );  
+UPDATE v0 SET c1 = 18446744073709551488, c3 = 9223372036854775807 FROM v0 AS a10;  
+INSERT INTO v0 VALUES ( 9223372036854775807, 'v1', 'v1' );  
+INSERT INTO v0 VALUES ( 16, 'v1', 'v0' );  
+INSERT INTO v0 VALUES ( 18446744073709551488, 'hgfedcb', 'v0' );  
+CREATE VIEW v11 AS SELECT c1, c3, c1 > c3 AND EXISTS ( SELECT * FROM v0 AS a14 WHERE c1 = c3 AND c2 != c3 ) AND NOT EXISTS ( SELECT * FROM v0 AS a15 WHERE c1 = c1 AND c3 != c2 AND c3 > c2 ) AND c2 = c1 AND c1 = 'v0' AS y, c2 FROM v0 AS a12 NATURAL JOIN v0 AS a13 WHERE c3 == 9223372036854775807;  
+INSERT INTO v11 VALUES ( 18446744073709551615, 'v1', 'av1 a' );  
+INSERT INTO v0 VALUES ( 0, 'iii', 'CANADA' );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v11 AS a16, v0 AS a17, v0 AS a18, v0 AS a19, v0 AS a20, v11 AS a21, v11 AS a22, v0 AS a23 WHERE a23.c3 < 'v1';        SELECT TOTAL ( ( CAST ( a23.c3 < 'v1' AS BOOL ) ) != 0 ) FROM v11 AS a16, v0 AS a17, v0 AS a18, v0 AS a19, v0 AS a20, v11 AS a21, v11 AS a22, v0 AS a23;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+243
+RES 1: 
+0
+First buggy commit ID:e7cf8fdd17c50ab8e46fa8a39b336ed1b0cb9d58
+
+First correct (or crashing) commit ID:576d5a8634851f3762c0ee527511ca53016eab7e
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 4 
+
+Query 0: 
+CREATE VIRTUAL TABLE v0 USING rtree ( c1, c2, c3 );  
+CREATE INDEX i4 ON v0 ( c1 );  
+CREATE INDEX i5 ON v0 ( substr ( c3, - 18446744073709551488 ) COLLATE y );  
+INSERT INTO v0 VALUES ( 2147483647, 'v0', '23' );  
+INSERT INTO v0 VALUES ( 18446744073709551488, 'v1', 'Value for C2.3' );  
+UPDATE OR REPLACE v0 SET c3 = 9223372036854775807 FROM v0 AS a6, v0 AS a7, v0 AS a8, v0 AS a9, v0 AS a10, v0 AS a11;  
+DELETE FROM v0 WHERE c2 = 9223372036854775807 AND c1 = 4294967295 AND c3 = 16;  
+CREATE VIEW v12 AS SELECT *, 'v0' FROM v0 AS a13 WHERE ( x'56', 9223372036854775807 ) > ( c2, 4294967295 ) AND c1 = c3 AND c3 = c3 = 12.500000 AND ( c1 = 18446744073709551488 OR c3 = 9223372036854775807 ) ORDER BY c1 DESC NULLS FIRST;  
+INSERT INTO v12 VALUES ( 9223372036854775807 > 255, NULL, 18446744073709551615, 'v1', 'x' );  
+INSERT INTO v12 VALUES ( 18446744073709551488, 'v0', 'nd_' );  
+INSERT INTO v0 VALUES ( 94.094000, 'x', 'v0' );  
+CREATE VIEW v14 AS SELECT count ( * ) FROM v0 AS a15 WHERE c2 AND c3 = 'score' AND c1 > c3 AND EXISTS ( SELECT * FROM v12 AS a16 LEFT JOIN v0 AS a17 USING ( c3 ) LEFT JOIN v12 AS a18 USING ( c1 ) ORDER BY c3, c2, c2, c2 DESC NULLS LAST, c2 ) AND NOT EXISTS ( SELECT * FROM v12 AS a19 WHERE c2 = c3 AND c2 != c3 AND c1 > c2 ) AND c1 = c2 AND c1 = 'Ar' MATCH 'v0' AND c1 <= 18446744073709551488;  
+INSERT INTO v0 VALUES ( 0, 'x', 'av3 b' );  
+CREATE INDEX i20 ON v0 ( abs ( c3 ), abs ( c3 ), CASE WHEN c1 THEN 127 WHEN 18446744073709551488 THEN 18446744073709551615 WHEN 'v0' THEN 18446744073709518848 WHEN 18446744073709551615 THEN c1 ELSE c3 END );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a25 WHERE a25.c3 IN ( 9223372036854775807, 660, 18446744073709551488 );        SELECT TOTAL ( ( CAST ( a25.c3 IN ( 9223372036854775807, 660, 18446744073709551488 ) AS BOOL ) ) != 0 ) FROM v0 AS a25;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+2
+RES 1: 
+0
+First buggy commit ID:e7cf8fdd17c50ab8e46fa8a39b336ed1b0cb9d58
+
+First correct (or crashing) commit ID:576d5a8634851f3762c0ee527511ca53016eab7e
+
+
+
+

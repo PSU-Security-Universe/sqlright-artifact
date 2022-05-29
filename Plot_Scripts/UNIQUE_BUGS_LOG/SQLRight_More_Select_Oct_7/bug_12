@@ -1,0 +1,57 @@
+-------------------------------
+
+Bug ID: 12, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY, c2, c3, c4, c5, c6, c7 );  
+INSERT INTO v0 VALUES ( 8, 8, 8, 8, 8, '**%s**', 'hgfedcb' );  
+INSERT INTO v0 VALUES ( 8, NULL, 8, 8, 8, 'v0', '.ABC' );  
+INSERT INTO v0 VALUES ( 0, 8, NULL, 8, 248, 'evil', 'v1' );  
+INSERT INTO v0 VALUES ( 0, 4294967295, 8, NULL, 8, 'p1', 'hgfedcb' );  
+INSERT INTO v0 VALUES ( 8, 18446744073709551488, 8, 8, NULL, 'x', 'UTF-16be' );  
+INSERT INTO v0 VALUES ( 4294967295, 10, 8, 8, 16, NULL, 'v0' );  
+INSERT INTO v0 VALUES ( 248, 4294967295, 8, 0, 8, 'v1', NULL );  
+INSERT INTO v0 VALUES ( 0, NULL, NULL, 10, 18446744073709551615, 'arctic', 'x' );  
+UPDATE v0 SET c7 = x ( ) + 18446744073709551615 WHERE c5 = x ( );  
+INSERT INTO v0 VALUES ( 4294967295, 127, 8, 8, 8, NULL, NULL );  
+INSERT INTO v0 VALUES ( 8, NULL, NULL, NULL, NULL, NULL, NULL );  
+CREATE INDEX i8 ON v0 ( c6 );  
+CREATE INDEX i9 ON v0 ( c1 );  
+CREATE INDEX i10 ON v0 ( c6 );  
+CREATE INDEX i11 ON v0 ( c5 );  
+CREATE INDEX i12 ON v0 ( c6 );  
+CREATE INDEX i13 ON v0 ( c4 );  
+CREATE TABLE v14 ( c15 INTEGER PRIMARY KEY, c16, c17, c18, c19, c20, c21 );  
+INSERT INTO v14 SELECT * FROM v14 AS a22;  
+CREATE VIEW v23 AS SELECT c21, c20, SUM ( c21 ) AS y, SUM ( c16 ) AS y, SUM ( c15 * ( 0 == c21 ) ) AS y, SUM ( c17 * ( 18446744073709518848 - c17 ) * ( 127 + c19 ) ) OVER ( ORDER BY c15 ) AS y, AVG ( c19 ) AS y, AVG ( c17 ) AS y, AVG ( c18 ) AS y FROM v14 AS a24;  
+CREATE INDEX i25 ON v14 ( c17, c17 );  
+CREATE INDEX i26 ON v14 ( c17 ASC, c17 );  
+CREATE INDEX i27 ON v0 ( c7, c2, c1 );  
+CREATE INDEX i28 ON v0 ( c4, c4, c5, c1 );  
+CREATE INDEX i29 ON v14 ( c16, c19 );  
+CREATE TABLE v30 ( c31, c32 );  
+INSERT INTO v14 VALUES ( 8, 100 );  
+INSERT INTO v23 VALUES ( 18446744073709551488, 8 );  
+CREATE TABLE v33 ( c34, c35 AS( typeof ( c34 ) ) );  
+CREATE TABLE v36 ( c37 INTEGER PRIMARY KEY, c38, c39, c40, c41, c42, c43 );  
+INSERT INTO v33 SELECT * FROM v36 AS a44;  
+CREATE INDEX i45 ON v33 ( c34 );  
+CREATE INDEX i46 ON v0 ( c5 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a95, v0 AS a96 WHERE a95.c5 = a95.c3 AND a95.c5 = a96.c2 AND a95.c3 = a96.c4 AND NOT EXISTS ( SELECT * FROM v33 AS a97 WHERE a96.c6 = a95.c5 AND a96.c6 != a96.c1 AND a97.c34 > a95.c1 ) ORDER BY a96.c7 + 8;        SELECT TOTAL ( ( CAST ( a95.c5 = a95.c3 AND a95.c5 = a96.c2 AND a95.c3 = a96.c4 AND NOT EXISTS ( SELECT * FROM v33 AS a97 WHERE a96.c6 = a95.c5 AND a96.c6 != a96.c1 AND a97.c34 > a95.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a95, v0 AS a96 ORDER BY a96.c7 + 8;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+6
+RES 1: 
+4
+First buggy commit ID:7e508f1ee2d671976fd1dbe4a8fdbc840ba39b97
+
+First correct (or crashing) commit ID:16fd04cdbe01c2cd9f90383592555bae7f4d9927
+
+
+
+

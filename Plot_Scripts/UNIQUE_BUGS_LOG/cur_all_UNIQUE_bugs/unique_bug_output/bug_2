@@ -1,0 +1,25 @@
+-------------------------------
+
+Bug ID: 2, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( v1 INTEGER PRIMARY KEY ); 
+INSERT INTO v0 VALUES ( 9223372036854775807 ); 
+
+
+
+SELECT "--------- 1   SELECT COUNT ( * ) FROM v0 WHERE v1 >= ( 9223372036854775807 + 1 );      SELECT TOTAL (CAST( (v1 >= ( 9223372036854775807 + 1 )) AS BOOL) != 0 ) FROM v0;     
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:8b8446fc21c194dbd92c57fe2527b1ec08067077
+
+First correct (or crashing) commit ID:b1d607de25eae569ccdf6b56f5b648124bc4def3
+
+
+
+

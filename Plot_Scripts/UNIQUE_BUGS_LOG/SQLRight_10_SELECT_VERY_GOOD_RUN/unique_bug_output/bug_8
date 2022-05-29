@@ -1,0 +1,488 @@
+-------------------------------
+
+Bug ID: 8, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 255 );  
+INSERT INTO v0 SELECT c1 + 93 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 16 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 127 FROM v0 AS a4;  
+INSERT INTO v0 ( c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1, c1 ) SELECT c1 + 8 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 127 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+8
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 2 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE );  
+INSERT INTO v0 VALUES ( 2147483647 );  
+INSERT INTO v0 SELECT c1 + 4294967295 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 0 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 0 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 18446744073709518848 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709518848 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 3 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 SELECT c1 + 127 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 18446744071562067968 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 18446744071562067968 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 8 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 4 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 18446744071562067968 );  
+INSERT INTO v0 SELECT c1 + 2147483647 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a3;  
+INSERT INTO v0 SELECT COUNT ( * ) FROM v0 AS a4, v0 AS a5, v0 AS a6, v0 AS a7 WHERE c1 >= x ( x ( ), 'x' ) >= 'bA' AND c1 < dateadd ( c1, 255, CAST ( 'x' AS DATETIME ) ) AND EXISTS ( SELECT * FROM v0 AS a8 WHERE c1 = c1 AND c1 < c1 );  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a9;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551615 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a12 WHERE a12.c1 >= ( SELECT * FROM v0 AS a13 WHERE a12.c1 = a13.c1 OR a12.c1 < a13.c1 );        SELECT TOTAL ( ( CAST ( a12.c1 >= ( SELECT * FROM v0 AS a13 WHERE a12.c1 = a13.c1 OR a12.c1 < a13.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a12;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 5 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 18446744073709551488 );  
+INSERT INTO v0 SELECT c1 + 2147483647 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551615 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 6 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 9223372036854775807 );  
+INSERT INTO v0 SELECT c1 + 127 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1, SUM ( ) OVER ( ORDER BY c1 ) FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 0 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 127 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 7 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 18446744073709551615 );  
+CREATE INDEX i2 ON v0 ( c1, c1, c1, substr ( c1, 18446744073709551488, 2147483647 ), c1 );  
+INSERT INTO v0 SELECT c1 + 14.014000 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 255 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744071562067968 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 8 
+
+Query 0: 
+CREATE TABLE v0 ( c1 TEXT PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 18446744073709518848 );  
+INSERT INTO v0 SELECT c1 + 127 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 0 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 0 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 9 
+
+Query 0: 
+CREATE TABLE v0 ( c1 VARCHAR(24) UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 18446744073709551615 );  
+INSERT INTO v0 SELECT c1 + 4294967295 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 255 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 8 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551488 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 10 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 18446744071562067968 );  
+REPLACE INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 2147483647 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 18446744071562067968 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551615 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 11 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 16 );  
+CREATE TABLE v2 ( c3 INTEGER PRIMARY KEY );  
+INSERT INTO v2 VALUES ( 18446744073709551615 );  
+INSERT INTO v0 VALUES ( 255 );  
+INSERT INTO v0 SELECT c1 + 16 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 18446744073709551615 FROM v0 AS a5;  
+CREATE VIEW v6 AS SELECT c3 + ( SELECT c3 FROM v2 AS a10 JOIN v0 AS a11 USING ( c1 ) ), c3 + ( SELECT max ( c3 ) FROM v0 AS a9 ), c3 + ( SELECT max ( c3 ) FROM v2 AS a8 ) FROM v2 AS a7;  
+INSERT INTO v6 SELECT + 93 FROM v6 AS a12;  
+CREATE TABLE v13 ( c14 INTEGER PRIMARY KEY );  
+INSERT INTO v13 VALUES ( 0 );  
+INSERT INTO v2 VALUES ( 0 );  
+INSERT INTO v13 VALUES ( 16 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a15 WHERE ( SELECT * FROM v13 AS a16 WHERE a15.c1 = a16.c14 OR a15.c1 != a16.c14 AND a16.c14 > a15.c1 );        SELECT TOTAL ( ( CAST ( ( SELECT * FROM v13 AS a16 WHERE a15.c1 = a16.c14 OR a15.c1 != a16.c14 AND a16.c14 > a15.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a15;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+2
+RES 1: 
+1
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 12 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 18446744073709551615 );  
+INSERT INTO v0 SELECT c1 + 255 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 6500 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 33033 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 0 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ) ORDER BY c1 DESC, c1 ASC; END;  
+DELETE FROM v0 WHERE c1 > 67.067000 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 13 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 4294967295 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v0 AS a5;  
+BEGIN;  
+SELECT RAISE ( IGNORE );  
+END;  
+DELETE FROM v0 WHERE c1 > 36 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 14 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 255 );  
+INSERT INTO v0 SELECT c1 + 255 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 82 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 18446744071562067968 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 4294967295 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551488 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+8
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+
+-------------------------------
+
+Bug ID: 8, count: 15 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 18446744073709551615 );  
+INSERT INTO v0 SELECT c1 + 18446744071562067968 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 4294967295 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 + 2147483647 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT count ( * ); END;  
+DELETE FROM v0 WHERE c1 > 9223372036854775807 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+8
+First buggy commit ID:faa68dbb7d294d32070983acd008667d0542e466
+
+First correct (or crashing) commit ID:051cd806f1e28a493dccee456700ed7919587897
+
+
+
+

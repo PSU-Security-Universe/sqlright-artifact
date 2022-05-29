@@ -1,0 +1,32 @@
+-------------------------------
+
+Bug ID: 21, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK );  
+INSERT INTO v0 VALUES ( 18446744073709551488 );  
+INSERT INTO v0 SELECT c1 + 18446744073709518848 FROM v0 AS a2;  
+INSERT INTO v0 SELECT c1 + 9223372036854775807 FROM v0 AS a3;  
+INSERT INTO v0 SELECT c1 || 4294967295 FROM v0 AS a4;  
+INSERT INTO v0 SELECT c1 + 127 FROM v0 AS a5;  
+CREATE TRIGGER r1 BEFORE UPDATE ON v0 BEGIN SELECT RAISE ( IGNORE ); END;  
+DELETE FROM v0 WHERE c1 > 18446744073709551615 COLLATE y;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a8 WHERE a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 );        SELECT TOTAL ( ( CAST ( a8.c1 >= ( SELECT * FROM v0 AS a9 WHERE a8.c1 = a9.c1 OR a8.c1 < a9.c1 ) AS BOOL ) ) != 0 ) FROM v0 AS a8;      
+ 
+
+Error: The early commit failed to compile, or crashing. Failed to find the bug introduced commit. 
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+8
+First buggy commit ID:6d4486ae9f6679e01d8648c5351dff8465879fb8
+
+First correct (or crashing) commit ID:d981d447810bf90b03a471757d3cb480c5034593
+
+
+
+

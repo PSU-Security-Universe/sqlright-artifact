@@ -1,0 +1,26 @@
+-------------------------------
+
+Bug ID: 6, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( v1 INT PRIMARY KEY DESC, v2 INT ) WITHOUT ROWID; 
+INSERT INTO v0 VALUES ( 10, 10 ); 
+CREATE INDEX v3 ON v0 ( v2 ); 
+
+
+
+SELECT "--------- 1   SELECT COUNT ( * ) FROM v0 WHERE v2 = 10 AND v1 < 11;      SELECT TOTAL(cast ( (v2 = 10 AND v1 < 11) AS BOOL ) != 0) FROM v0;     
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+0
+RES 1: 
+1
+First buggy commit ID:39129ce8d9cb0101bad783fa06365332e0ddd83d
+
+First correct (or crashing) commit ID:971fd0713572a7b3c2420e516327bbe8c97711da
+
+
+
+

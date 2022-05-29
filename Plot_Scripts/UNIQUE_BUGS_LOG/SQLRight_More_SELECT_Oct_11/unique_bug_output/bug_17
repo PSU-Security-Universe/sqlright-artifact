@@ -1,0 +1,89 @@
+-------------------------------
+
+Bug ID: 17, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1, c2 TEXT, c3, c4 INTEGER CHECK( 8 ), c5, c6, c7 );  
+INSERT INTO v0 VALUES ( 8, 8, 8, 8, 18446744073709551488, 'g', 'v1' );  
+INSERT INTO v0 VALUES ( 8, NULL, 8, 127, 8, 'four', 'v0' );  
+CREATE VIEW v8 AS SELECT c6, c1, c3 FROM v0 AS a9 GROUP BY c1 HAVING - 8 = c1 = c2 AND c2 = 'v1';  
+INSERT INTO v0 VALUES ( 8, 18446744073709551488, 8, NULL, 8, 'x', 'v0' );  
+INSERT INTO v8 VALUES ( 10, 18446744073709551488, 18446744073709551488, 8, NULL, 'C1.3', 'x' );  
+INSERT INTO v8 VALUES ( 18446744073709551488, 18446744073709518848, 18446744073709551488, 8, 8, NULL, 'v0' );  
+INSERT INTO v8 VALUES ( 8, 4294967295, 8, 16, 8, 'v0', NULL );  
+INSERT INTO v0 VALUES ( 8, NULL, NULL, 127, 18446744073709551488, 'Felix F rstenberg', 'x' );  
+INSERT INTO v0 VALUES ( 127, 18446744073709551615, 8, NULL, NULL, 'Max Mustermann', 'C1.1' );  
+INSERT INTO v0 VALUES ( 18446744073709551615, 18446744073709551615, 0, 16, 2147483647, NULL, NULL );  
+CREATE INDEX i10 ON v0 ( c6 );  
+CREATE INDEX i11 ON v8 ( c1 );  
+WITH v0 ( c12 ) AS ( VALUES ( 127 ) UNION SELECT c12 + 18446744073709551615 FROM v0 AS a14 WHERE c12 < 8 GROUP BY 255, 'v0', 8, 0, 8, 'x' HAVING SUM ( c3 * c12 ) > ( SELECT SUM ( c12 * c12 ) * 9223372036854775807 FROM v0 AS a15, v8 AS a16, v8 AS a17 WHERE c7 = c12 AND c7 = c2 AND c2 = 'AA' ) ) INSERT INTO v8 SELECT c12 + 127 FROM v0 AS a13;  
+CREATE INDEX i18 ON v0 ( c5 );  
+CREATE INDEX i19 ON v0 ( c7 );  
+CREATE INDEX i20 ON v8 ( c7 );  
+CREATE INDEX i21 ON v8 ( c1 );  
+CREATE TABLE v22 ( c23 INTEGER PRIMARY KEY, c24, c25, c26, c27, c28, c29 );  
+INSERT INTO v0 SELECT * FROM v0 AS a30;  
+CREATE INDEX i31 ON v8 ( c2, c7 );  
+CREATE INDEX i32 ON v8 ( c7, c2 );  
+CREATE INDEX i33 ON v8 ( c2, c4, c2 );  
+CREATE INDEX i34 ON v0 ( c6, c6, c7, c2 );  
+CREATE INDEX i35 ON v22 ( c26, c27 );  
+CREATE TABLE v36 ( c37, c38 );  
+INSERT INTO v0 VALUES ( 8, 18446744073709551488 );  
+INSERT INTO v0 VALUES ( 8, 0 );  
+INSERT INTO v22 SELECT * FROM v8 AS a39;  
+CREATE INDEX i40 ON v36 ( c37 );  
+CREATE INDEX i41 ON v36 ( c38 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a70, v0 AS a71 WHERE NOT EXISTS ( SELECT * FROM v36 AS a72 WHERE a70.c7 = a70.c6 AND a72.c38 != a72.c38 AND a71.c7 > a71.c7 ) AND a71.c6 = a71.c1 AND a71.c1 = 'x';        SELECT TOTAL ( ( CAST ( NOT EXISTS ( SELECT * FROM v36 AS a72 WHERE a70.c7 = a70.c6 AND a72.c38 != a72.c38 AND a71.c7 > a71.c7 ) AND a71.c6 = a71.c1 AND a71.c1 = 'x' AS BOOL ) ) != 0 ) FROM v0 AS a70, v0 AS a71;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+24
+RES 1: 
+0
+First buggy commit ID:efad2e23668ea5cbd744b6abde43058de45fb53a
+
+First correct (or crashing) commit ID:7de7602eb7deac00e4bb5c2f44f82f5389cbcb83
+
+
+
+
+-------------------------------
+
+Bug ID: 17, count: 2 
+
+Query 0: 
+CREATE TABLE v0 ( c1, c2, c3, c4 );  
+CREATE TABLE v5 ( c6 TEXT, c7 TEXT );  
+CREATE UNIQUE INDEX i8 ON v5 ( c6 );  
+CREATE TABLE v9 ( c10 DOUBLE, c11 DOUBLE, c12 INT );  
+INSERT INTO v0 ( c4, c1, c2 ) VALUES ( 0, '.abcd', 'v1' );  
+INSERT INTO v5 ( c6, c7 ) VALUES ( 'v1', 'Beethoven' );  
+INSERT INTO v0 ( c2, c1 ) VALUES ( 'Thomas Tallis', 'x' );  
+INSERT INTO v5 ( c7, c6, c6 ) VALUES ( 255, 'x', '%02x' );  
+INSERT INTO v0 ( c4, c3 ) VALUES ( 'v0', 'v0' );  
+INSERT INTO v5 ( c6, c6, c6 ) VALUES ( 0, 'x', 'hgfedcb' );  
+INSERT INTO v9 ( c11, c12 ) VALUES ( 't', 'v1' );  
+INSERT INTO v5 ( c7, c7 ) VALUES ( 'x', 'v1' );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v5 AS a100 JOIN v0 AS a101 ON likely ( a100.c6 IS a100.c7 ) AND a100.c7 = 'x' WHERE a100.c7;        SELECT TOTAL ( ( CAST ( a100.c7 AS BOOL ) ) != 0 ) FROM v5 AS a100 JOIN v0 AS a101 ON likely ( a100.c6 IS a100.c7 ) AND a100.c7 = 'x';      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+0
+RES 1: 
+3
+First buggy commit ID:efad2e23668ea5cbd744b6abde43058de45fb53a
+
+First correct (or crashing) commit ID:7de7602eb7deac00e4bb5c2f44f82f5389cbcb83
+
+
+
+

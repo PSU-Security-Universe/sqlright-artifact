@@ -1,0 +1,53 @@
+-------------------------------
+
+Bug ID: 13, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 VARCHAR(16), c2 PRIMARY KEY ASC, c3 );  
+INSERT INTO v0 VALUES ( 255, 127, NULL );  
+INSERT INTO v0 VALUES ( c1 = c2 AND c3 >= 'x' AND c2 < dateadd ( c1, 18446744073709551488, CAST ( 'x' AS DATETIME ) ) AND c3 = '29' AND c3 = c2, 18446744073709551488, NULL );  
+CREATE VIEW v4 AS SELECT c1, c3, c3 FROM v0 AS a5 UNION ALL SELECT count ( c3 ), CAST ( c1 AS TEXT ) AS y, c3 FROM v0 AS a6 ORDER BY ( c3 ) DESC;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM main . v0 AS a103, v0 AS a104, v4 AS a105, v4 AS a106 WHERE a106.c1 = ( CASE WHEN a103.c1 = a105.c1 + 'x' THEN 0 ELSE 10 END );        SELECT TOTAL ( ( CAST ( a106.c1 = ( CASE WHEN a103.c1 = a105.c1 + 'x' THEN 0 ELSE 10 END ) AS BOOL ) ) != 0 ) FROM main . v0 AS a103, v0 AS a104, v4 AS a105, v4 AS a106;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+0
+RES 1: 
+1
+First buggy commit ID:a344ad47f3d059f9571b024b4e65258cfb44d321
+
+First correct (or crashing) commit ID:12a6a1eaf90acee120967cde8d63041550b5c6f9
+
+
+
+
+-------------------------------
+
+Bug ID: 13, count: 2 
+
+Query 0: 
+CREATE TABLE v0 ( c1 VARCHAR(16), c2 PRIMARY KEY ASC, c3 );  
+INSERT INTO v0 VALUES ( 18446744073709551615, 18446744073709551615, NULL );  
+CREATE VIEW v4 AS SELECT c3, c2, c1 FROM v0 AS a5 UNION ALL SELECT count ( c1 ), CAST ( c2 AS TEXT ) AS y, c2 FROM v0 AS a6 ORDER BY ( c3 ) DESC;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM main . v4 AS a103, v0 AS a104, v4 AS a105, v4 AS a106 WHERE a106.c1 = ( CASE WHEN a105.c1 = a104.c2 + 'v1' THEN 18446744073709551615 ELSE 3000 END );        SELECT TOTAL ( ( CAST ( a106.c1 = ( CASE WHEN a105.c1 = a104.c2 + 'v1' THEN 18446744073709551615 ELSE 3000 END ) AS BOOL ) ) != 0 ) FROM main . v4 AS a103, v0 AS a104, v4 AS a105, v4 AS a106;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+4
+RES 1: 
+8
+First buggy commit ID:a344ad47f3d059f9571b024b4e65258cfb44d321
+
+First correct (or crashing) commit ID:12a6a1eaf90acee120967cde8d63041550b5c6f9
+
+
+
+

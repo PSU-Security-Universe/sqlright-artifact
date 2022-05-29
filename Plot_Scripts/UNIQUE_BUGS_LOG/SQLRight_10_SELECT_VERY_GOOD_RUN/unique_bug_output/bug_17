@@ -1,0 +1,104 @@
+-------------------------------
+
+Bug ID: 17, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INT PRIMARY KEY ) WITHOUT ROWID;  
+INSERT INTO v0 ( c1 ) VALUES ( 18446744073709551615 );  
+ALTER TABLE main . v0 ADD COLUMN c2 INT;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a5, v0 AS a6 WHERE a6.c2 = 255 AND a6.c1 = 18446744073709551615 ORDER BY a5.c1;        SELECT TOTAL ( ( CAST ( a6.c2 = 255 AND a6.c1 = 18446744073709551615 AS BOOL ) ) != 0 ) FROM v0 AS a5, v0 AS a6 ORDER BY a5.c1;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:39129ce8d9cb0101bad783fa06365332e0ddd83d
+
+First correct (or crashing) commit ID:971fd0713572a7b3c2420e516327bbe8c97711da
+
+
+
+
+-------------------------------
+
+Bug ID: 17, count: 2 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INT PRIMARY KEY ) WITHOUT ROWID;  
+INSERT INTO v0 ( c1 ) VALUES ( 18446744073709551488 );  
+ALTER TABLE v0 ADD COLUMN c2 INT;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a7, v0 AS a8 WHERE a8.c2 = 255 AND a8.c1 = 18446744073709551488 ORDER BY 18446744073709551488, 18446744073709551488 DESC;        SELECT TOTAL ( ( CAST ( a8.c2 = 255 AND a8.c1 = 18446744073709551488 AS BOOL ) ) != 0 ) FROM v0 AS a7, v0 AS a8 ORDER BY 18446744073709551488, 18446744073709551488 DESC;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:39129ce8d9cb0101bad783fa06365332e0ddd83d
+
+First correct (or crashing) commit ID:971fd0713572a7b3c2420e516327bbe8c97711da
+
+
+
+
+-------------------------------
+
+Bug ID: 17, count: 3 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INT PRIMARY KEY ) WITHOUT ROWID;  
+INSERT INTO v0 ( c1 ) VALUES ( 18446744073709551615 );  
+ALTER TABLE v0 ADD COLUMN c2 INT;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a5, v0 AS a6 WHERE a6.c2 = 65 AND a6.c1 = 18446744073709551488 ORDER BY a5.c2;        SELECT TOTAL ( ( CAST ( a6.c2 = 65 AND a6.c1 = 18446744073709551488 AS BOOL ) ) != 0 ) FROM v0 AS a5, v0 AS a6 ORDER BY a5.c2;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:39129ce8d9cb0101bad783fa06365332e0ddd83d
+
+First correct (or crashing) commit ID:971fd0713572a7b3c2420e516327bbe8c97711da
+
+
+
+
+-------------------------------
+
+Bug ID: 17, count: 4 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INT PRIMARY KEY ) WITHOUT ROWID;  
+INSERT INTO v0 ( c1 ) VALUES ( 18446744073709551488 );  
+ALTER TABLE v0 ADD COLUMN c2 INT;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a11, v0 AS a12 WHERE a11.c1 = 18446744073709551615 AND a11.c2 = 255 ORDER BY substr ( a11.c1, 11011 );        SELECT TOTAL ( ( CAST ( a11.c1 = 18446744073709551615 AND a11.c2 = 255 AS BOOL ) ) != 0 ) FROM v0 AS a11, v0 AS a12 ORDER BY substr ( a11.c1, 11011 );      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:39129ce8d9cb0101bad783fa06365332e0ddd83d
+
+First correct (or crashing) commit ID:971fd0713572a7b3c2420e516327bbe8c97711da
+
+
+
+

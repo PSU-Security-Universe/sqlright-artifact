@@ -1,0 +1,26 @@
+-------------------------------
+
+Bug ID: 8, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( v1 INTEGER PRIMARY KEY ) WITHOUT ROWID; 
+INSERT INTO v0 VALUES (10) ; 
+ALTER TABLE v0 ADD v2 INT; 
+
+
+
+SELECT "--------- 1   SELECT COUNT ( * ) FROM v0 WHERE ( v1 = 20 ) OR ( v1 = 10 AND v2 = 10 );      SELECT TOTAL (CAST ((( v1 = 20 ) OR ( v1 = 10 AND v2 = 10 )) AS BOOL ) != 0 ) FROM v0;     
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:b95e1193d58be876cffb061424aae2e13115c338
+
+First correct (or crashing) commit ID:cc7aa1f6f3638fedb2492bf219a63a53a412536b
+
+
+
+

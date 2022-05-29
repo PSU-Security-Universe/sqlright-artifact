@@ -1,0 +1,35 @@
+-------------------------------
+
+Bug ID: 14, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 TEXT, c2 TEXT );  
+CREATE UNIQUE INDEX i3 ON v0 ( c2 );  
+CREATE VIEW v4 AS SELECT c1, MIN ( c2 ) FROM v0 AS a5;  
+CREATE TABLE v6 ( c7 TEXT, c8 TEXT );  
+INSERT INTO v6 ( c8, c7, c7 ) VALUES ( 127, 'v1', 'DDD' );  
+INSERT INTO v6 ( c8, c8 ) VALUES ( 'v1', 'Bob' );  
+INSERT INTO v0 ( c1, c1 ) VALUES ( 'x', 'v1' );  
+INSERT INTO v6 ( c7, c8, c7 ) VALUES ( 127, 'v1', 'C2.3' );  
+INSERT INTO v6 ( c8, c8, c7, c8, c8, c7, c8, c8, c8, c8, c8, c8, c8, c7, c8, c8, c8, c8, c7, c8, c7, c8, c8, c8, c8, c7, c8, c7, c8, c8, *, c8, c8, c7, c8, c7, c7, c7, c8, c8, c8, c7, c7, c7, c7, c7, c8, c7, c8, c7, c7, c8, c7, c7, c8, c7, c8, *, c8, c8, *, c7, c7, c8, c7, c8, c7, c7, c7, *, c7, c8, c8, c7, c7, c8, c8, c7, c8 ) VALUES ( 'v1', 'v1' );  
+INSERT INTO v0 ( c1, c1, c1 ) VALUES ( 127, 'x', 'v0' );  
+UPDATE v0 SET c2 = 127 WHERE c2 = 18446744073709551615;  
+INSERT INTO v6 ( c7, c7 ) VALUES ( 'v0', 'v1' );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v4 AS a173 WHERE a173.c1 = 'x' OR a173.c1 = 'x';        SELECT TOTAL ( ( CAST ( a173.c1 = 'x' OR a173.c1 = 'x' AS BOOL ) ) != 0 ) FROM v4 AS a173;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+0
+RES 1: 
+1
+First buggy commit ID:ddd7421c9170317294e69a4287deda996a3cd3dc
+
+First correct (or crashing) commit ID:d744ee0b50e64348a0ba605eb8270cd2363e8dd3
+
+
+
+

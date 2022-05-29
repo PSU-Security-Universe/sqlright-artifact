@@ -1,0 +1,63 @@
+# Bug chain for bug JOIN + likely/unlikely:
+
+In total, 2 mutations. But these mutations are not critical for triggering the bug. Given the original seed and the correct SELECT statement, the bug can be triggered. 
+
+Source:
+```SQL
+/* id:000016,orig:115.txt */
+CREATE TABLE t1 (a PRIMARY KEY, b);
+INSERT INTO t1 VALUES ('w',  1);
+INSERT INTO t1 VALUES ('z', -1);
+CREATE TABLE t2 (m INTEGER PRIMARY KEY, n, a, p);
+INSERT INTO t2 VALUES (25, 13, 'w', 1);
+INSERT INTO t2 VALUES (26, 25, 'z', 153);
+INSERT INTO t2 VALUES (27, 25, 'z', 68);
+CREATE TABLE t3 (m);
+INSERT INTO t3 VALUES (25);
+SELECT 111, t1.b*123 FROM t3, t2 AS j0, t2 AS j1, t1 WHERE j0.m=t3.m AND t1.a=j0.a AND j1.n=j0.m
+```
+
+Mutation 1:
+One INSERT statement changes its column form. (Line 6)
+```SQL
+/* id:000823,src:000016,op:(null),pos:0 */
+CREATE TABLE v0 ( c1 PRIMARY KEY, c2 );
+INSERT INTO v0 VALUES ( 'v0', 81 );
+INSERT INTO v0 VALUES ( 'v1', - 66.066000 );
+CREATE TABLE v3 ( c4 INTEGER PRIMARY KEY, c5, c6, c7 );
+INSERT INTO v0 VALUES ( 127, 18446744073709551615, 'x', 18446744073709551615 );
+INSERT INTO v0 ( c2, c2, c2, c1 ) VALUES ( 18446744073709551615, 957, '456', 0 );
+INSERT INTO v0 VALUES ( 18446744073709551615, 0, 'v0', 18446744073709551615 );
+CREATE TABLE v8 ( c9 );
+INSERT INTO v8 VALUES ( 18446744073709551615 );
+```
+
+Buggy query source, mutation 2:
+Replace INSERT statement to SELECT statement. 
+```SQL
+/* id\:003462\,src\:000823\,op\:\(null\)\,pos\:0 */
+CREATE TABLE v0 ( c1 PRIMARY KEY, c2 );
+INSERT INTO v0 VALUES ( 't1b', 2147483647 );
+INSERT INTO v0 VALUES ( 'v1', - 18446744073709551615 );
+CREATE TABLE v3 ( c4 INTEGER PRIMARY KEY, c5, c6, c7 );
+INSERT INTO v3 VALUES ( 18446744073709551488, 255, 'v0', 127 );
+INSERT INTO v0 ( c2, c1, c1, c2 ) VALUES ( 127, 18446744071562067968, 'v1', 127 );
+INSERT INTO v0 VALUES ( 9223372036854775807, 0, 'v1', 127 );
+CREATE TABLE v8 ( c9 );
+SELECT a10.c2, a10.c2, dense_rank ( ) OVER ( ORDER BY a10.c2 ), dense_rank ( ) OVER ( PARTITION BY a10.c1 ORDER BY a10.c1 ) FROM v0 AS a10;
+```
+
+Bug Triggering query:
+```SQL
+CREATE TABLE v0 ( c1 PRIMARY KEY, c2 );
+INSERT INTO v0 VALUES ( 'x', 18446744073709518848 );
+INSERT INTO v0 VALUES ( 'v1', - 9223372036854775807 );
+CREATE TABLE v3 ( c4 INTEGER PRIMARY KEY, c5, c6, c7 );
+INSERT INTO v3 VALUES ( 18446744073709551488, 18446744073709518848, 'v0', 0 );
+INSERT INTO v3 ( c6, c7, c7, c7 ) VALUES ( 18446744073709551488, 0, 'v0', 255 );
+INSERT INTO v0 VALUES ( 4294967295, 1565, 'Brand#12', 18446744073709551488 );
+CREATE TABLE v8 ( c9 );
+
+SELECT COUNT ( * ) FROM v3 AS a20 JOIN v0 AS a21 ON likely ( a21.c1 = a21.c2 ) AND a21.c2 = 'x' WHERE a21.c2;
+SELECT TOTAL ( ( CAST ( a21.c2 AS BOOL ) ) != 0 ) FROM v3 AS a20 JOIN v0 AS a21 ON likely ( a21.c1 = a21.c2 ) AND a21.c2 = 'x';
+```

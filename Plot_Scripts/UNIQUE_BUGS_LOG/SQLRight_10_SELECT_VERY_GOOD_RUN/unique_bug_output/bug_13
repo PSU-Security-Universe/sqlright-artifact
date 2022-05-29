@@ -1,0 +1,79 @@
+-------------------------------
+
+Bug ID: 13, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INT PRIMARY KEY ) WITHOUT ROWID;  
+SELECT a3.c1, a3.c1, a3.c1, a2.c1, a2.c1 FROM v0 AS a2, v0 AS a3 WHERE a3.c1 = a2.c1 AND a2.c1 = ( SELECT MAX ( a3.c1 ) FROM v0 AS a4 ) ORDER BY a2.c1;  
+INSERT INTO v0 ( c1 ) VALUES ( 49 );  
+ALTER TABLE v0 ADD COLUMN c5 INT;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a16, v0 AS a17 WHERE a16.c5 > a17.c1 AND a17.c1 = a16.c1;        SELECT TOTAL ( ( CAST ( a16.c5 > a17.c1 AND a17.c1 = a16.c1 AS BOOL ) ) != 0 ) FROM v0 AS a16, v0 AS a17;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:d34742901d0ef95c41da21267c640ef9e26d0c0f
+
+First correct (or crashing) commit ID:e21a6e1dfe2196184bf17e9d9212f3eae0b346e5
+
+
+
+
+-------------------------------
+
+Bug ID: 13, count: 2 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INT PRIMARY KEY ) WITHOUT ROWID;  
+INSERT INTO v0 ( c1 ) VALUES ( 9223372036854775807 );  
+ALTER TABLE v0 ADD COLUMN c2 INT;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a13, v0 AS a14 WHERE a13.c2 > a14.c1 AND a14.c1 = a13.c1;        SELECT TOTAL ( ( CAST ( a13.c2 > a14.c1 AND a14.c1 = a13.c1 AS BOOL ) ) != 0 ) FROM v0 AS a13, v0 AS a14;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:d34742901d0ef95c41da21267c640ef9e26d0c0f
+
+First correct (or crashing) commit ID:e21a6e1dfe2196184bf17e9d9212f3eae0b346e5
+
+
+
+
+-------------------------------
+
+Bug ID: 13, count: 3 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INT PRIMARY KEY ) WITHOUT ROWID;  
+INSERT INTO v0 ( c1 ) VALUES ( 0 );  
+ALTER TABLE v0 ADD COLUMN c2 INT;  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a13, v0 AS a14 WHERE a13.c2 > a14.c1 AND a13.c1 = a14.c1;        SELECT TOTAL ( ( CAST ( a13.c2 > a14.c1 AND a13.c1 = a14.c1 AS BOOL ) ) != 0 ) FROM v0 AS a13, v0 AS a14;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+0
+First buggy commit ID:d34742901d0ef95c41da21267c640ef9e26d0c0f
+
+First correct (or crashing) commit ID:e21a6e1dfe2196184bf17e9d9212f3eae0b346e5
+
+
+
+

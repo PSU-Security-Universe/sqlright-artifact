@@ -1,0 +1,31 @@
+-------------------------------
+
+Bug ID: 9, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 PRIMARY KEY, c2 );  
+INSERT INTO v0 VALUES ( 'x', 18446744073709518848 );  
+INSERT INTO v0 VALUES ( 'v1', - 9223372036854775807 );  
+CREATE TABLE v3 ( c4 INTEGER PRIMARY KEY, c5, c6, c7 );  
+INSERT INTO v3 VALUES ( 18446744073709551488, 18446744073709518848, 'v0', 0 );  
+INSERT INTO v3 ( c6, c7, c7, c7 ) VALUES ( 18446744073709551488, 0, 'v0', 255 );  
+INSERT INTO v0 VALUES ( 4294967295, 1565, 'Brand#12', 18446744073709551488 );  
+CREATE TABLE v8 ( c9 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v3 AS a20 JOIN v0 AS a21 ON likely ( a21.c1 = a21.c2 ) AND a21.c2 = 'x' WHERE a21.c2;        SELECT TOTAL ( ( CAST ( a21.c2 AS BOOL ) ) != 0 ) FROM v3 AS a20 JOIN v0 AS a21 ON likely ( a21.c1 = a21.c2 ) AND a21.c2 = 'x';      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+0
+RES 1: 
+1
+First buggy commit ID:efad2e23668ea5cbd744b6abde43058de45fb53a
+
+First correct (or crashing) commit ID:7de7602eb7deac00e4bb5c2f44f82f5389cbcb83
+
+
+
+

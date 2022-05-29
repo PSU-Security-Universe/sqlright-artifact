@@ -1,0 +1,540 @@
+-------------------------------
+
+Bug ID: 20, count: 1 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'x' AND 'x' AND 0 AND 0 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v2 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v5 AS a7;  
+INSERT INTO v0 SELECT c1 + 0 FROM v0 AS a8 WHERE c1 IN ( 0, 0 );  
+INSERT INTO v0 SELECT c1, SUM ( c1 * ( 16 - c1 ) ) AS y, c1, c1 FROM v2 AS a9;  
+INSERT INTO v5 SELECT c1 + 0 FROM v0 AS a10;  
+INSERT INTO v2 VALUES ( 0 );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 16 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v2 AS a48, v0 AS a49, v2 AS a50, v2 AS a51, v2 AS a52, v2 AS a53 WHERE a48.c1;        SELECT TOTAL ( ( CAST ( a48.c1 AS BOOL ) ) != 0 ) FROM v2 AS a48, v0 AS a49, v2 AS a50, v2 AS a51, v2 AS a52, v2 AS a53;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+2
+RES 1: 
+32
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 2 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'x' AND 'x' AND 0 AND 0 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v2 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v5 AS a7;  
+INSERT INTO v0 SELECT c1 + 0 FROM v0 AS a8 WHERE c1 IN ( 0, 0 );  
+INSERT INTO v0 SELECT c1, SUM ( c1 * ( 16 - c1 ) ) AS y, c1, c1 FROM v2 AS a9;  
+INSERT INTO v5 SELECT c1 + 0 FROM v0 AS a10;  
+INSERT INTO v2 VALUES ( 0 );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 16 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v2 AS a78, v2 AS a79 WHERE a78.c1;        SELECT TOTAL ( ( CAST ( a78.c1 AS BOOL ) ) != 0 ) FROM v2 AS a78, v2 AS a79;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 3 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'v0' AND 'x' AND 0 AND 18446744071562067968 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v2 VALUES ( 0 );  
+INSERT INTO v0 SELECT c1 + 18446744071562067968 FROM v0 AS a7;  
+INSERT INTO v2 SELECT c6 + 0 FROM v5 AS a8 WHERE c6 IN ( 2147483647, 0 );  
+INSERT INTO v5 SELECT c1 + 2147483647 FROM v0 AS a9;  
+INSERT INTO v5 VALUES ( 127 );  
+INSERT INTO v5 VALUES ( 10 );  
+INSERT INTO v0 VALUES ( 127 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v2 AS a77, v2 AS a78 WHERE a77.c1;        SELECT TOTAL ( ( CAST ( a77.c1 AS BOOL ) ) != 0 ) FROM v2 AS a77, v2 AS a78;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 4 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'Cindy' AND 'x' AND 255 AND 0 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v2 SELECT c1 + 0 FROM v0 AS a7;  
+INSERT INTO v0 SELECT c6 + 4294967295 FROM v5 AS a8 WHERE c1 IN ( 2147483647, 18446744073709551488 );  
+INSERT INTO v2 SELECT c1 + 0 FROM v0 AS a9;  
+INSERT INTO v2 SELECT c1 + 0 FROM v5 AS a10;  
+INSERT INTO v2 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 255 );  
+INSERT INTO v0 VALUES ( substr ( c1, ( 9223372036854775807, 255 ), 0 ) * 0 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v5 AS a55, v2 AS a56, v2 AS a57, v2 AS a58 WHERE a56.c1;        SELECT TOTAL ( ( CAST ( a56.c1 AS BOOL ) ) != 0 ) FROM v5 AS a55, v2 AS a56, v2 AS a57, v2 AS a58;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+4
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 5 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'x' AND 'V' AND 0 AND 0 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 SELECT c6 + 0 FROM v5 AS a7;  
+INSERT INTO v2 SELECT c1 + 9223372036854775807 FROM v0 AS a8 WHERE c1 IN ( 0, 0 );  
+INSERT INTO v2 SELECT c1 + 9223372036854775807 FROM v5 AS a9;  
+INSERT INTO v0 SELECT c1 + 0 FROM v2 AS a10;  
+INSERT INTO v0 VALUES ( 9223372036854775807 );  
+INSERT INTO v5 VALUES ( 9223372036854775807 );  
+INSERT INTO v5 VALUES ( 0 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a48, v5 AS a49, v5 AS a50, v2 AS a51, v2 AS a52, v0 AS a53 WHERE a51.c1;        SELECT TOTAL ( ( CAST ( a51.c1 AS BOOL ) ) != 0 ) FROM v0 AS a48, v5 AS a49, v5 AS a50, v2 AS a51, v2 AS a52, v0 AS a53;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+16
+RES 1: 
+32
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 6 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'x' AND 'V' AND 0 AND 0 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 SELECT c6 + 0 FROM v5 AS a7;  
+INSERT INTO v2 SELECT c1 + 9223372036854775807 FROM v0 AS a8 WHERE c1 IN ( 0, 0 );  
+INSERT INTO v2 SELECT c1 + 9223372036854775807 FROM v5 AS a9;  
+INSERT INTO v0 SELECT c1 + 0 FROM v2 AS a10;  
+INSERT INTO v0 VALUES ( 9223372036854775807 );  
+INSERT INTO v5 VALUES ( 9223372036854775807 );  
+INSERT INTO v5 VALUES ( 0 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a172, v5 AS a173, v5 AS a174, v2 AS a175, v2 AS a176, v5 AS a177 WHERE a175.c1;        SELECT TOTAL ( ( CAST ( a175.c1 AS BOOL ) ) != 0 ) FROM v0 AS a172, v5 AS a173, v5 AS a174, v2 AS a175, v2 AS a176, v5 AS a177;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+16
+RES 1: 
+32
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 7 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 IN ( );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v2 VALUES ( 0 );  
+CREATE TABLE v5 ( c6 INTEGER REFERENCES i ( c6 ) );  
+INSERT INTO v5 VALUES ( 127 );  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 SELECT c1 + 127 FROM v2 AS a7;  
+INSERT INTO v2 SELECT c1 + 0 FROM v0 AS a8;  
+INSERT INTO v2 SELECT c1 + 127 FROM v2 AS a9;  
+INSERT INTO v2 SELECT c1 + 0 FROM v0 AS a10;  
+CREATE TABLE v11 ( c12 INTEGER PRIMARY KEY );  
+CREATE VIRTUAL TABLE v13 USING rtree;  
+INSERT INTO v13 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 127 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a207, v2 AS a208, v0 AS a209, v2 AS a210, v2 AS a211, v0 AS a212 WHERE a208.c1;        SELECT TOTAL ( ( CAST ( a208.c1 AS BOOL ) ) != 0 ) FROM v0 AS a207, v2 AS a208, v0 AS a209, v2 AS a210, v2 AS a211, v0 AS a212;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+8
+RES 1: 
+32
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 8 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'v1' AND 'c1' AND 0 AND 0 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v5 VALUES ( 0, c6 = c6 AND c6 = 'v0' LIKE c6 >= c6 AND c6 >= '40000 400 1' AND dateadd ( c6, c6 || c6, c6 = c6 AND c6 AND c6 = c6 AND c6 = c6 AND c6 = c6 AND c6 = 'yzabcdefg' AND c6 >= 'v1' AND c6 < DATEADD ( c6, 0, CAST ( 'id.1' AS DATETIME ) ) ) COLLATE y AND substr ( c6, 100, ( c6 = 127 ) OR ( c6 > substr ( c6, 0, ( c6 = 0 ) OR ( 18446744073709551615 ) ) ) ) );  
+INSERT INTO v0 SELECT c1 + 127 FROM v2 AS a7;  
+INSERT INTO v0 SELECT c1 + 0 FROM v0 AS a8 WHERE c1 IN ( 0, 100 );  
+INSERT INTO v0 SELECT c1 + 0 FROM v5 AS a9;  
+INSERT INTO v2 SELECT c1 + 0 FROM v0 AS a10;  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 18446744073709518848 );  
+INSERT INTO v2 VALUES ( 100 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v2 AS a55, v0 AS a56, v2 AS a57, v5 AS a58 WHERE a55.c1;        SELECT TOTAL ( ( CAST ( a55.c1 AS BOOL ) ) != 0 ) FROM v2 AS a55, v0 AS a56, v2 AS a57, v5 AS a58;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+2
+RES 1: 
+4
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 9 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'v1' AND 'c1' AND 0 AND 0 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v5 VALUES ( 0, c6 = c6 AND c6 = 'v0' LIKE c6 >= c6 AND c6 >= '40000 400 1' AND dateadd ( c6, c6 || c6, c6 = c6 AND c6 AND c6 = c6 AND c6 = c6 AND c6 = c6 AND c6 = 'yzabcdefg' AND c6 >= 'v1' AND c6 < DATEADD ( c6, 0, CAST ( 'id.1' AS DATETIME ) ) ) COLLATE y AND substr ( c6, 100, ( c6 = 127 ) OR ( c6 > substr ( c6, 0, ( c6 = 0 ) OR ( 18446744073709551615 ) ) ) ) );  
+INSERT INTO v0 SELECT c1 + 127 FROM v2 AS a7;  
+INSERT INTO v0 SELECT c1 + 0 FROM v0 AS a8 WHERE c1 IN ( 0, 100 );  
+INSERT INTO v0 SELECT c1 + 0 FROM v5 AS a9;  
+INSERT INTO v2 SELECT c1 + 0 FROM v0 AS a10;  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 18446744073709518848 );  
+INSERT INTO v2 VALUES ( 100 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v5 AS a112, v5 AS a113, v2 AS a114, v2 AS a115 WHERE a114.c1;        SELECT TOTAL ( ( CAST ( a114.c1 AS BOOL ) ) != 0 ) FROM v5 AS a112, v5 AS a113, v2 AS a114, v2 AS a115;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1
+RES 1: 
+2
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 10 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'fghijklmn' AND 'v1' AND 0 AND 255 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 100 );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 SELECT c1 + 255 FROM v2 AS a7;  
+INSERT INTO v2 SELECT c1 + 255 FROM v5 AS a8 WHERE c1 IN ( 255, 0 );  
+INSERT INTO v5 SELECT c1 + 0 FROM v2 AS a9;  
+INSERT INTO v5 SELECT c6 + 5 FROM v5 AS a10;  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 255 );  
+INSERT INTO v5 VALUES ( 0 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v2 AS a127, v5 AS a128, v2 AS a129 WHERE a127.c1;        SELECT TOTAL ( ( CAST ( a127.c1 AS BOOL ) ) != 0 ) FROM v2 AS a127, v5 AS a128, v2 AS a129;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+18
+RES 1: 
+24
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 11 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'fghijklmn' AND 'v1' AND 0 AND 255 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 100 );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 SELECT c1 + 255 FROM v2 AS a7;  
+INSERT INTO v2 SELECT c1 + 255 FROM v5 AS a8 WHERE c1 IN ( 255, 0 );  
+INSERT INTO v5 SELECT c1 + 0 FROM v2 AS a9;  
+INSERT INTO v5 SELECT c6 + 5 FROM v5 AS a10;  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 255 );  
+INSERT INTO v5 VALUES ( 0 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a172, v2 AS a173, v0 AS a174, v2 AS a175, v2 AS a176, v2 AS a177 WHERE a173.c1;        SELECT TOTAL ( ( CAST ( a173.c1 AS BOOL ) ) != 0 ) FROM v0 AS a172, v2 AS a173, v0 AS a174, v2 AS a175, v2 AS a176, v2 AS a177;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+1296
+RES 1: 
+3072
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 12 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 16 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'v0' AND 'x' AND 0 AND 0 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v2 VALUES ( 18446744071562067968 );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 SELECT c1 + 0 FROM v0 AS a7;  
+INSERT INTO v0 SELECT c1 + 0 FROM v5 AS a8 WHERE c6 IN ( 0, 0 );  
+INSERT INTO v0 SELECT c1 + 0 FROM v2 AS a9;  
+INSERT INTO v0 SELECT c1 + 0 FROM v2 AS a10;  
+INSERT INTO v0 VALUES ( 0 );  
+INSERT INTO v2 VALUES ( 100 );  
+INSERT INTO v2 VALUES ( 2147483647 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v2 AS a112, v5 AS a113, v2 AS a114, v0 AS a115 WHERE a112.c1;        SELECT TOTAL ( ( CAST ( a112.c1 AS BOOL ) ) != 0 ) FROM v2 AS a112, v5 AS a113, v2 AS a114, v0 AS a115;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+2
+RES 1: 
+4
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 13 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 0 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'TWOX' AND '1998-12-01' AND 0 AND 0 AND c1 = 18446744073709551615 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 127 );  
+INSERT INTO v5 SELECT c1 + 0 FROM v2 AS a7;  
+INSERT INTO v2 SELECT c1 + 0 FROM v5 AS a8 WHERE c1 IN ( 0, 4294967295 );  
+INSERT INTO v5 SELECT c6 + 0 FROM v5 AS a9;  
+INSERT INTO v5 SELECT c6 + 127 FROM v0 AS a10;  
+INSERT INTO v0 VALUES ( 9223372036854775807 );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 0 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v2 AS a78, v2 AS a79 WHERE a78.c1;        SELECT TOTAL ( ( CAST ( a78.c1 AS BOOL ) ) != 0 ) FROM v2 AS a78, v2 AS a79;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+4
+RES 1: 
+6
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 14 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 18446744073709551488 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'x' AND 'x' AND 18446744073709551615 AND 0 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v2 VALUES ( 18446744073709551488 );  
+INSERT INTO v0 VALUES ( 127 );  
+INSERT INTO v0 SELECT c1 + 8 FROM v2 AS a7;  
+INSERT INTO v5 SELECT c6 + 0 FROM v5 AS a8 WHERE c6;  
+INSERT INTO v0 SELECT c1 + 0 FROM v5 AS a9;  
+INSERT INTO v5 SELECT c1 + 18446744073709551615 FROM v2 AS a10;  
+INSERT INTO v5 VALUES ( 18446744073709551488 );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 0 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a55, v2 AS a56, v2 AS a57, v0 AS a58 WHERE a56.c1;        SELECT TOTAL ( ( CAST ( a56.c1 AS BOOL ) ) != 0 ) FROM v0 AS a55, v2 AS a56, v2 AS a57, v0 AS a58;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+36
+RES 1: 
+54
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
+-------------------------------
+
+Bug ID: 20, count: 15 
+
+Query 0: 
+CREATE TABLE v0 ( c1 INTEGER PRIMARY KEY );  
+INSERT INTO v0 VALUES ( 255 );  
+CREATE VIEW v2 AS SELECT * FROM v0 AS a3 UNION ALL SELECT * FROM v0 AS a4 WHERE c1 = c1 < c1 AND c1 >= 'v1' AND 'w' AND 9223372036854775807 AND 0 AND c1 = 0 = c1 ORDER BY c1 DESC, c1 DESC, c1, c1, c1, c1;  
+CREATE TABLE v5 ( c6 INTEGER PRIMARY KEY );  
+INSERT INTO v5 VALUES ( 0 );  
+INSERT INTO v0 VALUES ( 255 );  
+INSERT INTO v0 SELECT c1 + 0 FROM v2 AS a7;  
+INSERT INTO v2 SELECT c1 + 0 FROM v0 AS a8 WHERE c1 IN ( 18446744073709551615, 9223372036854775807 );  
+INSERT INTO v5 SELECT c6 + 9223372036854775807 FROM v5 AS a9;  
+INSERT INTO v0 SELECT c1 + 18446744073709551488 FROM v2 AS a10;  
+INSERT INTO v2 VALUES ( 9223372036854775807 );  
+INSERT INTO v0 VALUES ( 0 );  
+
+
+
+SELECT "--------- 1    SELECT COUNT ( * ) FROM v0 AS a56, v2 AS a57, v0 AS a58, v2 AS a59 WHERE a57.c1;        SELECT TOTAL ( ( CAST ( a57.c1 AS BOOL ) ) != 0 ) FROM v0 AS a56, v2 AS a57, v0 AS a58, v2 AS a59;      
+ 
+
+Last Buggy Result Num: 0 
+RES 0: 
+4
+RES 1: 
+8
+First buggy commit ID:e08e8d6b61187ecfd19f98f863a2a35f6b80152b
+
+First correct (or crashing) commit ID:6f92c34866730eafcecc1fd8dfc42e37fadfa59f
+
+
+
+
