@@ -201,6 +201,7 @@ RUN chown -R mysql:mysql /home/mysql/fuzzing/
 
 # set up MySQL database
 USER mysql
+WORKDIR /home/mysql/mysql-server/bld/
 RUN mkdir data
 RUN bin/mysqld --initialize-insecure --user=mysql --datadir=data
 RUN bin/mysql_ssl_rsa_setup --datadir=data
@@ -213,7 +214,7 @@ WORKDIR /home/mysql/scripts
 RUN python3 setup_database.py
 
 # Not sure why, but user Postgres doesn't have the permission to open the database.
-RUN chown -R mysql:mysql /home/mysql/mysql-server/bld/
+RUN chown -R mysql:mysql /home/mysql/mysql-server/bld/data_all
 
 USER root
 WORKDIR /home/mysql/fuzzing/fuzz_root

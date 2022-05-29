@@ -150,19 +150,13 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     # mysql_command = "__AFL_SHM_ID=" + cur_shm_str + " " + mysql_bin_dir + " --basedir=" + mysql_root_dir + " --datadir=" + cur_mysql_data_dir_str + " --port=" + str(cur_port_num) + " --socket=" + socket_path + " & "
 
     mysql_command = [
-        "screen",
-        "-dmS",
-        "test" + str(cur_inst_id),
-        "bash", "-c", 
-        "'",    # left quote
         mysql_bin_dir,
         "--basedir=" + mysql_root_dir,
         "--datadir=" + cur_mysql_data_dir_str,
         "--port=" + str(cur_port_num),
         "--socket=" + socket_path,
         "--performance_schema=OFF",
-        "&>", cur_output_file,
-        "'"  # right quote
+        "&>", cur_output_file
     ]
     mysql_modi_env = dict()
     mysql_modi_env["__AFL_SHM_ID"] = cur_shm_str
