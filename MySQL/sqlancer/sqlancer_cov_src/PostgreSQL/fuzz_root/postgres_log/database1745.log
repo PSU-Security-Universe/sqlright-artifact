@@ -1,0 +1,10 @@
+[11/09 19:20:57] \c test;
+[11/09 19:20:57] DROP DATABASE IF EXISTS database1745;
+[11/09 19:20:57] CREATE DATABASE database1745  TEMPLATE template0;
+[11/09 19:20:57] \c database1745;
+[11/09 19:20:57] CREATE TEMP TABLE t0(c0 inet , c1 REAL  UNIQUE NOT NULL PRIMARY KEY) WITH (fillfactor=25, autovacuum_vacuum_cost_delay=26) ON COMMIT DROP ;
+[11/09 19:20:57] CREATE TEMPORARY TABLE IF NOT EXISTS t0(c0 DECIMAL  UNIQUE PRIMARY KEY CHECK (((0.48366455093175109158920577101525850594043731689453125)=(t0.c0))), c1 REAL  DEFAULT (get_bit(substr('', -856944753, 241521223), ((0.12996572) IN (0.40856737, 0.39680508))::INT)), CHECK(pg_jit_available())) ON COMMIT DELETE ROWS ;
+[11/09 19:20:57] CREATE TEMP TABLE t0(c0 money , c1 boolean , c2 BIT VARYING(238) ) WITH (autovacuum_enabled=1, autovacuum_vacuum_cost_delay=68, autovacuum_vacuum_threshold=28555038, autovacuum_vacuum_cost_limit=7097, autovacuum_freeze_max_age=424841940, parallel_workers=55, autovacuum_analyze_scale_factor=0.9, autovacuum_freeze_min_age=340229833, autovacuum_freeze_table_age=360163865, autovacuum_vacuum_scale_factor=0.5, autovacuum_analyze_threshold=1485656451) ON COMMIT DROP ;
+[11/09 19:20:57] CREATE TEMPORARY TABLE IF NOT EXISTS t0(c0 REAL  DEFAULT (0.39551938) UNIQUE NOT NULL, c1 DECIMAL  DEFAULT (0.5610568231688703999537892741500400006771087646484375) UNIQUE PRIMARY KEY NULL, c2 boolean , EXCLUDE (c1 NULLS FIRST WITH +, (0.17738250256691967532418630071333609521389007568359375) array_ops ASC NULLS LAST WITH @>, c2 oid_minmax_ops ASC WITH *) WHERE ((- (CAST('178.143.5.230' AS INT))) BETWEEN (0.2998437) AND (((- (((872015334)%(-917294765))))^(num_nulls('0.39680509246394047', '241521223', -392863648, t0.c1)))))) WITH (autovacuum_freeze_min_age=421929942, fillfactor=18, autovacuum_enabled=1, autovacuum_analyze_threshold=675404275, parallel_workers=18);
+[11/09 19:20:57] CREATE TABLE t0(c0 int4range , c1 FLOAT  DEFAULT (0.1327892637506869)) WITH (autovacuum_vacuum_cost_limit=2551, fillfactor=28);
+[11/09 19:20:57] CREATE UNLOGGED TABLE t1(c0 DECIMAL , c1 smallint  NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY, c2 money ) INHERITS(t0);

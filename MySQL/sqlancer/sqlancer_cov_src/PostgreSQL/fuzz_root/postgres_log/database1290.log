@@ -1,0 +1,28 @@
+[11/09 07:39:39] \c test;
+[11/09 07:39:39] DROP DATABASE IF EXISTS database1290;
+[11/09 07:39:39] CREATE DATABASE database1290  TEMPLATE template0;
+[11/09 07:39:39] \c database1290;
+[11/09 07:39:39] CREATE TEMPORARY TABLE IF NOT EXISTS t0(c0 money  UNIQUE PRIMARY KEY, EXCLUDE (c0 float4_minmax_multi_ops NULLS FIRST WITH <<) WHERE ((to_hex((('u+
+>î')||(0.643273303249014105631431448273360729217529296875))))::BOOLEAN), CHECK(((CAST((((('[136018845,1440093958]'::int4range)*('(-1496562342,161229016]'::int4range)))*((('(136018845,220803198]'::int4range)-('(-1962726004,2034368750)'::int4range)))) AS BOOLEAN))OR((((B'1010101110101100001011100000110')&(B'1111111111111111111111111111111110001011000000110010110110001100')))::VARCHAR(546)!~*(CAST('93.8.1.88' AS VARCHAR(178)) COLLATE "en_US.utf8")))), UNIQUE(c0) WITH (autovacuum_vacuum_cost_delay=45, parallel_workers=967)) WITH (parallel_workers=964, autovacuum_vacuum_cost_limit=1946, autovacuum_analyze_scale_factor=0, autovacuum_freeze_min_age=613044378, autovacuum_vacuum_threshold=1592101948, autovacuum_enabled=1, autovacuum_vacuum_scale_factor=0.5, fillfactor=22, autovacuum_vacuum_cost_delay=99, autovacuum_analyze_threshold=1682050081, autovacuum_freeze_table_age=1411541239, autovacuum_freeze_max_age=542989706) ON COMMIT DELETE ROWS ;
+[11/09 07:39:39] CREATE TEMP TABLE t0(c0 money , c1 serial , PRIMARY KEY(c1), CHECK(NOT ((NOT ('Q#p|#'!~'iwz0'))::BOOLEAN)), EXCLUDE (c0 varbit_minmax_ops NULLS LAST WITH >, (0.1682999980797656) date_minmax_multi_ops ASC NULLS FIRST WITH @>) WITH (autovacuum_vacuum_cost_delay=87, parallel_workers=427, autovacuum_enabled=1, autovacuum_vacuum_cost_limit=1326, autovacuum_vacuum_threshold=1748051216, autovacuum_freeze_min_age=723425174, autovacuum_freeze_table_age=695069632, autovacuum_analyze_threshold=2067197679, fillfactor=65, autovacuum_analyze_scale_factor=0) WHERE ((0.77384661934715859299416251815273426473140716552734375)::VARCHAR(769)!~*abbrev(set_masklen('255.79.61.178', t0.c1))), UNIQUE(c0)) WITH (autovacuum_vacuum_cost_delay=97, autovacuum_freeze_table_age=1788508610, autovacuum_vacuum_scale_factor=0.8, autovacuum_analyze_scale_factor=0.01, autovacuum_enabled=1, autovacuum_freeze_min_age=781926021);
+[11/09 07:39:39] CREATE TABLE t0(c0 boolean , UNIQUE(c0), CHECK(t0.c0), PRIMARY KEY(c0)) WITH (autovacuum_vacuum_cost_delay=84);
+[11/09 07:39:39] CREATE TABLE t1(LIKE t0);
+[11/09 07:39:39] CREATE TABLE t2(c0 REAL , c1 serial , c2 serial ) INHERITS(t1);
+[11/09 07:39:39] CREATE TEMPORARY TABLE IF NOT EXISTS t2(LIKE t0);
+[11/09 07:39:39] CREATE TABLE t3(LIKE t0 EXCLUDING ALL);
+[11/09 07:39:39] CREATE TEMP TABLE t4(LIKE t0 EXCLUDING ALL EXCLUDING GENERATED);
+[11/09 07:39:39] UPDATE t2 SET c0 = FALSE WHERE t2.c0;
+[11/09 07:39:39] DELETE FROM ONLY t1 RETURNING version();
+[11/09 07:39:39] DISCARD TEMPORARY;
+[11/09 07:39:39] UPDATE t1 SET c0 = FALSE WHERE t1.c0;
+[11/09 07:39:39] ALTER TABLE  ONLY t0 DISABLE ROW LEVEL SECURITY, ENABLE ROW LEVEL SECURITY;
+[11/09 07:39:39] TRUNCATE t3;
+[11/09 07:39:39] ALTER TABLE  ONLY t3 FORCE ROW LEVEL SECURITY, DISABLE ROW LEVEL SECURITY, ALTER c0 DROP DEFAULT, NOT OF, ALTER c0  SET(n_distinct_inherited=-1, n_distinct=-0.2), ALTER c0  TYPE boolean, NO FORCE ROW LEVEL SECURITY;
+[11/09 07:39:39] UNLISTEN asdf;
+[11/09 07:39:39] DELETE FROM t3 WHERE t3.c0;
+[11/09 07:39:39] LISTEN test;
+[11/09 07:39:39] UPDATE t1 SET c0 = FALSE WHERE (('3mCvV*}ia')LIKE((translate('', '', '0.1682999980797656') COLLATE "en_US.utf8")));
+[11/09 07:39:39] DISCARD ALL;
+[11/09 07:39:39] COMMIT;
+[11/09 07:39:39] SET SESSION statement_timeout = 5000;
+;

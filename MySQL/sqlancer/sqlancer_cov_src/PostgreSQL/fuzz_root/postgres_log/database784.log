@@ -1,0 +1,6 @@
+[11/08 16:18:28] \c test;
+[11/08 16:18:28] DROP DATABASE IF EXISTS database784;
+[11/08 16:18:28] CREATE DATABASE database784 ;
+[11/08 16:18:28] \c database784;
+[11/08 16:18:28] CREATE UNLOGGED TABLE t0(c0 inet  PRIMARY KEY DEFAULT ('72.106.229.69') UNIQUE NULL) PARTITION BY LIST((0.09839499601605183887187422442366369068622589111328125)int4_ops) WITH (autovacuum_vacuum_cost_limit=499, autovacuum_analyze_scale_factor=0.9, parallel_workers=535, autovacuum_vacuum_cost_delay=29, autovacuum_freeze_min_age=949872725, fillfactor=75, autovacuum_vacuum_threshold=1740509656, autovacuum_freeze_table_age=155729823, autovacuum_enabled=0, autovacuum_analyze_threshold=706872557, autovacuum_vacuum_scale_factor=0.5);
+[11/08 16:18:28] CREATE TEMP TABLE t0(c0 money , c1 money  UNIQUE PRIMARY KEY NOT NULL, c2 bigint  GENERATED ALWAYS AS IDENTITY NULL) WITH (autovacuum_vacuum_scale_factor=1, autovacuum_vacuum_cost_delay=42, autovacuum_freeze_table_age=1158727083, autovacuum_vacuum_threshold=116905711, autovacuum_enabled=0, autovacuum_freeze_min_age=870556595, autovacuum_vacuum_cost_limit=8965);

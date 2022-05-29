@@ -1,0 +1,3 @@
+[submodule "MySQL/parser/mysql-server"]
+	path = MySQL/parser/mysql-server
+	url = https://github.com/mysql/mysql-server

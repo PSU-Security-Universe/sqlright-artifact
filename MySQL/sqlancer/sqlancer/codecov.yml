@@ -1,0 +1,16 @@
+codecov:
+  require_ci_to_pass: no
+  notify:
+    after_n_builds: 11
+
+coverage:
+  range: "50...100"
+
+coverage:
+  status:
+    project:
+      default:
+        threshold: 2%
+    patch:
+      default:
+        threshold: 2%
