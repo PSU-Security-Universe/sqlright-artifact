@@ -17,7 +17,11 @@ python3 run_parallel.py -o /home/mysql/fuzzing/fuzz_root/outputs $@ &
 
 sleep 60
 
-watch -d -n 60 python3 mysql_rebooter.py
+while :
+do
+    python3 mysql_rebooter.py
+    sleep 30
+done
 
 EOF
 )
