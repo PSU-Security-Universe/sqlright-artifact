@@ -7,3 +7,5 @@ current_workdir = os.getcwd()
 starting_core_id = 0
 parallel_num = 5
 port_starting_num = 9000
+
+MYSQL_REBOOT_TIME_GAP = 60
