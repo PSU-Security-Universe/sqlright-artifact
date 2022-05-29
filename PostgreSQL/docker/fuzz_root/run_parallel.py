@@ -48,6 +48,7 @@ try:
     opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:", ["odir=", "start-core=", "num-concurrent=", "oracle=", "feedback="])
 except getopt.GetoptError:
     print("Arguments parsing error")
+    exit(1)
 for opt, arg in opts:
     if opt in ("-o", "--odir"):
         output_dir_str = arg
