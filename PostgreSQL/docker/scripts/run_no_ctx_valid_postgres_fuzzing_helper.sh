@@ -15,6 +15,8 @@ cd /home/postgres/postgres/bld
 mkdir -p data_all
 mv data data_all/ori_data
 
+mkdir -p /home/postgres/fuzzing/Bug_Analysis/bug_samples
+
 cd /home/postgres/fuzzing/fuzz_root
 
 ######### Remember to copy from the correct source. Double check.
