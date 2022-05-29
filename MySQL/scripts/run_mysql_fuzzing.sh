@@ -120,7 +120,7 @@ elif [ $# > 4 ] && [ "$1" == "no-db-par-ctx-valid" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/mysql/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/mysql/fuzzing/Bug_Analysis \
-        sqlright_mysql /bin/bash /home/mysql/scripts/run_no_ctx_valid_mysql_fuzzing_helper.sh ${@:2}
+        sqlright_mysql /bin/bash /home/mysql/scripts/run_no_db_par_ctx_valid_mysql_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
 
@@ -157,7 +157,7 @@ elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/mysql/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/mysql/fuzzing/Bug_Analysis \
-        sqlright_mysql /bin/bash /home/mysql/scripts/run_no_ctx_valid_mysql_fuzzing_helper.sh ${@:2}
+        sqlright_mysql /bin/bash /home/mysql/scripts/run_squirrel_oracle_mysql_fuzzing_helper.sh ${@:2}
 
 elif [ "$1" == "sqlancer" ]; then
 
