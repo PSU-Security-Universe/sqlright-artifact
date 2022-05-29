@@ -5,10 +5,10 @@ import shutil
 import subprocess
 import atexit
 
-postgres_root_dir = "/home/postgres/postgres/bld/"
-postgres_src_data_dir = os.path.join(postgres_root_dir, "data_all/ori_data")
+mysql_root_dir = "/home/mysql/mysql-server/bld/"
+mysql_src_data_dir = os.path.join(mysql_root_dir, "data_all/ori_data")
 
-sqlancer_output_dir = "/home/postgres/sqlancer/sqlancer/target/logs/postgres"
+sqlancer_output_dir = "/home/mysql/sqlancer/sqlancer/target/logs/mysql"
 
 current_workdir = os.getcwd()
 
@@ -17,14 +17,14 @@ parallel_num = 1
 port_starting_num = 5550
 
 all_fuzzing_p_list = []
-all_postgres_p_list = []
+all_mysql_p_list = []
 shm_env_list = []
 
 def exit_handler():
     for fuzzing_instance in all_fuzzing_p_list:
         fuzzing_instance.kill()
-    for postgre_instance in all_postgres_p_list:
-        postgre_instance.kill()
+    for mysql_instance in all_mysql_p_list:
+        mysql_instance.kill()
     return
 
 
@@ -45,18 +45,19 @@ if os.path.isfile(os.path.join(os.getcwd(), "shm_env.txt")):
 for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     print("Setting up core_id: " + str(cur_inst_id))
 
-    # Set up the postgre data folder first. 
-    cur_postgre_data_dir_str = os.path.join(postgres_root_dir, "data_all/data_cov_" + str(cur_inst_id - starting_core_id))
-    if not os.path.isdir(cur_postgre_data_dir_str):
-        shutil.copytree(postgres_src_data_dir, cur_postgre_data_dir_str)
+    # Set up the mysql data folder first. 
+    cur_mysql_data_dir_str = os.path.join(mysql_root_dir, "data_all/data_cov_" + str(cur_inst_id - starting_core_id))
+    if not os.path.isdir(cur_mysql_data_dir_str):
+        shutil.copytree(mysql_src_data_dir, cur_mysql_data_dir_str)
 
     # Set up SQLRight output folder
     cur_output_dir_str = "./outputs_" + str(cur_inst_id - starting_core_id)
     if not os.path.isdir(cur_output_dir_str):
         os.mkdir(cur_output_dir_str)
     
-    # Prepare for env shared by the fuzzer and postgres. 
+    # Prepare for env shared by the fuzzer and mysql. 
     cur_port_num = port_starting_num + cur_inst_id
+    socket_path = "/tmp/mysql_" + str(cur_inst_id) + ".sock"
 
     # Start running the SQLRight fuzzer. 
     fuzzing_command = "AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 ./afl-fuzz -t 2000 -m 2000 " \
@@ -89,50 +90,54 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
 
     # os.remove(os.path.join(os.getcwd(), "shm_env.txt"))
 
-    # Start the PostgreS instance
+    # Start the mysql instance
     ori_workdir = os.getcwd()
-    os.chdir(postgres_root_dir)
+    os.chdir(mysql_root_dir)
 
-    postgre_bin_dir = os.path.join(postgres_root_dir, "bin/postgres")
-    postgre_command = "__AFL_SHM_ID=" + cur_shm_str + " " + postgre_bin_dir + " -D " + cur_postgre_data_dir_str + " --port=" + str(cur_port_num) + " & "
-    print("Running postgres command: " + postgre_command, end="\n\n")
+    mysql_bin_dir = os.path.join(mysql_root_dir, "bin/mysqld")
+    mysql_command = "__AFL_SHM_ID=" + cur_shm_str + " " + mysql_bin_dir + " --basedir=" + mysql_root_dir + " --datadir=" + cur_mysql_data_dir_str + " --port=" + str(cur_port_num) + "--socket=" + socket_path + " & "
+    print("Running mysql command: " + mysql_command, end="\n\n")
     p = subprocess.Popen(
-                        [postgre_command],
-                        cwd=postgres_root_dir,
+                        [mysql_command],
+                        cwd=mysql_root_dir,
                         shell=True,
                         stderr=subprocess.DEVNULL,
                         stdout=subprocess.DEVNULL,
                         stdin=subprocess.DEVNULL
                         )
-    all_postgres_p_list.append(p)
+    all_mysql_p_list.append(p)
     os.chdir(ori_workdir)
     time.sleep(5)
 
-print("Finished launching the fuzzing. Now monitor the postgres process. ")
+print("Finished launching the fuzzing. Now monitor the mysql process. ")
 
 while True:
-    for idx in range(len(all_postgres_p_list)):
-        cur_postgre_p = all_postgres_p_list[idx]
-        cur_postgre_pid = cur_postgre_p.pid
-        if not check_pid(cur_postgre_pid):
+    for idx in range(len(all_mysql_p_list)):
+        cur_inst_id = starting_core_id + idx
+        cur_port_num = port_starting_num + cur_inst_id
+        socket_path = "/tmp/mysql_" + str(cur_inst_id) + ".sock"
 
-            # PostgreS process crashed. Restart Postgres. 
-            all_postgres_p_list.remove(cur_postgre_p)
+        cur_mysql_p = all_mysql_p_list[idx]
+        cur_mysql_pid = cur_mysql_p.pid
+        if not check_pid(cur_mysql_pid):
+
+            # MySQL process crashed. Restart MySQL. 
+            all_mysql_p_list.remove(cur_mysql_p)
             cur_shm_str = shm_env_list[idx]
-            cur_postgre_data_dir_str = os.path.join(postgres_root_dir, "data_all/data_" + str(idx))
+            cur_mysql_data_dir_str = os.path.join(mysql_root_dir, "data_all/data_cov_" + str(idx))
 
-            postgre_command = "__AFL_SHM_ID=" + cur_shm_str +  " ./bin/postgres -D " + cur_postgre_data_dir_str + " & "
-            print("PostgreS PID: " + str(cur_postgre_pid) + " crashed. ")
-            print("Restarting postgres command: " + fuzzing_command, end="\n\n")
+            mysql_command = "__AFL_SHM_ID=" + cur_shm_str + " " + mysql_bin_dir + " --basedir=" + mysql_root_dir + " --datadir=" + cur_mysql_data_dir_str + " --port=" + str(cur_port_num) + "--socket=" + socket_path + " & "
+            print("MySQL PID: " + str(cur_mysql_pid) + " crashed. ")
+            print("Restarting mysql command: " + fuzzing_command, end="\n\n")
             p = subprocess.Popen(
-                                [postgre_command],
-                                cwd=postgres_root_dir,
+                                [mysql_command],
+                                cwd=mysql_root_dir,
                                 shell=False,
                                 stderr=subprocess.DEVNULL,
                                 stdout=subprocess.DEVNULL,
                                 stdin=subprocess.DEVNULL
                                 )
-            all_postgres_p_list.insert(idx, p)
+            all_mysql_p_list.insert(idx, p)
     
-    # Check postgres every 10 seconds. 
+    # Check mysql every 10 seconds. 
     time.sleep(10)
