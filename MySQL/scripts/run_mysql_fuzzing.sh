@@ -237,10 +237,10 @@ elif [ "$1" == "sqlancer" ]; then
         covoutdir="$resoutdir""_cov_$i"
         resoutdir="$resoutdir""_raw_$i"
 
-        sudo docker run -i --rm \
+        sudo -b docker run -it --rm \
             -v $(pwd)/$resoutdir:/home/mysql/sqlancer/sqlancer/target/logs \
             -v $(pwd)/$covoutdir:/home/mysql/sqlancer/sqlancer_cov/outputs_0 \
-            sqlright_mysql /bin/bash /home/mysql/scripts/run_sqlancer_helper.sh ${@:2} &
+            sqlright_mysql /bin/bash /home/mysql/scripts/run_sqlancer_helper.sh ${@:2}
 
     done
 
