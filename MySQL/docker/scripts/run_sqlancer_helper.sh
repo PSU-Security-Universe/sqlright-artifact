@@ -7,7 +7,7 @@ chown -R mysql:mysql /home/mysql/sqlancer
 
 oracle_str='TLP_WHERE'
 
-for var in "$@":
+for var in "$@";
 do
     if [ "$var" == "TLP" ]; then
         oracle_str='TLP_WHERE'

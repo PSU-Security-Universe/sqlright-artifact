@@ -7,12 +7,12 @@ chown -R postgres:postgres /home/postgres/sqlancer
 
 oracle_str='NoREC'
 
-for var in "$@":
+for var in "$@";
 do
-    if [ "$var" == "NoREC" ]; then
-        oracle_str='NoREC'
-    elif [ "$var" == "TLP" ]; then
-        oracle_str='QUERY_PARTITIONING'
+    if [[ $var == "NoREC" ]]; then
+        oracle_str="NoREC"
+    elif [[ $var == "TLP" ]]; then
+        oracle_str="QUERY_PARTITIONING"
     fi
 done
 
