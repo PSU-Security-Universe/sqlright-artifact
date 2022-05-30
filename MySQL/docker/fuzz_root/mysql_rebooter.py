@@ -78,7 +78,7 @@ for prev_shutdown_time_idx in range(len(all_prev_shutdown_time)):
 
 time.sleep(1)
 
-for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
+for cur_inst_id in range(starting_core_id, starting_core_id + len(all_mysql_p_list), 1):
     cur_shm_str = all_mysql_p_list[cur_inst_id]
     cur_port_num = port_starting_num + cur_inst_id - starting_core_id
     socket_path = "/tmp/mysql_" + str(cur_inst_id) + ".sock"

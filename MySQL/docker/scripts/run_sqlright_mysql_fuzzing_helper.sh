@@ -3,11 +3,15 @@
 # This file is used for start the SQLRight MySQL fuzzing inside the Docker env.
 # entrypoint: bash
 
-chown -R mysql:mysql /home/mysql/fuzzing/fuzz_root
+chown -R mysql:mysql /home/mysql/fuzzing
 
 SCRIPT_EXEC=$(cat << EOF
 # Setup data folder
-cd /home/mysql/fuzzing/fuzz_root
+cd /home/mysql/fuzzing/Bug_Analysis
+
+mkdir -p bug_samples
+
+cd /home/mysql/fuzzing/fuzz_root/
 
 cp /home/mysql/src/afl-fuzz ./
 
