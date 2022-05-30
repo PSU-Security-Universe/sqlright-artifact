@@ -1,9 +1,0 @@
-[11/10 20:11:53] \c test;
-[11/10 20:11:53] DROP DATABASE IF EXISTS database2587;
-[11/10 20:11:53] CREATE DATABASE database2587 WITH ENCODING 'utf8'  TEMPLATE template0;
-[11/10 20:11:53] \c database2587;
-[11/10 20:11:53] CREATE TABLE t0(c0 inet  DEFAULT ('31.2.85.31'), c1 inet ) PARTITION BY HASH((lower(convert_from('ﰢ', 'LATIN1')))pg_lsn_ops) WITH (autovacuum_analyze_scale_factor=0.8, autovacuum_freeze_min_age=63301753, autovacuum_analyze_threshold=255243340, autovacuum_vacuum_threshold=1211648325);
-[11/10 20:11:53] CREATE TEMPORARY TABLE t0(c0 FLOAT  NOT NULL PRIMARY KEY DEFAULT (0.8911029669338545) UNIQUE, c1 int4range  UNIQUE NULL DEFAULT ((('(-1713926113,1535362645)'::int4range)*((((((('[-1346347899,68023054]'::int4range)*('(1535362645,1535362645]'::int4range)))-((('[-1140832904,25702079]'::int4range)*('[-1713926113,-1140832904]'::int4range)))))*((((('(-58232964,612253252)'::int4range)-('(-1560434377,-1379658892)'::int4range)))*((('[-1379658892,2129101911]'::int4range)*('(-544434718,1768094754]'::int4range))))))))) CHECK (((t0.c1)<<(((t0.c1)-(((((t0.c1)-(t0.c1)))*(((t0.c1)-(t0.c1))))))))) NO INHERIT) PARTITION BY HASH((t0.c0)) WITH (autovacuum_freeze_min_age=14157326, fillfactor=45, autovacuum_vacuum_cost_delay=89, autovacuum_analyze_threshold=786975341, autovacuum_vacuum_scale_factor=1, parallel_workers=692) ON COMMIT DROP ;
-[11/10 20:11:53] CREATE TABLE IF NOT EXISTS t0(c0 BIT VARYING(239) , c1 inet ) WITH (autovacuum_vacuum_scale_factor=1.0E-5, autovacuum_freeze_max_age=342633310);
-[11/10 20:11:53] CREATE TEMP TABLE t1(LIKE t0);
-[11/10 20:11:53] CREATE UNLOGGED TABLE IF NOT EXISTS t2(c0 BIT VARYING(307) , c1 FLOAT , c2 integer  UNIQUE NULL GENERATED ALWAYS AS IDENTITY) PARTITION BY LIST((0.6836046871304606309394102936494164168834686279296875)) WITH (autovacuum_enabled=0, autovacuum_freeze_table_age=108040694, autovacuum_analyze_scale_factor=0.8);

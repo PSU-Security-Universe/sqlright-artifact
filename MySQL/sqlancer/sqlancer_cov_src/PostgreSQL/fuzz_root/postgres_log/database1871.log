@@ -1,7 +1,0 @@
-[11/09 22:45:49] \c test;
-[11/09 22:45:49] DROP DATABASE IF EXISTS database1871;
-[11/09 22:45:49] CREATE DATABASE database1871 WITH ENCODING 'utf8'  TEMPLATE template0;
-[11/09 22:45:49] \c database1871;
-[11/09 22:45:49] CREATE TEMP TABLE IF NOT EXISTS t0(c0 boolean , c1 FLOAT ) WITH (autovacuum_analyze_threshold=1649957927, autovacuum_vacuum_threshold=487994616, autovacuum_vacuum_cost_limit=9647, parallel_workers=541, autovacuum_vacuum_cost_delay=55, autovacuum_freeze_min_age=151243706, autovacuum_freeze_table_age=183452334) ON COMMIT PRESERVE ROWS ;
-[11/09 22:45:49] CREATE TEMP TABLE IF NOT EXISTS t1(LIKE t0);
-[11/09 22:45:49] CREATE TABLE IF NOT EXISTS t2(c0 bigint  NULL CHECK (((t2.c0)!=(CAST((+ (t2.c0))::VARCHAR(885) AS INT)))) NO INHERIT GENERATED ALWAYS AS IDENTITY UNIQUE, CHECK(((((((B'100010011010000010010011100111')<<(B'111100010110111010001001111010')))|(((B'111100010110111010001001111010')|(B'1011111001100110000111010110111')))))::VARCHAR(982) SIMILAR TO ((((('i0' COLLATE "en_US.utf8"))||(- (t2.c0))))||((FALSE)::BIT(462)))))) WITH (autovacuum_analyze_threshold=565696735);

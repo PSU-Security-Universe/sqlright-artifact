@@ -1,1 +1,0 @@
-SELECT 100 AS res;
