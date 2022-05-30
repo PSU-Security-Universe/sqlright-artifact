@@ -81,8 +81,8 @@ RUN git checkout REL_14_0
 RUN mkdir -p /home/postgres/postgres_ori/bld
 
 WORKDIR /home/postgres/postgres_ori/bld
-ENV CXX=/home/postgres/AFL/g++-9
-ENV CC=/home/postgres/AFL/gcc-9
+ENV CXX=g++-9
+ENV CC=gcc-9
 RUN ../configure --enable-debug --prefix=$(pwd) --exec-prefix=$(pwd) && make -j$(nproc) && make install
 
 # Setup Postgres. 
