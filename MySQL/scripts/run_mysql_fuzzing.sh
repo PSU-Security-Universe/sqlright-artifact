@@ -176,15 +176,13 @@ elif [ "$1" == "sqlancer" ]; then
     cd sqlancer_mysql
 
     # Get concurrent number from arguments.
-    check=0
     num_concurrent=5
     for var in "$@"
     do
-        if [ check == 1 ]; then
+        if [ -v check ]; then
             num_concurrent=$((var))
-            check=0
             break
-        elif [ "$var" == "num-concurrent" ]; then
+        elif [ "$var" == "--num-concurrent" ]; then
             check=1
         fi
     done
@@ -246,6 +244,11 @@ elif [ "$1" == "sqlancer" ]; then
     done
 
     echo "Finished launching the SQLancer processes."
+
+    while : 
+    do
+        sleep 100
+    done
 
 else
     echo "Usage: bash run_mysql_fuzzing.sh <config> --start-core <num> --num-concurrent <num> -O <oracle> "
