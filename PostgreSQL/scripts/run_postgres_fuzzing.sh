@@ -183,6 +183,7 @@ elif [ "$1" == "sqlancer" ]; then
         if [ check == 1 ]; then
             num_concurrent=$((var))
             check=0
+            break
         elif [ "$var" == "num-concurrent" ]; then
             check=1
         fi
@@ -235,10 +236,10 @@ elif [ "$1" == "sqlancer" ]; then
         covoutdir="$resoutdir""_cov_$i"
         resoutdir="$resoutdir""_raw_$i"
         
-        sudo docker run -i --rm \
+        sudo -b docker run -it --rm \
             -v $(pwd)/$resoutdir:/home/postgres/sqlancer/sqlancer/target/logs \
             -v $(pwd)/$covoutdir:/home/postgres/sqlancer/sqlancer_cov/outputs_0 \
-            sqlright_postgres /bin/bash /home/postgres/scripts/run_sqlancer_helper.sh ${@:2} &
+            sqlright_postgres /bin/bash /home/postgres/scripts/run_sqlancer_helper.sh ${@:2}
 
     done
 

@@ -183,6 +183,7 @@ elif [ "$1" == "sqlancer" ]; then
         if [ check == 1 ]; then
             num_concurrent=$((var))
             check=0
+            break
         elif [ "$var" == "num-concurrent" ]; then
             check=1
         fi
