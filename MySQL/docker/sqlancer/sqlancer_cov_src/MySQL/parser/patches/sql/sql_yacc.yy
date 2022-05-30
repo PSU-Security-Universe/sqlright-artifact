@@ -30,7 +30,8 @@
 %code requires {
 #include <vector>
 using std::vector;
-#include "sql/sql_lex.h"
+//#include "sql/sql_lex.h"
+class IR;
 }
 
 %{
@@ -150,7 +151,7 @@ Note: YYTHD is passed as an argument to yyparse(), and subsequently to yylex().
 #include "sql/sql_get_diagnostics.h"               // Sql_cmd_get_diagnostics
 #include "sql/sql_handler.h"                       // Sql_cmd_handler_*
 #include "sql/sql_import.h"                        // Sql_cmd_import_table
-// #include "sql/sql_lex.h"
+#include "sql/sql_lex.h"
 #include "sql/sql_list.h"
 #include "sql/sql_parse.h"                        /* comp_*_creator */
 #include "sql/sql_plugin.h"                      // plugin_is_ready
@@ -3838,7 +3839,7 @@ prepare:
 prepare_src:
 
     TEXT_STRING_sys {
-        auto tmp1 = new IR(kIdentifier, to_string($1), kDataFixLater, 0, kFlagUnknown);
+        auto tmp1 = new IR(kPrepareSrcStr, to_string($1), kDataFixLater, 0, kFlagUnknown);
         ir_vec.push_back(tmp1);
         res = new IR(kPrepareSrc, OP3("", "", ""), tmp1);
         ir_vec.push_back(res); 
@@ -9951,6 +9952,7 @@ table_constraint_def:
         $$ = res;
 
         tmp2->set_opt_ident_type(kDataIndexName, kDefine);
+        tmp3->set_key_list_type(kDataColumnName, kUseDefine);
     }
 
     | opt_constraint_name check_constraint opt_constraint_enforcement {
@@ -10269,7 +10271,7 @@ type:
     | YEAR_SYM opt_field_length field_options {
         auto tmp1 = $2;
         auto tmp2 = $3;
-        res = new IR(kType, OP3("SQL_TSI_YEAR", "", ""), tmp1, tmp2);
+        res = new IR(kType, OP3("YEAR", "", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -11453,7 +11455,7 @@ references:
         ir_vec.push_back(res); 
         $$ = res;
 
-        tmp2->set_table_ident_type(kDataTableName, kUse);
+        tmp1->set_table_ident_type(kDataTableName, kUse);
     }
 
 ;
@@ -16008,7 +16010,7 @@ predicate:
     | bit_expr IN_SYM '(' expr ')' {
         auto tmp1 = $1;
         auto tmp2 = $4;
-        res = new IR(kPredicate, OP3("", "IN (", ")"), tmp1, tmp2);
+        res = new IR(kPredicate, OP3("", "IN(", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16016,7 +16018,7 @@ predicate:
     | bit_expr IN_SYM '(' expr ',' expr_list ')' {
         auto tmp1 = $1;
         auto tmp2 = $4;
-        res = new IR(kPredicate_2, OP3("", "IN (", ","), tmp1, tmp2);
+        res = new IR(kPredicate_2, OP3("", "IN(", ","), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $6;
@@ -16028,7 +16030,7 @@ predicate:
     | bit_expr not IN_SYM '(' expr ')' {
         auto tmp1 = $1;
         auto tmp2 = $2;
-        res = new IR(kPredicate_3, OP3("", "", "IN ("), tmp1, tmp2);
+        res = new IR(kPredicate_3, OP3("", "", "IN("), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $5;
@@ -16040,7 +16042,7 @@ predicate:
     | bit_expr not IN_SYM '(' expr ',' expr_list ')' {
         auto tmp1 = $1;
         auto tmp2 = $2;
-        res = new IR(kPredicate_4, OP3("", "", "IN ("), tmp1, tmp2);
+        res = new IR(kPredicate_4, OP3("", "", "IN("), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $5;
@@ -16603,7 +16605,7 @@ simple_expr:
     | ROW_SYM '(' expr ',' expr_list ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kSimpleExpr, OP3("ROW (", ",", ")"), tmp1, tmp2);
+        res = new IR(kSimpleExpr, OP3("ROW(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16646,7 +16648,7 @@ simple_expr:
     | CAST_SYM '(' expr AS cast_type opt_array_cast ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kSimpleExpr_2, OP3("CAST (", "AS", ""), tmp1, tmp2);
+        res = new IR(kSimpleExpr_2, OP3("CAST(", "AS", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $6;
@@ -16658,7 +16660,7 @@ simple_expr:
     | CAST_SYM '(' expr AT_SYM LOCAL_SYM AS cast_type opt_array_cast ')' {
         auto tmp1 = $3;
         auto tmp2 = $7;
-        res = new IR(kSimpleExpr_3, OP3("CAST (", "AT LOCAL AS", ""), tmp1, tmp2);
+        res = new IR(kSimpleExpr_3, OP3("CAST(", "AT LOCAL AS", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $8;
@@ -16699,7 +16701,7 @@ simple_expr:
     | CONVERT_SYM '(' expr ',' cast_type ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kSimpleExpr, OP3("CONVERT (", ",", ")"), tmp1, tmp2);
+        res = new IR(kSimpleExpr, OP3("CONVERT(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16707,21 +16709,21 @@ simple_expr:
     | CONVERT_SYM '(' expr USING charset_name ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kSimpleExpr, OP3("CONVERT (", "USING", ")"), tmp1, tmp2);
+        res = new IR(kSimpleExpr, OP3("CONVERT(", "USING", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | DEFAULT_SYM '(' simple_ident ')' {
         auto tmp1 = $3;
-        res = new IR(kSimpleExpr, OP3("DEFAULT (", ")", ""), tmp1);
+        res = new IR(kSimpleExpr, OP3("DEFAULT(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | VALUES '(' simple_ident_nospvar ')' {
         auto tmp1 = $3;
-        res = new IR(kSimpleExpr, OP3("VALUES (", ")", ""), tmp1);
+        res = new IR(kSimpleExpr, OP3("VALUES(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16786,7 +16788,7 @@ function_call_keyword:
 
     CHAR_SYM '(' expr_list ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("CHAR (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("CHAR(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16794,7 +16796,7 @@ function_call_keyword:
     | CHAR_SYM '(' expr_list USING charset_name ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallKeyword, OP3("CHAR (", "USING", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword, OP3("CHAR(", "USING", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16808,21 +16810,21 @@ function_call_keyword:
 
     | DATE_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("DATE (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("DATE(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | DAY_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("DAY (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("DAY(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | HOUR_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("HOUR (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("HOUR(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16830,7 +16832,7 @@ function_call_keyword:
     | INSERT_SYM '(' expr ',' expr ',' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallKeyword_1, OP3("INSERT (", ",", ","), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword_1, OP3("INSERT(", ",", ","), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -16846,7 +16848,7 @@ function_call_keyword:
     | INTERVAL_SYM '(' expr ',' expr ')' %prec INTERVAL_SYM {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallKeyword, OP3("INTERVAL (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword, OP3("INTERVAL(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16854,7 +16856,7 @@ function_call_keyword:
     | INTERVAL_SYM '(' expr ',' expr ',' expr_list ')' %prec INTERVAL_SYM {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallKeyword_3, OP3("INTERVAL (", ",", ","), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword_3, OP3("INTERVAL(", ",", ","), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -16866,7 +16868,7 @@ function_call_keyword:
     | JSON_VALUE_SYM '(' simple_expr ',' text_literal opt_returning_type opt_on_empty_or_error ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallKeyword_4, OP3("JSON_VALUE (", ",", ""), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword_4, OP3("JSON_VALUE(", ",", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $6;
@@ -16882,21 +16884,21 @@ function_call_keyword:
     | LEFT '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallKeyword, OP3("LEFT (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword, OP3("LEFT(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | MINUTE_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("MINUTE (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("MINUTE(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | MONTH_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("MONTH (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("MONTH(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16904,28 +16906,28 @@ function_call_keyword:
     | RIGHT '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallKeyword, OP3("RIGHT (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword, OP3("RIGHT(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | SECOND_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("SECOND (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("SECOND(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | TIME_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("TIME (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("TIME(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | TIMESTAMP_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("TIMESTAMP (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("TIMESTAMP(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16933,14 +16935,14 @@ function_call_keyword:
     | TIMESTAMP_SYM '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallKeyword, OP3("TIMESTAMP (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword, OP3("TIMESTAMP(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | TRIM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("TRIM (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("TRIM(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16948,7 +16950,7 @@ function_call_keyword:
     | TRIM '(' LEADING expr FROM expr ')' {
         auto tmp1 = $4;
         auto tmp2 = $6;
-        res = new IR(kFunctionCallKeyword, OP3("TRIM ( LEADING", "FROM", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword, OP3("TRIM( LEADING", "FROM", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16956,7 +16958,7 @@ function_call_keyword:
     | TRIM '(' TRAILING expr FROM expr ')' {
         auto tmp1 = $4;
         auto tmp2 = $6;
-        res = new IR(kFunctionCallKeyword, OP3("TRIM ( TRAILING", "FROM", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword, OP3("TRIM( TRAILING", "FROM", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16964,28 +16966,28 @@ function_call_keyword:
     | TRIM '(' BOTH expr FROM expr ')' {
         auto tmp1 = $4;
         auto tmp2 = $6;
-        res = new IR(kFunctionCallKeyword, OP3("TRIM ( BOTH", "FROM", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword, OP3("TRIM( BOTH", "FROM", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | TRIM '(' LEADING FROM expr ')' {
         auto tmp1 = $5;
-        res = new IR(kFunctionCallKeyword, OP3("TRIM ( LEADING FROM", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("TRIM( LEADING FROM", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | TRIM '(' TRAILING FROM expr ')' {
         auto tmp1 = $5;
-        res = new IR(kFunctionCallKeyword, OP3("TRIM ( TRAILING FROM", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("TRIM( TRAILING FROM", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | TRIM '(' BOTH FROM expr ')' {
         auto tmp1 = $5;
-        res = new IR(kFunctionCallKeyword, OP3("TRIM ( BOTH FROM", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("TRIM( BOTH FROM", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -16993,20 +16995,20 @@ function_call_keyword:
     | TRIM '(' expr FROM expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallKeyword, OP3("TRIM (", "FROM", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallKeyword, OP3("TRIM(", "FROM", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | USER '(' ')' {
-        res = new IR(kFunctionCallKeyword, OP3("USER ( )", "", ""));
+        res = new IR(kFunctionCallKeyword, OP3("USER( )", "", ""));
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | YEAR_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallKeyword, OP3("SQL_TSI_YEAR (", ")", ""), tmp1);
+        res = new IR(kFunctionCallKeyword, OP3("YEAR(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17031,7 +17033,7 @@ function_call_nonkeyword:
     ADDDATE_SYM '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword, OP3("ADDDATE (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword, OP3("ADDDATE(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17039,7 +17041,7 @@ function_call_nonkeyword:
     | ADDDATE_SYM '(' expr ',' INTERVAL_SYM expr interval ')' {
         auto tmp1 = $3;
         auto tmp2 = $6;
-        res = new IR(kFunctionCallNonkeyword_1, OP3("ADDDATE (", ", INTERVAL", ""), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword_1, OP3("ADDDATE(", ", INTERVAL", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17065,7 +17067,7 @@ function_call_nonkeyword:
     | DATE_ADD_INTERVAL '(' expr ',' INTERVAL_SYM expr interval ')' %prec INTERVAL_SYM {
         auto tmp1 = $3;
         auto tmp2 = $6;
-        res = new IR(kFunctionCallNonkeyword_2, OP3("DATE_ADD (", ", INTERVAL", ""), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword_2, OP3("DATE_ADD(", ", INTERVAL", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17077,7 +17079,7 @@ function_call_nonkeyword:
     | DATE_SUB_INTERVAL '(' expr ',' INTERVAL_SYM expr interval ')' %prec INTERVAL_SYM {
         auto tmp1 = $3;
         auto tmp2 = $6;
-        res = new IR(kFunctionCallNonkeyword_3, OP3("DATE_SUB (", ", INTERVAL", ""), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword_3, OP3("DATE_SUB(", ", INTERVAL", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17089,7 +17091,7 @@ function_call_nonkeyword:
     | EXTRACT_SYM '(' interval FROM expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword, OP3("EXTRACT (", "FROM", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword, OP3("EXTRACT(", "FROM", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17097,7 +17099,7 @@ function_call_nonkeyword:
     | GET_FORMAT '(' date_time_type ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword, OP3("GET_FORMAT (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword, OP3("GET_FORMAT(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17112,7 +17114,7 @@ function_call_nonkeyword:
     | POSITION_SYM '(' bit_expr IN_SYM expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword, OP3("POSITION (", "IN", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword, OP3("POSITION(", "IN", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17120,7 +17122,7 @@ function_call_nonkeyword:
     | SUBDATE_SYM '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword, OP3("SUBDATE (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword, OP3("SUBDATE(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17128,7 +17130,7 @@ function_call_nonkeyword:
     | SUBDATE_SYM '(' expr ',' INTERVAL_SYM expr interval ')' {
         auto tmp1 = $3;
         auto tmp2 = $6;
-        res = new IR(kFunctionCallNonkeyword_4, OP3("SUBDATE (", ", INTERVAL", ""), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword_4, OP3("SUBDATE(", ", INTERVAL", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17140,7 +17142,7 @@ function_call_nonkeyword:
     | SUBSTRING '(' expr ',' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword_5, OP3("MID (", ",", ","), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword_5, OP3("MID(", ",", ","), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17152,7 +17154,7 @@ function_call_nonkeyword:
     | SUBSTRING '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword, OP3("MID (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword, OP3("MID(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17160,7 +17162,7 @@ function_call_nonkeyword:
     | SUBSTRING '(' expr FROM expr FOR_SYM expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword_6, OP3("MID (", "FROM", "FOR"), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword_6, OP3("MID(", "FROM", "FOR"), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17172,7 +17174,7 @@ function_call_nonkeyword:
     | SUBSTRING '(' expr FROM expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword, OP3("MID (", "FROM", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword, OP3("MID(", "FROM", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17187,7 +17189,7 @@ function_call_nonkeyword:
     | TIMESTAMP_ADD '(' interval_time_stamp ',' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword_7, OP3("TIMESTAMPADD (", ",", ","), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword_7, OP3("TIMESTAMPADD(", ",", ","), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17199,7 +17201,7 @@ function_call_nonkeyword:
     | TIMESTAMP_DIFF '(' interval_time_stamp ',' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallNonkeyword_8, OP3("TIMESTAMPDIFF (", ",", ","), tmp1, tmp2);
+        res = new IR(kFunctionCallNonkeyword_8, OP3("TIMESTAMPDIFF(", ",", ","), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17264,34 +17266,34 @@ function_call_conflict:
 
     ASCII_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallConflict, OP3("ASCII (", ")", ""), tmp1);
+        res = new IR(kFunctionCallConflict, OP3("ASCII(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | CHARSET '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallConflict, OP3("CHARSET (", ")", ""), tmp1);
+        res = new IR(kFunctionCallConflict, OP3("CHARSET(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | COALESCE '(' expr_list ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallConflict, OP3("COALESCE (", ")", ""), tmp1);
+        res = new IR(kFunctionCallConflict, OP3("COALESCE(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | COLLATION_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallConflict, OP3("COLLATION (", ")", ""), tmp1);
+        res = new IR(kFunctionCallConflict, OP3("COLLATION(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | DATABASE '(' ')' {
-        res = new IR(kFunctionCallConflict, OP3("DATABASE ( )", "", ""));
+        res = new IR(kFunctionCallConflict, OP3("DATABASE( )", "", ""));
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17299,7 +17301,7 @@ function_call_conflict:
     | IF '(' expr ',' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallConflict_1, OP3("IF (", ",", ","), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict_1, OP3("IF(", ",", ","), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17311,7 +17313,7 @@ function_call_conflict:
     | FORMAT_SYM '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallConflict, OP3("FORMAT (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict, OP3("FORMAT(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17319,7 +17321,7 @@ function_call_conflict:
     | FORMAT_SYM '(' expr ',' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallConflict_2, OP3("FORMAT (", ",", ","), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict_2, OP3("FORMAT(", ",", ","), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17330,7 +17332,7 @@ function_call_conflict:
 
     | MICROSECOND_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallConflict, OP3("MICROSECOND (", ")", ""), tmp1);
+        res = new IR(kFunctionCallConflict, OP3("MICROSECOND(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17338,14 +17340,14 @@ function_call_conflict:
     | MOD_SYM '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallConflict, OP3("MOD (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict, OP3("MOD(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | QUARTER_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallConflict, OP3("QUARTER (", ")", ""), tmp1);
+        res = new IR(kFunctionCallConflict, OP3("QUARTER(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17353,7 +17355,7 @@ function_call_conflict:
     | REPEAT_SYM '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallConflict, OP3("REPEAT (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict, OP3("REPEAT(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17361,7 +17363,7 @@ function_call_conflict:
     | REPLACE_SYM '(' expr ',' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallConflict_3, OP3("REPLACE (", ",", ","), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict_3, OP3("REPLACE(", ",", ","), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17372,13 +17374,13 @@ function_call_conflict:
 
     | REVERSE_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallConflict, OP3("REVERSE (", ")", ""), tmp1);
+        res = new IR(kFunctionCallConflict, OP3("REVERSE(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | ROW_COUNT_SYM '(' ')' {
-        res = new IR(kFunctionCallConflict, OP3("ROW_COUNT ( )", "", ""));
+        res = new IR(kFunctionCallConflict, OP3("ROW_COUNT( )", "", ""));
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17386,14 +17388,14 @@ function_call_conflict:
     | TRUNCATE_SYM '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallConflict, OP3("TRUNCATE (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict, OP3("TRUNCATE(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | WEEK_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallConflict, OP3("SQL_TSI_WEEK (", ")", ""), tmp1);
+        res = new IR(kFunctionCallConflict, OP3("WEEK(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17401,14 +17403,14 @@ function_call_conflict:
     | WEEK_SYM '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallConflict, OP3("SQL_TSI_WEEK (", ",", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict, OP3("WEEK(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | WEIGHT_STRING_SYM '(' expr ')' {
         auto tmp1 = $3;
-        res = new IR(kFunctionCallConflict, OP3("WEIGHT_STRING (", ")", ""), tmp1);
+        res = new IR(kFunctionCallConflict, OP3("WEIGHT_STRING(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17416,7 +17418,7 @@ function_call_conflict:
     | WEIGHT_STRING_SYM '(' expr AS CHAR_SYM ws_num_codepoints ')' {
         auto tmp1 = $3;
         auto tmp2 = $6;
-        res = new IR(kFunctionCallConflict, OP3("WEIGHT_STRING (", "AS CHAR", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict, OP3("WEIGHT_STRING(", "AS CHAR", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17424,7 +17426,7 @@ function_call_conflict:
     | WEIGHT_STRING_SYM '(' expr AS BINARY_SYM ws_num_codepoints ')' {
         auto tmp1 = $3;
         auto tmp2 = $6;
-        res = new IR(kFunctionCallConflict, OP3("WEIGHT_STRING (", "AS BINARY", ")"), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict, OP3("WEIGHT_STRING(", "AS BINARY", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17432,7 +17434,7 @@ function_call_conflict:
     | WEIGHT_STRING_SYM '(' expr ',' ulong_num ',' ulong_num ',' ulong_num ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kFunctionCallConflict_4, OP3("WEIGHT_STRING (", ",", ","), tmp1, tmp2);
+        res = new IR(kFunctionCallConflict_4, OP3("WEIGHT_STRING(", ",", ","), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -17459,35 +17461,35 @@ geometry_function:
 
     GEOMETRYCOLLECTION_SYM '(' opt_expr_list ')' {
         auto tmp1 = $3;
-        res = new IR(kGeometryFunction, OP3("GEOMCOLLECTION (", ")", ""), tmp1);
+        res = new IR(kGeometryFunction, OP3("GEOMCOLLECTION(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | LINESTRING_SYM '(' expr_list ')' {
         auto tmp1 = $3;
-        res = new IR(kGeometryFunction, OP3("LINESTRING (", ")", ""), tmp1);
+        res = new IR(kGeometryFunction, OP3("LINESTRING(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | MULTILINESTRING_SYM '(' expr_list ')' {
         auto tmp1 = $3;
-        res = new IR(kGeometryFunction, OP3("MULTILINESTRING (", ")", ""), tmp1);
+        res = new IR(kGeometryFunction, OP3("MULTILINESTRING(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | MULTIPOINT_SYM '(' expr_list ')' {
         auto tmp1 = $3;
-        res = new IR(kGeometryFunction, OP3("MULTIPOINT (", ")", ""), tmp1);
+        res = new IR(kGeometryFunction, OP3("MULTIPOINT(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | MULTIPOLYGON_SYM '(' expr_list ')' {
         auto tmp1 = $3;
-        res = new IR(kGeometryFunction, OP3("MULTIPOLYGON (", ")", ""), tmp1);
+        res = new IR(kGeometryFunction, OP3("MULTIPOLYGON(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17495,14 +17497,14 @@ geometry_function:
     | POINT_SYM '(' expr ',' expr ')' {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kGeometryFunction, OP3("POINT (", ",", ")"), tmp1, tmp2);
+        res = new IR(kGeometryFunction, OP3("POINT(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | POLYGON_SYM '(' expr_list ')' {
         auto tmp1 = $3;
-        res = new IR(kGeometryFunction, OP3("POLYGON (", ")", ""), tmp1);
+        res = new IR(kGeometryFunction, OP3("POLYGON(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17780,7 +17782,7 @@ sum_expr:
     | MIN_SYM '(' in_sum_expr ')' opt_windowing_clause {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kSumExpr, OP3("", "", ""), tmp1, tmp2);
+        res = new IR(kSumExpr, OP3("MIN(", "", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17891,28 +17893,28 @@ window_func_call:
 
     | RANK_SYM '(' ')' windowing_clause {
         auto tmp1 = $4;
-        res = new IR(kWindowFuncCall, OP3("RANK ( )", "", ""), tmp1);
+        res = new IR(kWindowFuncCall, OP3("RANK( )", "", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | DENSE_RANK_SYM '(' ')' windowing_clause {
         auto tmp1 = $4;
-        res = new IR(kWindowFuncCall, OP3("DENSE_RANK ( )", "", ""), tmp1);
+        res = new IR(kWindowFuncCall, OP3("DENSE_RANK( )", "", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | CUME_DIST_SYM '(' ')' windowing_clause {
         auto tmp1 = $4;
-        res = new IR(kWindowFuncCall, OP3("CUME_DIST ( )", "", ""), tmp1);
+        res = new IR(kWindowFuncCall, OP3("CUME_DIST( )", "", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
 
     | PERCENT_RANK_SYM '(' ')' windowing_clause {
         auto tmp1 = $4;
-        res = new IR(kWindowFuncCall, OP3("PERCENT_RANK ( )", "", ""), tmp1);
+        res = new IR(kWindowFuncCall, OP3("PERCENT_RANK( )", "", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17920,7 +17922,7 @@ window_func_call:
     | NTILE_SYM '(' stable_integer ')' windowing_clause {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kWindowFuncCall, OP3("NTILE (", ")", ""), tmp1, tmp2);
+        res = new IR(kWindowFuncCall, OP3("NTILE(", ")", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -17928,7 +17930,7 @@ window_func_call:
     | LEAD_SYM '(' expr opt_lead_lag_info ')' opt_null_treatment windowing_clause {
         auto tmp1 = $3;
         auto tmp2 = $4;
-        res = new IR(kWindowFuncCall_9, OP3("LEAD (", "", ")"), tmp1, tmp2);
+        res = new IR(kWindowFuncCall_9, OP3("LEAD(", "", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $6;
@@ -17944,7 +17946,7 @@ window_func_call:
     | LAG_SYM '(' expr opt_lead_lag_info ')' opt_null_treatment windowing_clause {
         auto tmp1 = $3;
         auto tmp2 = $4;
-        res = new IR(kWindowFuncCall_11, OP3("LAG (", "", ")"), tmp1, tmp2);
+        res = new IR(kWindowFuncCall_11, OP3("LAG(", "", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $6;
@@ -17960,7 +17962,7 @@ window_func_call:
     | FIRST_VALUE_SYM '(' expr ')' opt_null_treatment windowing_clause {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kWindowFuncCall_13, OP3("FIRST_VALUE (", ")", ""), tmp1, tmp2);
+        res = new IR(kWindowFuncCall_13, OP3("FIRST_VALUE(", ")", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $6;
@@ -17972,7 +17974,7 @@ window_func_call:
     | LAST_VALUE_SYM '(' expr ')' opt_null_treatment windowing_clause {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kWindowFuncCall_14, OP3("LAST_VALUE (", ")", ""), tmp1, tmp2);
+        res = new IR(kWindowFuncCall_14, OP3("LAST_VALUE(", ")", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $6;
@@ -17984,7 +17986,7 @@ window_func_call:
     | NTH_VALUE_SYM '(' expr ',' simple_expr ')' opt_from_first_last opt_null_treatment windowing_clause {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kWindowFuncCall_15, OP3("NTH_VALUE (", ",", ")"), tmp1, tmp2);
+        res = new IR(kWindowFuncCall_15, OP3("NTH_VALUE(", ",", ")"), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $7;
@@ -18685,7 +18687,7 @@ cast_type:
     }
 
     | YEAR_SYM {
-        res = new IR(kCastType, OP3("SQL_TSI_YEAR", "", ""));
+        res = new IR(kCastType, OP3("YEAR", "", ""));
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -19267,7 +19269,7 @@ use_partition:
 
     PARTITION_SYM '(' using_list ')' {
         auto tmp1 = $3;
-        res = new IR(kUsePartition, OP3("PARTITION (", ")", ""), tmp1);
+        res = new IR(kUsePartition, OP3("PARTITION(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
 
@@ -19461,7 +19463,7 @@ table_function:
     JSON_TABLE_SYM '(' expr ',' text_literal columns_clause ')' opt_table_alias {
         auto tmp1 = $3;
         auto tmp2 = $5;
-        res = new IR(kTableFunction_1, OP3("JSON_TABLE (", ",", ""), tmp1, tmp2);
+        res = new IR(kTableFunction_1, OP3("JSON_TABLE(", ",", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
 
         auto tmp3 = $6;
@@ -19481,7 +19483,7 @@ columns_clause:
 
     COLUMNS '(' columns_list ')' {
         auto tmp1 = $3;
-        res = new IR(kColumnsClause, OP3("COLUMNS (", ")", ""), tmp1);
+        res = new IR(kColumnsClause, OP3("COLUMNS(", ")", ""), tmp1);
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -19982,7 +19984,7 @@ interval_time_stamp:
     }
 
     | WEEK_SYM {
-        res = new IR(kIntervalTimeStamp, OP3("SQL_TSI_WEEK", "", ""));
+        res = new IR(kIntervalTimeStamp, OP3("WEEK", "", ""));
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -20024,7 +20026,7 @@ interval_time_stamp:
     }
 
     | YEAR_SYM {
-        res = new IR(kIntervalTimeStamp, OP3("SQL_TSI_YEAR", "", ""));
+        res = new IR(kIntervalTimeStamp, OP3("YEAR", "", ""));
         ir_vec.push_back(res); 
         $$ = res;
     }
@@ -20088,7 +20090,7 @@ opt_table_alias:
 
     | opt_as ident {
         auto tmp1 = $1;
-        auto tmp2 = new IR(kIdentifier, to_string($2), kDataAliasName, 0, kDefine);
+        auto tmp2 = new IR(kIdentifier, to_string($2), kDataAliasTableName, 0, kDefine);
         ir_vec.push_back(tmp2);
         res = new IR(kOptTableAlias, OP3("", "", ""), tmp1, tmp2);
         ir_vec.push_back(res); 
@@ -24684,8 +24686,8 @@ simple_ident_q:
         ir_vec.push_back(res); 
         $$ = res;
 
-        tmp1->set_ident_type(kDataTableName, kUse);
-        tmp2->set_ident_type(kDataColumnName, kUse);
+        tmp1->set_ident_type(kDataTableNameFollow, kUse);
+        tmp2->set_ident_type(kDataColumnNameFollow, kUse);
     }
 
     | ident '.' ident '.' ident {
@@ -24702,9 +24704,9 @@ simple_ident_q:
         ir_vec.push_back(res); 
         $$ = res;
 
-        tmp1->set_ident_type(kDataDatabase, kUse);
-        tmp2->set_ident_type(kDataTableName, kUse);
-        tmp3->set_ident_type(kDataColumnName, kUse);
+        tmp1->set_ident_type(kDataDatabaseFollow, kUse);
+        tmp2->set_ident_type(kDataTableNameFollow, kUse);
+        tmp3->set_ident_type(kDataColumnNameFollow, kUse);
     }
 
 ;
@@ -24785,9 +24787,12 @@ IDENT_sys:
             }
             else
             {
-              if (thd->convert_string(&$$, system_charset_info,
-                                  $1.str, $1.length, thd->charset()))
-                MYSQL_YYABORT;
+            //   if (thd->convert_string(&$$, system_charset_info,
+            //                       $1.str, $1.length, thd->charset()))
+
+            /* Yu: Has leaks. Do not make it too complicated, just returns.  */
+                $$= $1;
+                // MYSQL_YYABORT;
             }
           }
         ;
@@ -24829,9 +24834,12 @@ TEXT_STRING_sys:
               $$= $1;
             else
             {
-              if (thd->convert_string(&$$, system_charset_info,
-                                  $1.str, $1.length, thd->charset()))
-                MYSQL_YYABORT;
+            //   if (thd->convert_string(&$$, system_charset_info,
+            //                       $1.str, $1.length, thd->charset()))
+
+            /* Yu: Has leaks. Do not make it too complicated, just returns.  */
+                $$= $1;
+                // MYSQL_YYABORT;
             }
           }
         ;
@@ -24845,9 +24853,12 @@ TEXT_STRING_literal:
               $$= $1;
             else
             {
-              if (thd->convert_string(&$$, thd->variables.collation_connection,
-                                  $1.str, $1.length, thd->charset()))
-                MYSQL_YYABORT;
+            //   if (thd->convert_string(&$$, thd->variables.collation_connection,
+            //                       $1.str, $1.length, thd->charset()))
+
+            /* Yu: Has leaks. Do not make it too complicated, just returns.  */
+                $$= $1;
+                // MYSQL_YYABORT;
             }
           }
         ;
@@ -24862,10 +24873,13 @@ TEXT_STRING_filesystem:
               $$= $1;
             else
             {
-              if (thd->convert_string(&$$,
-                                      thd->variables.character_set_filesystem,
-                                      $1.str, $1.length, thd->charset()))
-                MYSQL_YYABORT;
+            //   if (thd->convert_string(&$$,
+            //                           thd->variables.character_set_filesystem,
+            //                           $1.str, $1.length, thd->charset()))
+
+            /* Yu: Has leaks. Do not make it too complicated, just returns.  */
+                $$= $1;
+                // MYSQL_YYABORT;
             }
           }
         ;
@@ -24894,9 +24908,14 @@ TEXT_STRING_validated:
               $$= $1;
             else
             {
-              if (thd->convert_string(&$$, system_charset_info,
-                                  $1.str, $1.length, thd->charset(), true))
-                MYSQL_YYABORT;
+            //   if (thd->convert_string(&$$, system_charset_info,
+            //                       $1.str, $1.length, thd->charset(), true)) {
+            //     MYSQL_YYABORT;
+            //                       }
+            
+            /* Yu: Has leaks. Do not make it too complicated. Just return is fine. */
+                $$= $1;
+            //   MYSQL_YYABORT;
             }
           }
         ;

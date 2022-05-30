@@ -4269,6 +4269,7 @@ V(kBinLiteral) \
 V(kBase64Literal) \
 V(kStringLiteral) \
 V(kBoolLiteral) \
+V(kPrepareSrcStr) \
 V(kUnknown)
 
 #define ALLDATATYPE(V) \
@@ -4568,6 +4569,7 @@ public:
     };
 
     bool is_node_struct_fixed = false; // Do not mutate this IR if this set to be true.
+    bool is_mutating = false;
 
     IR* deep_copy();
     void drop();
@@ -4651,6 +4653,7 @@ public:
     bool set_key_part_type(DATATYPE, DATAFLAG);
     bool set_key_part_with_expression_type(DATATYPE, DATAFLAG);
     bool set_key_list_with_expression_type(DATATYPE, DATAFLAG);
+    bool set_key_list_type(DATATYPE, DATAFLAG);
 
 };
 

@@ -108,6 +108,20 @@ void setup_server_for_unit_tests() {
   DD_initializer::SetUp();
 }
 
+void teardown_server_simple() {
+  mysql_bin_log.cleanup();
+  // range_optimizer_free();
+  transaction_cache_free();
+  gtid_server_cleanup();
+  // query_logger.cleanup();
+  // item_create_cleanup();
+  // key_caches.delete_elements();
+  // free_tmpdir(&mysql_tmpdir_list);
+  u_cleanup();
+  cleanup_errmsgs();
+  // deinit_errmessage();  // finish server errs
+}
+
 void teardown_server_for_unit_tests() {
   mysql_bin_log.cleanup();
   range_optimizer_free();

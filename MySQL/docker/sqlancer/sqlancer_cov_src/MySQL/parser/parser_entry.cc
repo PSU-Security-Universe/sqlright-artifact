@@ -38,9 +38,6 @@ int run_parser(string cmd_str, vector<IR*>& ir_vec) {
 
   // printf("Enter parser function.\n");
 
-  const LEX_CSTRING db_name = {"db", 4};
-  initializer.thd()->set_db(db_name);
-
   ir_vec = ::parse(&initializer, cmd_str.c_str(), 0, 0);
 
   if (ir_vec.size() == 0) {
@@ -50,6 +47,8 @@ int run_parser(string cmd_str, vector<IR*>& ir_vec) {
   if ( ir_vec.back()->get_ir_type() != kStartEntry) {
     return 1;
   }
+
+  // my_testing::teardown_server_simple();
 
   // printf("Exit parser function.\n");
   return 0;

@@ -515,14 +515,15 @@ bool lex_start(THD *thd) {
   // Initialize the cost model to be used for this query
   thd->init_cost_model();
 
-  const bool status = lex->new_top_level_query();
-  assert(lex->current_query_block() == nullptr);
-  lex->m_current_query_block = lex->query_block;
+  // const bool status = lex->new_top_level_query();
+  // assert(lex->current_query_block() == nullptr);
+  // lex->m_current_query_block = lex->query_block;
 
-  lex->m_IS_table_stats.invalidate_cache();
-  lex->m_IS_tablespace_stats.invalidate_cache();
+  // lex->m_IS_table_stats.invalidate_cache();
+  // lex->m_IS_tablespace_stats.invalidate_cache();
 
-  return status;
+  // return status;
+  return true;
 }
 
 /**
@@ -5096,7 +5097,11 @@ void trim_string(std::string &res) {
 
       prev_is_space = false;
 
-    } else {
+    } else if (c == '@') {
+      // Skip following spaces. 
+      res[effect_idx++] = c;
+    }
+    else {
 
       prev_is_space = false;
       res[effect_idx++] = c;
@@ -5127,6 +5132,9 @@ IR* deep_copy(const IR* const root) {
   copy_res->data_type_ = root->data_type_;
   copy_res->data_flag_ = root->data_flag_;
 
+  copy_res->is_node_struct_fixed = root->is_node_struct_fixed;
+  copy_res->is_mutating = root->is_mutating;
+
   return copy_res;
 }
 
@@ -5154,6 +5162,9 @@ IR *IR::deep_copy() {
   } else {
     copy_res->parent_ = NULL;
   }
+
+  copy_res->is_node_struct_fixed = this->is_node_struct_fixed;
+  copy_res->is_mutating = this->is_mutating;
 
   return copy_res;
 }
@@ -5193,31 +5204,37 @@ std::string IR::to_string_core(){
 
     std::string res;
 
-    if (str_val_ != "") {
-      res += str_val_;
-      return res;
-    }
-
-    if( op_!= NULL ){
-        //if(op_->prefix_ == NULL)
-            ///cout << "FUCK NULL prefix" << endl;
-         //cout << "OP_Prex: " << op_->prefix_ << endl;
+    if( op_!= NULL && op_->prefix_ != "" ){
         res += op_->prefix_ + " ";
     }
-     //cout << "OP_1_" << op_ << endl;
-    if(left_ != NULL)
-        //res += left_->to_string() + " ";
-        res += left_->to_string_core() + " ";
-    // cout << "OP_2_" << op_ << endl;
-    if( op_!= NULL)
-        res += op_->middle_ + " ";
-     //cout << "OP_3_" << op_ << endl;
-    if(right_ != NULL)
-        //res += right_->to_string() + " ";
-        res += right_->to_string_core() + " ";
-     //cout << "OP_4_" << op_ << endl;
-    if(op_!= NULL)
-        res += op_->suffix_;
+
+    if(left_ != NULL) {
+      res += left_->to_string_core() + " ";
+    }
+
+
+    if( op_!= NULL && op_->middle_ != "") {
+      res += op_->middle_ + " ";
+    }
+    if (
+      get_ir_type() == kStringLiteral ||
+      get_ir_type() == kPrepareSrcStr
+    ) {
+      res += " '" + str_val_ + "' ";
+    }
+    else if (str_val_ != "") {
+      res += " " + str_val_ + " ";
+    }
+
+
+    if(right_ != NULL) {
+      res += right_->to_string_core() + " ";
+    }
+
+    
+    if(op_!= NULL && op_->suffix_ != "") {
+      res += op_->suffix_ + " ";
+    }
 
     return res;
 }
@@ -5687,6 +5704,19 @@ bool IR::set_key_part_with_expression_type(DATATYPE data_type, DATAFLAG data_fla
   }
 
   // Only fixing kKeyPart. kExpr is out of our control. 
+
+  return true;
+}
+
+bool IR::set_key_list_type(DATATYPE data_type, DATAFLAG data_flag) {
+  assert(this->get_ir_type() == kKeyList);
+
+  if (get_right()) {
+    get_right()->set_key_part_type(data_type, data_flag);
+    get_left()->set_key_list_type(data_type, data_flag);
+  } else {
+    get_left()->set_key_part_type(data_type, data_flag);
+  }
 
   return true;
 }

@@ -2837,11 +2837,16 @@ bool THD::sql_parser(std::vector<IR*>& ir_vec) {
       does not leave any side effects in the THD.
     */
     cleanup_after_parse_error();
+    mem_root->Clear();
     return true;
   }
   if (root != nullptr && lex->make_sql_cmd(root)) {
+    cleanup_after_parse_error();
+    mem_root->Clear();
     return true;
   }
+  cleanup_after_parse_error();
+  mem_root->Clear();
   return false;
 }
 

@@ -119,6 +119,8 @@ static std::vector<IR*> parse(const Server_initializer *initializer,
     ir_vec.clear();
   }
 
+  lex_end(initializer->thd()->lex);
+
   return ir_vec;
 }
 

@@ -4,6 +4,8 @@ MAINTAINER "PSU-Security-Universe"
 ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+RUN chmod 777 /tmp
+
 RUN apt -y update
 RUN apt -y upgrade
 RUN apt -y install bison
@@ -200,7 +202,27 @@ USER mysql
 WORKDIR /home/mysql/sqlancer/sqlancer
 RUN mvn package -DskipTests
 
-WORKDIR /home/myqsl/sqlancer/sqlancer_cov_src/MySQL
+WORKDIR /home/mysql/sqlancer/sqlancer_cov_src/MySQL/parser
+RUN wget https://github.com/mysql/mysql-server/archive/refs/tags/mysql-8.0.27.zip
+RUN unzip mysql-8.0.27.zip 
+RUN mv mysql-server-mysql-8.0.27 mysql-server
+
+WORKDIR /home/mysql/sqlancer/sqlancer_cov_src/MySQL/parser/patches
+RUN bash ./replace-changed-code.sh
+
+WORKDIR /home/mysql/sqlancer/sqlancer_cov_src/MySQL/parser/mysql-server
+RUN mkdir bld
+WORKDIR /home/mysql/sqlancer/sqlancer_cov_src/MySQL/parser/mysql-server/bld
+RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost
+RUN make -j$(nproc)
+
+RUN mkdir data
+RUN bin/mysqld --initialize-insecure --user=mysql --datadir=data
+RUN bin/mysql_ssl_rsa_setup --datadir=data
+RUN mkdir data_all
+RUN mv data data_all/ori_data
+
+WORKDIR /home/mysql/sqlancer/sqlancer_cov_src/MySQL
 RUN make
 
 RUN cp ./afl-fuzz /home/mysql/sqlancer/sqlancer_cov/afl-fuzz
