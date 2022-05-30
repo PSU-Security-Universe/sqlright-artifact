@@ -5,8 +5,6 @@
 #include <vector>
 #include <iostream>
 #include <random>
-#include "../include/ast.h"
-#include "../parser/parser_entry.h"
 
 using std::vector;
 using std::string;
@@ -135,8 +133,6 @@ bool is_str_empty(string input_str);
 string::const_iterator findStringIter(const std::string &strHaystack,
                                       const std::string &strNeedle);
 bool findStringIn(const std::string &strHaystack, const std::string &strNeedle);
-
-int run_parser_multi_stmt(string cmd_str, vector<IR*>& ir_vec_all_stmt);
 
 inline bool is_digits(string str) {
   if (str == "NaN") return true;

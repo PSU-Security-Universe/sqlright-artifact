@@ -1,5 +1,4 @@
 #include "../include/utils.h"
-#include "../include/ir_wrapper.h"
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -9,7 +8,6 @@
 
 using namespace std;
 
-IRWrapper ir_wrapper_2;
 
 void trim_string(string &res){
     int count = 0;
@@ -208,105 +206,4 @@ vector<string> string_splitter2(const string &s, const char delimiter) {
   }
 
   return output;
-}
-
-
-int run_parser_multi_stmt(string cmd_str, vector<IR*>& ir_vec_all_stmt) {
-
-  vector<IR*> ir_vec_single;
-  vector<IR*> v_ir_root;
-  IR* ir_root;
-
-  vector<string> v_cmd_str = string_splitter(cmd_str, ';');
-  for (string cur_cmd_str : v_cmd_str) {
-
-    if(is_str_empty(cur_cmd_str)) continue;
-
-    cur_cmd_str += ";";
-
-    ir_vec_single.clear();
-    int ret = run_parser(cur_cmd_str, ir_vec_single);
-
-    if (ret != 0 || ir_vec_single.size() == 0) {
-      // cerr << "String parsing failed: " << cur_cmd_str << "\n\n\n";
-      // for (IR* ir_root : v_ir_root) {
-      //   ir_root->deep_drop();
-      // }
-      // v_ir_root.clear();
-      // return 1;
-      continue;
-    }
-
-    IR* cur_ir_root = ir_vec_single.back();
-
-    if (!(cur_ir_root->get_left())) {
-      cur_ir_root->deep_drop();
-      continue;
-    }
-
-    if (!(cur_ir_root->get_left()->get_left())) {
-      cur_ir_root->deep_drop();
-      continue;
-    }
-
-    if (ir_vec_single.size() > 300) {
-      // Do not save too complicated statements. 
-      cur_ir_root->deep_drop();
-      continue;
-    }
-
-    // cerr << "Just run throught the run_parser, getting: \n";
-    // cerr << cur_ir_root->to_string();
-    // cerr << "\nend for single stmt. \n\n\n";
-
-    IR* cur_stmt = ir_wrapper_2.get_first_stmt_from_root(cur_ir_root)->deep_copy();
-    v_ir_root.push_back(cur_stmt);
-
-    cur_ir_root->deep_drop();
-  }
-
-  ir_root = ir_wrapper_2.reconstruct_ir_with_stmt_vec(v_ir_root);
-
-  // cerr << "DEBUG: Inside run_parser_multi_stmt, getting: \n";
-  // cerr << ir_root->to_string();
-  // cerr << get_string_by_ir_type(ir_root->type_);
-  // cerr << "\n\n\n";
-
-  if (!ir_root) {
-    // cerr << "IR reconstruct failed in run_parser_multi_stmt. \n\n\n";
-    for (IR* cur_ir_root : v_ir_root) {
-      cur_ir_root->deep_drop();
-    } 
-    return 1;
-  }
-
-  ir_vec_all_stmt = ir_wrapper_2.get_all_ir_node(ir_root);
-
-  if (ir_vec_all_stmt.size() > 0) {
-
-    /* Set up unique_id */
-    int id = 0;
-    for (IR* cur_ir : ir_vec_all_stmt) {
-      cur_ir->uniq_id_in_tree_ = id++;
-    }
-    /* Double check whether root's parent is NULL.  */
-    ir_vec_all_stmt.back()->parent_ = NULL; 
-
-    // cerr << "Before returnning in the run_parser_multi_stmt, last check on the root\n\n\n";
-    // ir_root = ir_vec_all_stmt.back();
-    // cerr << ir_root->to_string();
-    // cerr << get_string_by_ir_type(ir_root->type_);
-    // cerr << "\n\n\n";
-
-    for (IR* cur_ir_root : v_ir_root) {
-      cur_ir_root->deep_drop();
-    } 
-
-    return 0;
-  } else {
-    for (IR* cur_ir_root : v_ir_root) {
-      cur_ir_root->deep_drop();
-    } 
-    return 1;
-  }
 }

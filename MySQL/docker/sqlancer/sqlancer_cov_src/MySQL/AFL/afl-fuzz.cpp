@@ -41,9 +41,6 @@
 #include "debug.h"
 #include "alloc-inl.h"
 #include "hash.h"
-#include "../include/ast.h"
-#include "../include/mutate.h"
-#include "sql/sql_ir_define.h"
 #include "../include/utils.h"
 
 #include <stdio.h>
@@ -85,9 +82,6 @@
 #include <fstream>
 #include <filesystem>
 
-#include "../oracle/mysql_oracle.h"
-#include "../oracle/mysql_norec.h"
-// #include "../oracle/mysql_tlp.h"
 
 #include <mysql/mysql.h>
 #include <mysql/mysqld_error.h>
@@ -183,8 +177,6 @@ fstream map_id_out_f;
 
 string socket_path = "";
 
-Mutator g_mutator;
-SQL_ORACLE *p_oracle;
 
 std::mutex timeout_mutex;
 bool is_timeout = false;
@@ -649,7 +641,6 @@ int g_query_result = -1;
 int g_child_pid = -1;
 char *g_current_input = NULL;
 char *g_libary_path;
-IR *g_current_ir = NULL;
 MysqlClient g_mysqlclient((char *)"127.0.0.1", (char *)"root", NULL);
 
 //MysqlClient g_psql_client;
@@ -3341,250 +3332,6 @@ static void check_map_coverage(void)
   WARNF("Recompile binary with newer version of afl to improve coverage!");
 }
 
-/* Perform dry run of all test cases to confirm that the app is working as
-   expected. This is done only for the initial inputs, and only once. */
-
-static void perform_dry_run(char **argv)
-{
-
-  struct queue_entry *q = queue;
-  u32 cal_failures = 0;
-  u8 *skip_crashes = getenv("AFL_SKIP_CRASHES");
-
-  while (q)
-  {
-
-    u8 *use_mem;
-    u8 res;
-    s32 fd;
-
-    u8 *fn = strrchr((char *)q->fname, '/') + 1;
-
-    ACTF("Attempting dry run with '%s'...", fn);
-
-    fd = open(q->fname, O_RDONLY);
-    if (fd < 0)
-      PFATAL("Unable to open '%s'", q->fname);
-
-    use_mem = ck_alloc_nozero(q->len);
-
-    if (read(fd, use_mem, q->len) != q->len)
-      FATAL("Short read from '%s'", q->fname);
-
-    close(fd);
-
-    string query_str;
-    query_str.assign((char *)use_mem, q->len);
-
-    vector<IR *> ir_tree;
-    int ret = run_parser_multi_stmt(query_str, ir_tree);
-    if (ret != 0 || ir_tree.size() == 0)
-    {
-      // cerr << "Query seed: " << query_str << " is not passing the parser!"
-      //      << endl;
-    }
-    else
-    {
-      ir_tree.back()->deep_drop();
-      res = calibrate_case(argv, q, use_mem, 0, 1);
-    }
-
-    ck_free(use_mem);
-
-    if (stop_soon)
-      return;
-
-    if (res == crash_mode || res == FAULT_NOBITS)
-      SAYF(cGRA "    len = %u, map size = %u, exec speed = %llu us\n" cRST,
-           q->len, q->bitmap_size, q->exec_us);
-
-        switch (res)
-        {
-
-        case FAULT_NONE:
-
-          if (q == queue)
-            check_map_coverage();
-
-          if (crash_mode)
-            FATAL("Test case '%s' does *NOT* crash", fn);
-
-          break;
-
-        case FAULT_TMOUT:
-
-          if (timeout_given)
-          {
-
-            /* The -t nn+ syntax in the command line sets timeout_given to '2' and
-                 instructs afl-fuzz to tolerate but skip queue entries that time
-                 out. */
-
-            if (timeout_given > 1)
-            {
-              WARNF("Test case results in a timeout (skipping)");
-              q->cal_failed = CAL_CHANCES;
-              cal_failures++;
-              break;
-            }
-
-            SAYF("\n" cLRD "[-] " cRST
-                 "The program took more than %u ms to process one of the initial test cases.\n"
-                 "    Usually, the right thing to do is to relax the -t option - or to delete it\n"
-                 "    altogether and allow the fuzzer to auto-calibrate. That said, if you know\n"
-                 "    what you are doing and want to simply skip the unruly test cases, append\n"
-                 "    '+' at the end of the value passed to -t ('-t %u+').\n",
-                 exec_tmout,
-                 exec_tmout);
-
-            // FATAL("Test case '%s' results in a timeout", fn);
-            // cerr << "Test case '" << fn << "' results in a timeout.\n\n\n";
-            q->is_timeout = true;
-            timeout_seed_num++;
-            break;
-          }
-          else
-          {
-
-            SAYF("\n" cLRD "[-] " cRST
-                 "The program took more than %u ms to process one of the initial test cases.\n"
-                 "    This is bad news; raising the limit with the -t option is possible, but\n"
-                 "    will probably make the fuzzing process extremely slow.\n\n"
-
-                 "    If this test case is just a fluke, the other option is to just avoid it\n"
-                 "    altogether, and find one that is less of a CPU hog.\n",
-                 exec_tmout);
-
-            WARNF("Test case results in a timeout (skipping)");
-            q->cal_failed = CAL_CHANCES;
-            q->is_timeout = true;
-            cal_failures++;
-            timeout_seed_num++;
-            break;
-          }
-
-        case FAULT_CRASH:
-
-          if (crash_mode)
-            break;
-
-          if (skip_crashes)
-          {
-            WARNF("Test case results in a crash (skipping)");
-            q->cal_failed = CAL_CHANCES;
-            cal_failures++;
-            break;
-          }
-
-          if (mem_limit)
-          {
-
-            SAYF("\n" cLRD "[-] " cRST
-                 "Oops, the program crashed with one of the test cases provided. There are\n"
-                 "    several possible explanations:\n\n"
-
-                 "    - The test case causes known crashes under normal working conditions. If\n"
-                 "      so, please remove it. The fuzzer should be seeded with interesting\n"
-                 "      inputs - but not ones that cause an outright crash.\n\n"
-
-                 "    - The current memory limit (%s) is too low for this program, causing\n"
-                 "      it to die due to OOM when parsing valid files. To fix this, try\n"
-                 "      bumping it up with the -m setting in the command line. If in doubt,\n"
-                 "      try something along the lines of:\n\n"
-
-    #ifdef RLIMIT_AS
-                 "      ( ulimit -Sv $[%llu << 10]; /path/to/binary [...] <testcase )\n\n"
-    #else
-                 "      ( ulimit -Sd $[%llu << 10]; /path/to/binary [...] <testcase )\n\n"
-    #endif /* ^RLIMIT_AS */
-
-                 "      Tip: you can use http://jwilk.net/software/recidivm to quickly\n"
-                 "      estimate the required amount of virtual memory for the binary. Also,\n"
-                 "      if you are using ASAN, see %s/notes_for_asan.txt.\n\n"
-
-    #ifdef __APPLE__
-
-                 "    - On MacOS X, the semantics of fork() syscalls are non-standard and may\n"
-                 "      break afl-fuzz performance optimizations when running platform-specific\n"
-                 "      binaries. To fix this, set AFL_NO_FORKSRV=1 in the environment.\n\n"
-
-    #endif /* __APPLE__ */
-
-                 "    - Least likely, there is a horrible bug in the fuzzer. If other options\n"
-                 "      fail, poke <lcamtuf@coredump.cx> for troubleshooting tips.\n",
-                 DMS(mem_limit << 20), mem_limit - 1, doc_path);
-          }
-          else
-          {
-
-            SAYF("\n" cLRD "[-] " cRST
-                 "Oops, the program crashed with one of the test cases provided. There are\n"
-                 "    several possible explanations:\n\n"
-
-                 "    - The test case causes known crashes under normal working conditions. If\n"
-                 "      so, please remove it. The fuzzer should be seeded with interesting\n"
-                 "      inputs - but not ones that cause an outright crash.\n\n"
-
-    #ifdef __APPLE__
-
-                 "    - On MacOS X, the semantics of fork() syscalls are non-standard and may\n"
-                 "      break afl-fuzz performance optimizations when running platform-specific\n"
-                 "      binaries. To fix this, set AFL_NO_FORKSRV=1 in the environment.\n\n"
-
-    #endif /* __APPLE__ */
-
-                 "    - Least likely, there is a horrible bug in the fuzzer. If other options\n"
-                 "      fail, poke <lcamtuf@coredump.cx> for troubleshooting tips.\n");
-          }
-
-          // FATAL("Test case '%s' results in a crash", fn);
-          break;
-
-        case FAULT_ERROR:
-
-          // FATAL("Unable to execute target application ('%s')", argv[0]);
-          break;
-
-        case FAULT_NOINST:
-
-          // FATAL("No instrumentation detected");
-          break;
-
-        case FAULT_NOBITS:
-
-          useless_at_start++;
-
-          if (!in_bitmap && !shuffle_queue)
-            WARNF("No new instrumentation output, test case may be useless.");
-
-          break;
-        }
-
-    if (q->var_behavior)
-      WARNF("Instrumentation output varies across runs.");
-
-    q = q->next;
-  }
-
-  if (cal_failures)
-  {
-
-    if (cal_failures == queued_paths)
-      FATAL("All test cases time out%s, giving up!",
-            skip_crashes ? " or crash" : "");
-
-    WARNF("Skipped %u test cases (%0.02f%%) due to timeouts%s.", cal_failures,
-          ((double)cal_failures) * 100 / queued_paths,
-          skip_crashes ? " or crashes" : "");
-
-    // if (cal_failures * 5 > queued_paths)
-    //   WARNF(cLRD "High percentage of rejected test cases, check settings!");
-  }
-
-  OKF("All test cases processed.");
-}
-
-/* Helper function: link() if possible, copy otherwise. */
 
 static void link_or_copy(u8 *old_path, u8 *new_path)
 {
@@ -3814,267 +3561,6 @@ static void write_crash_readme(void)
           orig_cmdline, DMS(mem_limit << 20)); /* ignore errors */
 
   fclose(f);
-}
-
-/* Check if the result of an execve() during routine fuzzing is interesting,
-   save or queue the input test case for further analysis if so. Returns 1 if
-   entry is saved, 0 otherwise. */
-
-static u8 save_if_interesting(char **argv, string &query_str, u8 fault,
-                              const vector<int> &explain_diff_id = {})
-{
-
-  u8 *fn = "";
-  u8 hnb;
-  s32 fd;
-  u8 keeping = 0, res;
-
-  if (is_str_empty(query_str))
-    return keeping; // return 0; Empty string. Not added.
-
-  if (fault == crash_mode)
-  {
-
-    /* Keep only if there are new bits in the map, add to queue for
-       future fuzzing, etc. */
-
-    /* Always check has_new_bits first. */
-
-    /* If no_new_bits, dropped. However, if disable_coverage_feedback is specified, ignore has_new_bits. */
-    if ( !(hnb = has_new_bits(virgin_bits, query_str)) && !disable_coverage_feedback) {  
-      if (crash_mode)
-        total_crashes++;
-      return 0;
-    }
-
-    if (disable_coverage_feedback == 1)
-    { // Disable feedbacks. Drop all queries.
-      return keeping;
-    }
-
-    /* For evaluation experiments, if we need to disable coverage feedback and randomly drop queries:
-    **  1/10 of chances to save the interesting seed.
-    **  9/10 of chances to throw away the seed.
-    **/
-    if ( (disable_coverage_feedback == 2) && get_rand_int(10) < 9 ) {
-      // Drop query. 
-      return keeping;
-    }
-
-    /* If disable_coverage_feedback == 3, always go through save_if_interesting. */
-
-    stage_name = "add_to_library";
-
-    vector<IR*> ir_tree;
-    int ret = run_parser_multi_stmt(query_str, ir_tree);
-    if (ret != 0 || ir_tree.size() == 0) {
-      return keeping;
-    }
-
-    // IR * tmp_ir = ir_tree.back();
-    // g_mutator.extract_struct(tmp_ir);
-    // g_mutator.add_all_to_library(
-    //     tmp_ir->to_string(),
-    //     explain_diff_id);
-    ir_tree.back()->deep_drop();
-
-    show_stats();
-
-#ifndef SIMPLE_FILES
-
-    fn = alloc_printf("%s/queue/id:%06u,%s", out_dir, queued_paths,
-                      describe_op(hnb));
-
-#else
-
-    fn = alloc_printf("%s/queue/id_%06u", out_dir, queued_paths);
-
-#endif /* ^!SIMPLE_FILES */
-
-    add_to_queue(fn, query_str.size(), 0);
-
-    total_add_to_queue++;
-
-    if (hnb == 2)
-    {
-      queue_top->has_new_cov = 1;
-      queued_with_cov++;
-    }
-
-    queue_top->exec_cksum = hash32(trace_bits, MAP_SIZE, HASH_CONST);
-
-    /* Try to calibrate inline; this also calls update_bitmap_score() when
-       successful. */
-
-    // res = calibrate_case(argv, queue_top, mem, queue_cycle - 1, 0);
-
-    // if (res == FAULT_ERROR)
-    //   FATAL("Unable to execute target application");
-
-    fd = open(fn, O_WRONLY | O_CREAT | O_EXCL, 0600);
-    if (fd < 0)
-      PFATAL("Unable to create '%s'", fn);
-
-    ck_write(fd, query_str.c_str(), query_str.size(), fn);
-    close(fd);
-
-    keeping = 1;
-  }
-
-  switch (fault)
-  {
-
-  case FAULT_TMOUT:
-
-    /* Timeouts are not very interesting, but we're still obliged to keep
-         a handful of samples. We use the presence of new bits in the
-         hang-specific bitmap as a signal of uniqueness. In "dumb" mode, we
-         just keep everything. */
-
-    total_tmouts++;
-
-    if (unique_hangs >= KEEP_UNIQUE_HANG)
-      return keeping;
-
-    if (!dumb_mode)
-    {
-
-#ifdef __x86_64__
-      simplify_trace((u64 *)trace_bits);
-#else
-      simplify_trace((u32 *)trace_bits);
-#endif /* ^__x86_64__ */
-
-      show_stats();
-
-      if (!has_new_bits(virgin_tmout))
-        return keeping;
-    }
-
-    unique_tmouts++;
-
-    // /* Before saving, we make sure that it's a genuine hang by re-running
-    //      the target with a more generous timeout (unless the default timeout
-    //      is already generous). */
-
-    // if (exec_tmout < hang_tmout)
-    // {
-
-    //   u8 new_fault;
-    //   write_to_testcase(mem, len);
-    //   new_fault = run_target(argv, hang_tmout);
-
-    //   /* A corner case that one user reported bumping into: increasing the
-    //        timeout actually uncovers a crash. Make sure we don't discard it if
-    //        so. */
-
-    //   if (!stop_soon && new_fault == FAULT_CRASH)
-    //     goto keep_as_crash;
-
-    //   if (stop_soon || new_fault != FAULT_TMOUT)
-    //     return keeping;
-    // }
-
-#ifndef SIMPLE_FILES
-
-    fn = alloc_printf("%s/hangs/id:%06llu,%s", out_dir,
-                      unique_hangs, describe_op(0));
-
-#else
-
-    fn = alloc_printf("%s/hangs/id_%06llu", out_dir,
-                      unique_hangs);
-
-#endif /* ^!SIMPLE_FILES */
-
-    unique_hangs++;
-
-    last_hang_time = get_cur_time();
-
-    break;
-
-  case FAULT_CRASH:
-
-  keep_as_crash:
-
-    /* This is handled in a manner roughly similar to timeouts,
-         except for slightly different limits and no need to re-run test
-         cases. */
-
-    total_crashes++;
-
-    if (unique_crashes >= KEEP_UNIQUE_CRASH)
-      return keeping;
-
-    if (!dumb_mode)
-    {
-
-#ifdef __x86_64__
-      simplify_trace((u64 *)trace_bits);
-#else
-      simplify_trace((u32 *)trace_bits);
-#endif /* ^__x86_64__ */
-
-      if (!has_new_bits(virgin_crash))
-        return keeping;
-    }
-
-    if (!unique_crashes)
-      write_crash_readme();
-
-#ifndef SIMPLE_FILES
-
-    fn = alloc_printf("%s/crashes/id:%06llu,sig:%02u,%s", out_dir,
-                      unique_crashes, kill_signal, describe_op(0));
-
-#else
-
-    fn = alloc_printf("%s/crashes/id_%06llu_%02u", out_dir, unique_crashes,
-                      kill_signal);
-
-#endif /* ^!SIMPLE_FILES */
-
-    unique_crashes++;
-
-    last_crash_time = get_cur_time();
-    last_crash_execs = total_execs;
-
-    break;
-
-  case FAULT_ERROR: {
-    // FATAL("Unable to execute target application");
-    cerr << "In save if interesting. Encounter FAULT_ERROR. \n\n\n";
-  }
-
-  default:
-    return keeping;
-  }
-
-  /* If we're here, we apparently want to save the crash or hang
-     test case, too. */
-
-  fd = open(fn, O_WRONLY | O_CREAT | O_EXCL, 0600);
-  if (fd < 0)
-    PFATAL("Unable to create '%s'", fn);
-  ck_write(fd, query_str.c_str(), query_str.size(), fn);
-  close(fd);
-
-  if (fault == FAULT_CRASH)
-  {
-    //cout << "NIU BI!" << endl;
-    //cout << "\n\n\n";
-    for (auto i : g_previous_input)
-    {
-      write(crash_fd, i, strlen(i));
-      write(crash_fd, "\n\n", 2);
-    }
-    write(crash_fd, "-------------\n\n", strlen("-------------\n\n"));
-    //cout << "Previous input might crash the server: " << i << endl;
-    //exit(0);
-  }
-
-  ck_free(fn);
-  return keeping;
 }
 
 /* When resuming, try to find the queue position to start from. This makes sense
@@ -4316,15 +3802,15 @@ static void maybe_update_plot_file(double bitmap_cvg, double eps)
 
   fprintf(plot_file,
           /* Format */
-          "%llu,%llu,%u,%u,%u,%u,%0.02f%%,%llu,%llu,%u,%0.02f,%llu,%llu,%0.02f%%,%llu,%llu,%llu,%llu,%llu,%llu,"
+          "%llu,%llu,%u,%u,%u,%u,%0.02f%%,%llu,%llu,%u,%0.02f,%llu,%llu,%llu,%llu,%llu,%llu,%llu,"
           "%0.02f%%,%llu,%llu,%llu,%0.02f%%,%llu,%llu,%llu,%llu,%llu,%llu, %s"
           "\n", 
           /* Data */
           get_cur_time() / 1000, queue_cycle - 1, current_entry, queued_paths,
           pending_not_fuzzed, pending_favored, bitmap_cvg, unique_crashes,
           unique_hangs, max_depth, eps, total_execs, 
-          total_input_failed, p_oracle->total_temp * 100.0 / p_oracle->total_rand_valid, total_add_to_queue,
-          total_mutate_all_failed, total_mutate_failed, total_append_failed,  g_mutator.get_cri_valid_collection_size(),
+          total_input_failed, total_add_to_queue,
+          total_mutate_all_failed, total_mutate_failed, total_append_failed, 
           debug_error, (debug_good * 100.0 / (debug_error + debug_good)), mysql_execute_ok, mysql_execute_error, mysql_execute_total,
           (float(total_mutate_failed) / float(total_mutate_num) * 100.0), num_valid, num_parse, num_mutate_all, num_reparse, num_append, num_validate,
           cur_SQLancer_timestamp.c_str()
@@ -5525,227 +5011,6 @@ void extract_query_result(const string &res, vector<string> &res_vec_out,
   }
 }
 
-void compare_query_results_cross_run(ALL_COMP_RES &all_comp_res,
-                                     vector<int> &explain_diff_id)
-{
-
-  if (p_oracle->get_mul_run_num() <= 1)
-  {
-    cerr << "Error: calling cross_run compare results function, when "
-            "mul_run_num <= 1. Code logic error. \n";
-    abort();
-  }
-
-  all_comp_res.final_res = ORA_COMP_RES::Pass;
-  explain_diff_id.clear();
-
-  vector<vector<string>> res_vec, exp_vec;
-
-  for (int idx = 0; idx < p_oracle->get_mul_run_num(); idx++)
-  {
-    if (idx >= all_comp_res.v_res_str.size())
-    {
-      cerr << "Error: v_res_str overflow in the "
-              "compare_query_results_cross_run func. \n";
-      abort();
-    }
-    const string &res_str = all_comp_res.v_res_str[idx];
-    const string &cmd_str = all_comp_res.v_cmd_str[idx];
-    if (is_str_empty(res_str))
-    {
-      all_comp_res.final_res = ORA_COMP_RES::ALL_Error;
-      return;
-    }
-
-    vector<string> cur_res_vec, cur_exp_vec;
-    /* Only takes one type of validation at a time in the query. */
-    extract_query_result(res_str, cur_res_vec, "BEGIN VERI 0", "END VERI 0");
-
-    // cerr << "For results: \n" << res_str << "\n, we get :" << endl;
-    // for (int i = 0; i < cur_res_vec.size(); i++){
-    //   cerr << "cur_res_vec: " << cur_res_vec[i] << endl;
-    // }
-
-    res_vec.push_back(std::move(cur_res_vec));
-    exp_vec.push_back(std::move(cur_exp_vec));
-  }
-
-  /* Compare valid stat by valid stat between different runs. */
-  for (int j = 0; j < res_vec[0].size(); j++)
-  {
-    COMP_RES comp_res;
-    for (int i = 0; i < res_vec.size(); i++)
-    {
-      if (j < res_vec[i].size())
-      {
-        comp_res.v_res_str.push_back(res_vec[i][j]);
-      }
-      else
-      {
-        comp_res.comp_res = ORA_COMP_RES::ALL_Error;
-      }
-      if (j < exp_vec[0].size() && j < exp_vec[i].size() &&
-          exp_vec[0][j] != exp_vec[i][j])
-      {
-        comp_res.explain_diff_id.push_back(j);
-        explain_diff_id.push_back(
-            j); /* Might contains duplicated IDs. But it should be OK. */
-      }
-    }
-    all_comp_res.v_res.push_back(std::move(comp_res));
-  }
-
-  p_oracle->compare_results(all_comp_res);
-  return;
-}
-
-void compare_query_result(ALL_COMP_RES &all_comp_res,
-                          vector<int> &explain_diff_id)
-{
-
-  all_comp_res.final_res = ORA_COMP_RES::Pass;
-  explain_diff_id.clear();
-
-  const string &res_str = all_comp_res.res_str;
-  if (is_str_empty(res_str))
-  {
-    all_comp_res.final_res = ORA_COMP_RES::ALL_Error;
-    return;
-  }
-
-  vector<string> res_vec_0, res_vec_1, res_vec_2, res_vec_3, exp_vec_0,
-      exp_vec_1, exp_vec_2, exp_vec_3;
-
-  /* Look throught first validation stmt's res_0 first */
-  extract_query_result(res_str, res_vec_0, "BEGIN VERI 0", "END VERI 0");
-
-  /* Second validation stmt... etc*/
-  extract_query_result(res_str, res_vec_1, "BEGIN VERI 1", "END VERI 1");
-
-  extract_query_result(res_str, res_vec_2, "BEGIN VERI 2", "END VERI 2");
-
-  extract_query_result(res_str, res_vec_3, "BEGIN VERI 3", "END VERI 3");
-
-
-  // cout << "command: " << all_comp_res.cmd_str << endl;
-
-  // for (string tmp_str : res_vec_0) {
-  //   cout << "res_vec_0: " << tmp_str <<  endl;
-  // }
-
-  // for (string tmp_str : res_vec_1) {
-  //   cout << "res_vec_1: " << tmp_str <<  endl;
-  // }
-
-  // cerr << "Size of res_vec_0: " << res_vec_0.size() << "   1: " <<
-  // res_vec_1.size() << endl; 
-
-  for (int idx = 0; idx < max({res_vec_0.size(), res_vec_1.size(),
-                               res_vec_2.size(), res_vec_3.size()});
-       idx++)
-  {
-    COMP_RES comp_res;
-    if (idx < res_vec_0.size())
-    {
-      comp_res.res_str_0 = res_vec_0[idx];
-    }
-    if (idx < res_vec_1.size())
-    {
-      comp_res.res_str_1 = res_vec_1[idx];
-    }
-    if (idx < res_vec_2.size())
-    {
-      comp_res.res_str_2 = res_vec_2[idx];
-    }
-    if (idx < res_vec_3.size())
-    {
-      comp_res.res_str_3 = res_vec_3[idx];
-    }
-    if (idx < exp_vec_0.size())
-    {
-      if ((idx < exp_vec_1.size() && exp_vec_0[idx] != exp_vec_1[idx]) ||
-          (idx < exp_vec_2.size() && exp_vec_0[idx] != exp_vec_2[idx]) ||
-          (idx < exp_vec_3.size() && exp_vec_0[idx] != exp_vec_3[idx]))
-      {
-        comp_res.explain_diff_id.push_back(idx);
-        explain_diff_id.push_back(idx);
-      }
-    }
-    all_comp_res.v_res.push_back(std::move(comp_res));
-  }
-
-
-  /* Now we can compare the results and find whether there are inconsistant. */
-  p_oracle->compare_results(all_comp_res);
-  return;
-}
-
-void stream_output_res(const ALL_COMP_RES &all_comp_res, ostream &out)
-{
-  if (p_oracle->get_mul_run_num() <= 1)
-  {
-    out << "Query: \n";
-    out << all_comp_res.cmd_str << "\n";
-    out << "Result string: \n";
-    out << all_comp_res.res_str << "\n";
-    out << "\nFinal_res: " << all_comp_res.final_res << "\n";
-    out << "Detailed result: "
-        << "\n";
-    int iter = 0;
-    for (const COMP_RES &res : all_comp_res.v_res)
-    {
-      out << "\n\nResult NUM: " << iter++ << " \nRESULT FLAGS: " << res.comp_res
-          << "\n";
-      out << "First stmt res is (str): " << res.res_str_0 << "\n"
-          << "First stmt res is (int): " << res.res_int_0 << "\n";
-      out << "Second stmt res is (str): " << res.res_str_1 << "\n"
-          << "Second stmt is (int): " << res.res_int_1 << "\n";
-      out << "Third stmt res is (str): " << res.res_str_2 << "\n"
-          << "Third stmt is (int): " << res.res_int_2 << "\n";
-      out << "Fourth stmt res is (str): " << res.res_str_3 << "\n"
-          << "Fourth stmt is (int): " << res.res_int_3 << "\n";
-    }
-
-    out << "Compare_No_Rec_result_int: \n"
-        << all_comp_res.final_res;
-    out << "\n\n\n\n";
-  }
-  else
-  { // multiple execute SQLite.
-    out << "Multiple execution of SQLite: \n";
-
-    for (int i = 0; i < all_comp_res.v_cmd_str.size(); i++)
-    {
-      out << "Query: " << i << ": \n";
-      out << all_comp_res.v_cmd_str[i] << "\n";
-      out << "Result string: \n";
-      out << all_comp_res.v_res_str[i] << "\n";
-    }
-    out << "\nFinal_res: " << all_comp_res.final_res << "\n";
-    out << "Detailed result: "
-        << "\n";
-    int iter = 0;
-    for (const COMP_RES &res : all_comp_res.v_res)
-    {
-      out << "\n\nResult NUM: " << iter << " \nRESULT FLAGS: " << res.comp_res
-          << "\n";
-      for (int j = 0; j < max(res.v_res_str.size(), res.v_res_int.size());
-           j++)
-      {
-        if (j < res.v_res_str.size())
-          out << "Str: " << res.v_res_str[j] << " \n";
-        if (j < res.v_res_int.size())
-          out << "INT: " << res.v_res_int[j] << " \n";
-      }
-      iter++;
-    }
-
-    out << "Compare_No_Rec_result_int: \n"
-        << all_comp_res.final_res;
-    out << "\n\n\n\n";
-  }
-}
-
 
 u8 execute_cmd_string(string& cmd_string, vector<int> &explain_diff_id, ALL_COMP_RES& all_comp_res,
                       char **argv, u32 tmout = exec_tmout)
@@ -5809,9 +5074,6 @@ EXP_ST u8 common_fuzz_stuff(char **argv, string& query_str)
   }
 
   /* This handles FAULT_ERROR for us: */
-  //cout << num ++ << ":" << out_buf << endl;
-  int should_keep = save_if_interesting(argv, query_str, fault);
-  queued_discovered += should_keep;
 
   //cout << "OK" << endl;
   if (!(stage_cur % stats_update_freq) || stage_cur + 1 == stage_max)
@@ -6174,52 +5436,11 @@ static u8 could_be_interest(u32 old_val, u32 new_val, u8 blen, u8 check_le)
   return 0;
 }
 
-void get_oracle_select_stmts(vector<IR*> &v_oracle_select_stmts, int valid_max_num = 10) {
-
-  // cout << "get_oracle_select_stmt" << endl;
-  // exit(0);
-  int trial = 0;
-  int num_norec = 0;
-  int max_trial =
-      valid_max_num * 10; // For each norec select stmt, we have on average 10
-                         // chances to append the stmt and check.
-
-  // cerr << "Entering get_oracle_select_stmt func. \n";
-
-  while (num_norec < valid_max_num)
-  {
-
-    if (trial++ >= max_trial) { // Give on average 3 chances per select stmts.
-      // cerr << "Break due to exceeding max_trial. \n";
-      break;
-    }
-    // cout << "get_oracle_select_stmt trial times: " << trial << endl;
-    IR* new_oracle_select_stmts = p_oracle->get_random_mutated_select_stmt();
-    if (new_oracle_select_stmts == NULL) {
-      cerr << "new_norec_stmts is empty. \n";
-      continue;
-    }
-    // ensure_semicolon_at_query_end(new_norec_stmts);
-    v_oracle_select_stmts.push_back(std::move(new_oracle_select_stmts));
-
-    num_norec++;
-    num_valid++;
-  }
-
-  // cerr << "DEBUG: v_oracle_select_stmts.size() is: " << v_oracle_select_stmts.size() << ". \n";
-  // for (IR* v_oracle_select : v_oracle_select_stmts) {
-  //   cerr << "DEBUG: Getting oracle select: " << v_oracle_select->to_string() << "\n";
-  // }
-  // cerr << "\n\n\n";
-  return;
-}
-
 
 
 /* Take the current entry from the queue, fuzz it for a while. This
    function is a tad too long... returns 0 if fuzzed successfully, 1 if
    skipped or bailed out. */
-//vector<IR*> ir_set;
 
 static u8 fuzz_one(char **argv, fstream& input_fd)
 {
@@ -6232,10 +5453,6 @@ static u8 fuzz_one(char **argv, fstream& input_fd)
 
   u8 a_collect[MAX_AUTO_EXTRA];
   u32 a_len = 0;
-
-  vector<IR *> ori_ir_tree;
-  vector<IR*> v_oracle_select_stmts;
-  vector<IR*> v_ir_stmts;
 
   int skip_count;
   string input;
@@ -6285,153 +5502,6 @@ static u8 fuzz_one(char **argv, fstream& input_fd)
   }
 
   return ret_val;
-}
-
-/* Grab interesting test cases from other fuzzers. */
-
-static void sync_fuzzers(char **argv)
-{
-
-  DIR *sd;
-  struct dirent *sd_ent;
-  u32 sync_cnt = 0;
-
-  sd = opendir(sync_dir);
-  if (!sd)
-    PFATAL("Unable to open '%s'", sync_dir);
-
-  stage_max = stage_cur = 0;
-  cur_depth = 0;
-
-  /* Look at the entries created for every other fuzzer in the sync directory. */
-
-  while ((sd_ent = readdir(sd)))
-  {
-
-    static u8 stage_tmp[128];
-
-    DIR *qd;
-    struct dirent *qd_ent;
-    u8 *qd_path, *qd_synced_path;
-    u32 min_accept = 0, next_min_accept;
-
-    s32 id_fd;
-
-    /* Skip dot files and our own output directory. */
-
-    if (sd_ent->d_name[0] == '.' || !strcmp(sync_id, sd_ent->d_name))
-      continue;
-
-    /* Skip anything that doesn't have a queue/ subdirectory. */
-
-    qd_path = alloc_printf("%s/%s/queue", sync_dir, sd_ent->d_name);
-
-    if (!(qd = opendir(qd_path)))
-    {
-      ck_free(qd_path);
-      continue;
-    }
-
-    /* Retrieve the ID of the last seen test case. */
-
-    qd_synced_path = alloc_printf("%s/.synced/%s", out_dir, sd_ent->d_name);
-
-    id_fd = open(qd_synced_path, O_RDWR | O_CREAT, 0600);
-
-    if (id_fd < 0)
-      PFATAL("Unable to create '%s'", qd_synced_path);
-
-    if (read(id_fd, &min_accept, sizeof(u32)) > 0)
-      lseek(id_fd, 0, SEEK_SET);
-
-    next_min_accept = min_accept;
-
-    /* Show stats */
-
-    sprintf(stage_tmp, "sync %u", ++sync_cnt);
-    stage_name = stage_tmp;
-    stage_cur = 0;
-    stage_max = 0;
-
-    /* For every file queued by this fuzzer, parse ID and see if we have looked at
-       it before; exec a test case if not. */
-
-    while ((qd_ent = readdir(qd)))
-    {
-
-      u8 *path;
-      s32 fd;
-      struct stat st;
-
-      if (qd_ent->d_name[0] == '.' ||
-          sscanf(qd_ent->d_name, CASE_PREFIX "%06u", &syncing_case) != 1 ||
-          syncing_case < min_accept)
-        continue;
-
-      /* OK, sounds like a new one. Let's give it a try. */
-
-      if (syncing_case >= next_min_accept)
-        next_min_accept = syncing_case + 1;
-
-      path = alloc_printf("%s/%s", qd_path, qd_ent->d_name);
-
-      /* Allow this to fail in case the other fuzzer is resuming or so... */
-
-      fd = open(path, O_RDONLY);
-
-      if (fd < 0)
-      {
-        ck_free(path);
-        continue;
-      }
-
-      if (fstat(fd, &st))
-        PFATAL("fstat() failed");
-
-      /* Ignore zero-sized or oversized files. */
-
-      if (st.st_size && st.st_size <= MAX_FILE)
-      {
-
-        u8 fault;
-        u8 *mem = mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-
-        if (mem == MAP_FAILED)
-          PFATAL("Unable to mmap '%s'", path);
-
-        /* See what happens. We rely on save_if_interesting() to catch major
-           errors and save the test case. */
-
-        string cmd_str = (char*) mem;
-        string dummy_res;
-        fault = run_target(argv, exec_tmout, cmd_str, dummy_res);
-
-        if (stop_soon)
-          return;
-
-        syncing_party = sd_ent->d_name;
-        queued_imported += save_if_interesting(argv, cmd_str, fault);
-        syncing_party = 0;
-
-        munmap(mem, st.st_size);
-
-        if (!(stage_cur++ % stats_update_freq))
-          show_stats();
-      }
-
-      ck_free(path);
-      close(fd);
-    }
-
-    ck_write(id_fd, &next_min_accept, sizeof(u32), qd_synced_path);
-
-    close(id_fd);
-    closedir(qd);
-    ck_free(qd_path);
-    ck_free(qd_synced_path);
-  }
-
-  closedir(sd);
 }
 
 /* Handle stop signal (Ctrl-C, etc). */
@@ -7436,63 +6506,6 @@ static void save_cmdline(u32 argc, char **argv)
   *buf = 0;
 }
 
-static void do_libary_initialize()
-{
-  if (g_libary_path == NULL)
-    g_libary_path = INIT_LIB_PATH;
-  vector<IR *> ir_set;
-  vector<string> file_list = get_all_files_in_dir(g_libary_path);
-  for (auto &f : file_list)
-  {
-    cerr << "init filename: " << string(g_libary_path) + "/" + f << endl;
-    g_mutator.init(string(g_libary_path) + "/" + f);
-  }
-  g_mutator.init_data_library(GLOBAL_TYPE_PATH);
-  // g_mutator.init_safe_generate_type(SAFE_GENERATE_PATH);
-
-  char *in_dir_str = (char *)in_dir;
-  file_list = get_all_files_in_dir(in_dir_str);
-  for (auto &f : file_list)
-  {
-    string file_path = string(in_dir_str) + "/" + f;
-    cerr << "init filename: " << file_path << endl;
-    g_mutator.init(file_path);
-  }
-
-  g_mutator.init_library();
-
-  cout << "init_lib done" << endl;
-
-}
-
-// void test_mutate()
-// {
-//   string test = "select a from b where c=0;";
-//   vector<IR *> tmp;
-//   IR* root = parser(test);
-//   cout << "Initing new_code" << endl;
-//   g_mutator.init("./init_lib/new_code");
-//   cout << "Finish init" << endl;
-//   exit(0);
-
-//   /* TODO:: YU:: DIRTY FIX FOR NOW */
-//   tmp.clear();
-//   tmp.push_back(root);
-//   auto mutated_tree = g_mutator.mutate_all(tmp);
-//   deep_delete(tmp[tmp.size() - 1]);
-//   tmp.clear();
-
-//   for (auto ir : mutated_tree)
-//   {
-//     bool tmp_res = g_mutator.validate(ir);
-//     if (tmp_res == false)
-//     {
-//       continue;
-//     }
-//     cout << endl;
-//     getchar();
-//   }
-// }
 
 #ifndef AFL_LIB
 
@@ -7510,11 +6523,6 @@ char *g_client_path;
 int main(int argc, char *argv[])
 {
   printf("\n\n\n%s\n\n\n", argv[0]);
-  parser_init("./afl-fuzz");
-  //test_mutate();
-  // ff_debug = 0;
-
-  p_oracle = nullptr;
 
   is_server_up = -1;
   s32 opt;
@@ -7535,7 +6543,7 @@ int main(int argc, char *argv[])
   gettimeofday(&tv, &tz);
   srandom(tv.tv_sec ^ tv.tv_usec ^ getpid());
 
-  while ((opt = getopt(argc, argv, "+i:o:f:m:t:T:dnCB:S:M:x:Q:s:c:lDc:O:P:K:F:I:")) > 0)
+  while ((opt = getopt(argc, argv, "+i:o:f:m:t:T:dnCB:S:M:x:Q:s:c:lDc:P:K:F:I:")) > 0)
 
     switch (opt)
     {
@@ -7736,24 +6744,6 @@ int main(int argc, char *argv[])
       bind_to_port = atoi(optarg);
       break;
     
-    case 'O': /* ORACLE */
-    {
-      /* Default NOREC */
-      string arg = string(optarg);
-      if (arg == "NOREC")
-        p_oracle = new SQL_NOREC();
-      // else if (arg == "TLP")
-      //   p_oracle = new SQL_TLP();
-      // else if (arg == "LIKELY")
-      //   p_oracle = new SQL_LIKELY();
-      // else if (arg == "ROWID")
-      //   p_oracle = new SQL_ROWID();
-      // else if (arg == "INDEX")
-      //   p_oracle = new SQL_INDEX();
-      else
-        FATAL("Oracle arguments not supported. ");
-    }
-    break;
 
     case 'B': /* load bitmap */
 
@@ -7815,14 +6805,6 @@ int main(int argc, char *argv[])
 
       usage(argv[0]);
     }
-
-  if (p_oracle == NULL) {
-    p_oracle = new SQL_NOREC();
-  }
-  p_oracle->set_mutator(&g_mutator);
-  g_mutator.set_p_oracle(p_oracle);
-
-  g_mutator.set_dump_library(dump_library);
 
   if (socket_path == "") {
     socket_path = "/tmp/mysql.sock";
@@ -7924,7 +6906,7 @@ int main(int argc, char *argv[])
     use_argv = argv + optind;
 
   u64 start_time = get_cur_time();
-  do_libary_initialize();
+
   cerr << "do_library_initialize() takes "
        << (get_cur_time() - start_time) / 1000 << " seconds\n";
 
@@ -7937,7 +6919,6 @@ int main(int argc, char *argv[])
   //char* tmp_argv[] = {g_server_path, NULL};
   //init_forkserver(tmp_argv);
   // to do
-  perform_dry_run(use_argv);
 
   cerr << "\nTimeout seed number: " << timeout_seed_num << "/" << queued_paths << "\n\n\n";
 
