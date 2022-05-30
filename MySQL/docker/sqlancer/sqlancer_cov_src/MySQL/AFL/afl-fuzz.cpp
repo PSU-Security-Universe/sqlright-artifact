@@ -254,7 +254,7 @@ public:
     }
 
     // cerr << "Using socket: " << socket_path << "\n\n\n";
-    if (mysql_real_connect(&tmp_m, NULL, "root", "", "fuck", bind_to_port, socket_path.c_str(), 0) == NULL)
+    if (mysql_real_connect(&tmp_m, NULL, "root", "", "test_init", bind_to_port, socket_path.c_str(), 0) == NULL)
     {
       fprintf(stderr, "Connection error3 \n", mysql_errno(&tmp_m), mysql_error(&tmp_m));
       mysql_close(&tmp_m);
@@ -426,7 +426,7 @@ public:
     }
 
     // cerr << "Using socket: " << socket_path << "\n\n\n";
-    if (mysql_real_connect(&tmp_m, NULL, "root", "", "fuck", bind_to_port, socket_path.c_str(), 0) == NULL)
+    if (mysql_real_connect(&tmp_m, NULL, "root", "", "test_init", bind_to_port, socket_path.c_str(), 0) == NULL)
     {
       fprintf(stderr, "Connection error5 \n", mysql_errno(&tmp_m), mysql_error(&tmp_m));
       mysql_close(&tmp_m);
@@ -576,7 +576,7 @@ public:
       mysql_close(&tmp_m);
       return false;
     }
-    if (mysql_real_connect(&tmp_m, NULL, "root", "", "fuck", bind_to_port, socket_path.c_str(), CLIENT_MULTI_STATEMENTS) == NULL)
+    if (mysql_real_connect(&tmp_m, NULL, "root", "", "test_init", bind_to_port, socket_path.c_str(), CLIENT_MULTI_STATEMENTS) == NULL)
     {
       fprintf(stderr, "Connection error2 \n", mysql_errno(&tmp_m), mysql_error(&tmp_m));
       mysql_close(&tmp_m);
