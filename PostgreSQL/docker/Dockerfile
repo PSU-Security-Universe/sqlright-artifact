@@ -64,6 +64,7 @@ RUN make
 
 WORKDIR /home/postgres
 RUN git clone https://github.com/postgres/postgres.git
+RUN cp -r /home/postgres/postgres/ /home/postgres/postgres_ori/
 
 WORKDIR /home/postgres/postgres/ 
 RUN git checkout REL_14_0
@@ -74,6 +75,15 @@ WORKDIR /home/postgres/postgres/bld
 ENV CXX=/home/postgres/AFL/afl-clang-fast++
 ENV CC=/home/postgres/AFL/afl-clang-fast
 RUN ../configure --enable-debug --prefix=$(pwd) --exec-prefix=$(pwd) --enable-cassert && make -j$(nproc) && make install
+
+WORKDIR /home/postgres/postgres_ori/
+RUN git checkout REL_14_0
+RUN mkdir -p /home/postgres/postgres_ori/bld
+
+WORKDIR /home/postgres/postgres_ori/bld
+ENV CXX=/home/postgres/AFL/g++-9
+ENV CC=/home/postgres/AFL/gcc-9
+RUN ../configure --enable-debug --prefix=$(pwd) --exec-prefix=$(pwd) && make -j$(nproc) && make install
 
 # Setup Postgres. 
 # RUN ./bin/initdb -D ./data

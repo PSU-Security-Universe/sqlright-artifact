@@ -17,8 +17,8 @@ do
 done
 
 SCRIPT_EXEC=$(cat << EOF
-# Setup data folder
-cd /home/postgres/postgres/bld
+# Setup data folder for the uninsturmented database
+cd /home/postgres/postgres_ori/bld
 ./bin/initdb -D ./data
 ./bin/pg_ctl -D ./data start
 ./bin/createdb x
@@ -29,6 +29,18 @@ mkdir -p data_all
 mv data data_all/ori_data
 cp -r data_all/ori_data data_all/data_100
 
+# Setup data folder for the insturmented database
+cd /home/postgres/postgres/bld
+./bin/initdb -D ./data
+./bin/pg_ctl -D ./data start
+./bin/createdb x
+echo "CREATE USER sqlancer; ALTER USER sqlancer with SUPERUSER; ALTER USER sqlancer with LOGIN; CREATE DATABASE test;" | ./bin/psql postgres 
+./bin/pg_ctl -D ./data stop
+
+mkdir -p data_all
+mv data data_all/ori_data
+
+cd /home/postgres/postgres_ori/bld
 ./bin/postgres -D ./data_all/data_100 -p 5432 &
 sleep 5
 
