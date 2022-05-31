@@ -207,11 +207,11 @@ elif [ "$1" == "sqlancer" ]; then
         
 
         if [ -d "./$resoutdir" ]; then
-            echo "Detected Results/$resoutdir folder existed. Please cleanup the output folder and then retry. "
+            echo "Detected Results/sqlancer/$resoutdir folder existed. Please cleanup the output folder and then retry. "
             exit 5
         fi
         if [ -d "./$covoutdir" ]; then
-            echo "Detected Results/$covoutdir folder existed. Please cleanup the output folder and then retry. "
+            echo "Detected Results/sqlancer/$covoutdir folder existed. Please cleanup the output folder and then retry. "
             exit 5
         fi
 

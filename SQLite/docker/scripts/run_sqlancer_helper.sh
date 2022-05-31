@@ -14,6 +14,6 @@ python3 run_sqlancer_and_log_cov.py
 EOF
 )
 
-su -c "$SCRIPT_EXEC" postgres
+su -c "$SCRIPT_EXEC" sqlite
 
 echo "Finished running the sqlancer test. "
