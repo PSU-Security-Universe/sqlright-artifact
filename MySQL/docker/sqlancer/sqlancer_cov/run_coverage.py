@@ -111,34 +111,3 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     time.sleep(5)
 
 print("Finished launching the fuzzing. Now monitor the mysql process. ")
-
-while True:
-    for idx in range(len(all_mysql_p_list)):
-        cur_inst_id = starting_core_id + idx
-        cur_port_num = port_starting_num + cur_inst_id
-        socket_path = "/tmp/mysql_" + str(cur_inst_id) + ".sock"
-
-        cur_mysql_p = all_mysql_p_list[idx]
-        cur_mysql_pid = cur_mysql_p.pid
-        if not check_pid(cur_mysql_pid):
-
-            # MySQL process crashed. Restart MySQL. 
-            all_mysql_p_list.remove(cur_mysql_p)
-            cur_shm_str = shm_env_list[idx]
-            cur_mysql_data_dir_str = os.path.join(mysql_root_dir, "data_all/data_cov_" + str(idx))
-
-            mysql_command = "__AFL_SHM_ID=" + cur_shm_str + " " + mysql_bin_dir + " --basedir=" + mysql_root_dir + " --datadir=" + cur_mysql_data_dir_str + " --port=" + str(cur_port_num) + "--socket=" + socket_path + " & "
-            print("MySQL PID: " + str(cur_mysql_pid) + " crashed. ")
-            print("Restarting mysql command: " + fuzzing_command, end="\n\n")
-            p = subprocess.Popen(
-                                [mysql_command],
-                                cwd=mysql_root_dir,
-                                shell=False,
-                                stderr=subprocess.DEVNULL,
-                                stdout=subprocess.DEVNULL,
-                                stdin=subprocess.DEVNULL
-                                )
-            all_mysql_p_list.insert(idx, p)
-    
-    # Check mysql every 10 seconds. 
-    time.sleep(10)
