@@ -29,6 +29,7 @@ sleep 5
 cd /home/mysql/sqlancer/sqlancer/target
 mkdir -p logs
 java -jar sqlancer-1.1.0.jar --log-execution-time false --num-threads 1 --num-tries 999999 --timeout-seconds 999999 mysql --oracle $oracle_str > ./logs/output.txt &
+sleep 5
 
 cd /home/mysql/sqlancer/sqlancer_cov
 

@@ -79,7 +79,7 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
                         stdin=subprocess.DEVNULL
                         )
     all_fuzzing_p_list.append(p)
-    time.sleep(5)
+    time.sleep(3)
 
     # Read the current generated shm_mem_id
     while not (os.path.isfile(os.path.join(os.getcwd(), "shm_env.txt"))):
@@ -108,6 +108,8 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
                         )
     all_mysql_p_list.append(p)
     os.chdir(ori_workdir)
-    time.sleep(5)
 
 print("Finished launching the fuzzing. Now monitor the mysql process. ")
+
+while True:
+    time.sleep(10)
