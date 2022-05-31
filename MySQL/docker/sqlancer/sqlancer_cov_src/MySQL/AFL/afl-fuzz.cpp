@@ -5042,6 +5042,8 @@ EXP_ST u8 common_fuzz_stuff(char **argv, string& query_str)
 
   fault = execute_cmd_string(query_str, explain_diff_id, all_comp_res, argv, exec_tmout);
 
+  has_new_bits(virgin_bits);
+
   if (stop_soon)
     return 1;
   
