@@ -4,6 +4,8 @@ import os
 import shutil
 import subprocess
 import atexit
+import getopt
+import sys
 
 oracle_str = ""
 
