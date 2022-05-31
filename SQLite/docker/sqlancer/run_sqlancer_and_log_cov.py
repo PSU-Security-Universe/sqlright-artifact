@@ -7,8 +7,8 @@ import sys
 import getopt
 
 # Parse the command line arguments:
-output_dir_str = ""
-oracle_str = "NOREC"
+output_dir_str = "./outputs_0"
+oracle_str = "NoREC"
 feedback_str = ""
 
 try:
@@ -27,7 +27,10 @@ for opt, arg in opts:
         # ignored
         pass
     elif opt in ("-O", "--oracle"):
-        oracle_str = arg
+        if arg == "NOREC" or arg == "NoREC":
+            oracle_str = "NoREC"
+        elif arg == "TLP" or arg == "QUERY_PARTITIONING":
+            oracle_str = "QUERY_PARTITIONING"
         print("Using oracle: %s " % (oracle_str))
     elif opt in ("-F", "--feedback"):
         # ignored
@@ -44,7 +47,7 @@ cur_root_dir = os.getcwd()
 
 # Set up dir
 new_sql_dir = os.path.join(cur_root_dir, "sqlancer")
-new_cov_dir = os.path.join(cur_root_dir, "coverage")
+new_cov_dir = os.path.join(cur_root_dir, "sqlancer_cov")
 
 cur_log_file = open(os.path.join(new_sql_dir, "target/logs/output.txt"), 'w', errors = 'ignore')
 # run sqlancer
@@ -61,13 +64,12 @@ p = subprocess.Popen([sqlancer_command],
 time.sleep(5)
 
 #run coverage logger. 
-cov_command = "./afl-fuzz -i ./inputs/ "
+cov_command = "./afl-fuzz -i ./inputs/ " \
              + " -o " + output_dir_str \
              + " -I " + os.path.join(new_sql_dir, "target/logs/sqlite3/") \
              + " -- /home/sqlite/sqlite/sqlite3 "
 print("Runnning cov command: %s" % (cov_command))
 p = subprocess.Popen([cov_command],
-                     env = run_env, 
                      cwd = new_cov_dir,
                      shell = True,
                      stderr = subprocess.DEVNULL,

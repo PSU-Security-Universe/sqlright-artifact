@@ -156,6 +156,12 @@ RUN chown -R sqlite:sqlite /home/sqlite/sqlancer
 USER sqlite
 WORKDIR /home/sqlite/sqlancer/sqlancer_cov_src/
 RUN make
+RUN cp ./afl-fuzz ../sqlancer_cov/afl-fuzz
+
+WORKDIR /home/sqlite/sqlancer/sqlancer
+RUN mvn package -DskipTests
+WORKDIR /home/sqlite/sqlancer/sqlancer/target
+RUN mkdir -p logs
 
 
 # Setup the fuzzing context
