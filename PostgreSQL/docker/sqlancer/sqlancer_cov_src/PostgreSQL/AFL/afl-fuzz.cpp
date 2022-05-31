@@ -4524,7 +4524,7 @@ static void maybe_update_plot_file(double bitmap_cvg, double eps)
   fprintf(plot_file,
           /* Format */
           "%llu,%llu,%u,%u,%u,%u,%0.02f%%,%llu,%llu,%u,%0.02f,%llu,%llu,%0.02f%%,%llu,%llu,%llu,%llu,%llu,%llu,"
-          "%0.02f%%,%llu,%llu,%llu,%0.02f%%,%llu,%llu,%llu,%llu,%llu,%llu, %s"
+          "%0.02f%%,%llu,%llu,%llu,%0.02f%%,%llu,%llu,%llu,%llu,%llu,%llu"
           "\n", 
           /* Data */
           get_cur_time() / 1000, queue_cycle - 1, current_entry, queued_paths,
@@ -4533,8 +4533,7 @@ static void maybe_update_plot_file(double bitmap_cvg, double eps)
           total_input_failed, p_oracle->total_temp * 100.0 / p_oracle->total_rand_valid, total_add_to_queue,
           total_mutate_all_failed, total_mutate_failed, total_append_failed,  g_mutator.get_cri_valid_collection_size(),
           debug_error, (debug_good * 100.0 / (debug_error + debug_good)), postgre_execute_ok, postgre_execute_error, postgre_execute_total,
-          (float(total_mutate_failed) / float(total_mutate_num) * 100.0), num_valid, num_parse, num_mutate_all, num_reparse, num_append, num_validate,
-          cur_SQLancer_timestamp.c_str()
+          (float(total_mutate_failed) / float(total_mutate_num) * 100.0), num_valid, num_parse, num_mutate_all, num_reparse, num_append, num_validate
           ); /* ignore errors */
   fflush(plot_file);
 }
