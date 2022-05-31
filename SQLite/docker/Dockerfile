@@ -141,8 +141,25 @@ RUN make
 WORKDIR /home/sqlite/Validaty_Components_Config/Squirrel_Oracle/src/AFL/
 RUN make
 
+# Setup sqlancer for testing
+
+FROM squirrel_oracle AS sqlancer_sqlite
+
+USER root
+RUN apt -y install openjdk-11-jdk
+RUN apt -y install maven
+
+WORKDIR /home/sqlite
+COPY sqlancer /home/sqlite/sqlancer
+RUN chown -R sqlite:sqlite /home/sqlite/sqlancer
+
+USER sqlite
+WORKDIR /home/sqlite/sqlancer/sqlancer_cov_src/
+RUN make
+
+
 # Setup the fuzzing context
-FROM squirrel_oracle AS SQLite3_fuzzing
+FROM sqlancer_sqlite AS SQLite3_fuzzing
 USER sqlite
 WORKDIR /home/sqlite
 RUN mkdir -p fuzzing
