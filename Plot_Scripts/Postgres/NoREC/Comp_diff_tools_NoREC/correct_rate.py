@@ -15,8 +15,8 @@ sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
 
-plot_sql_correct_rate("../SQLRight_NoREC/plot_data_3", markevery = 30, line_style = 0)
-plot_sql_correct_rate("./Squirrel_with_oracle/plot_data_0", markevery = 30, line_style = 1)
+plot_sql_correct_rate("../SQLRight_NoREC/", markevery = 30, line_style = 0)
+plot_sql_correct_rate("./Squirrel_with_oracle/", markevery = 30, line_style = 1)
 plot_sqlancer_correct_rate("./SQLancer/logs_0", markevery = 30, line_style = 2)
 
 

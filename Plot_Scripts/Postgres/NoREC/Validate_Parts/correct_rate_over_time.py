@@ -12,10 +12,10 @@ import paramiko
 sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
-plot_sql_corr_over_time("../SQLRight_NoREC/plot_data_1", markevery = 10, line_style = 4)
-plot_sql_corr_over_time("./SQLRight_with_squ_valid/plot_data_0", markevery = 10, line_style = 2)
+plot_sql_corr_over_time("../SQLRight_NoREC/", markevery = 10, line_style = 4)
+plot_sql_corr_over_time("./SQLRight_with_squ_valid/", markevery = 10, line_style = 2)
 # plot_sql_corr_over_time("./SQLRight_with_squ_parser/plot_data_0", markevery = 10, line_style = 3)
-plot_sql_corr_over_time("../SQLRight_NoREC/plot_data_3", markevery = 10, line_style = 0)
+plot_sql_corr_over_time("../SQLRight_NoREC/", markevery = 10, line_style = 0)
 # plot_sql_corr_over_time("../Comp_diff_tools_NoREC/Squirrel_with_oracle/plot_data_0", markevery = 10, line_style = 1)
 
 x = list(np.arange(0, 72.2, 0.2))

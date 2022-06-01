@@ -81,13 +81,37 @@ def plot_with_style(x, y, style_id = 0, markevery=100):
         plt.plot(x, y, linestyle = (0, (3, 1, 1, 1, 1, 1)), marker = 'o', markevery=markevery, linewidth=4.0, markersize=10)
     return
 
-def plot_sql_mapsize(file_name, markevery, line_style, is_downsampling = True):
+def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
     # For SQLRight. Our main tool.
     all_time_delta = []
     all_map_size = []
     time_avg = []
     map_size_avg = []
     min_size = sys.maxsize
+
+    """
+        Find the longest run plot_data.
+        In some rare cases, the fuzzing could stop in the middle, and cause the plot_data output incomplete.
+        In order to get the latest and longest stable run,
+        we pick the longest run plot_data available.
+    """
+
+    latest_time = 0
+    file_name = ""
+    for cur_file_name in os.listdir(file_dir):
+        if "plot_data_" not in cur_file_name:
+            continue
+        cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name))
+        last_idx = cur_file_fd['unix_time'].size - 1
+        if last_idx < 10:
+            continue
+        cur_file_fd = cur_file_fd['unix_time'][last_idx]
+        if cur_file_fd > latest_time:
+            latest_time = cur_file_fd
+            file_name = os.path.join(file_dir, cur_file_name)
+
+    if file_name == "":
+        print("Error: Cannot find plot_data_* file in dir %s" % (file_dir))
     
     for i in [0]:
         file = pd.read_csv(file_name)
@@ -271,7 +295,7 @@ def plot_sqlancer_correct_rate(file_name, markevery=2600, line_style = 2, is_dow
 
 
 
-def plot_sql_correct_rate(file_name, markevery, line_style, is_downsampling = True):
+def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = True):
     # For SQLRight. Our main tool.
     all_time_delta = []
     all_corr_rate = []
@@ -279,6 +303,29 @@ def plot_sql_correct_rate(file_name, markevery, line_style, is_downsampling = Tr
     corr_rate_avg = []
     min_size = sys.maxsize
     
+    """
+        Find the longest run plot_data.
+        In some rare cases, the fuzzing could stop in the middle, and cause the plot_data output incomplete.
+        In order to get the latest and longest stable run,
+        we pick the longest run plot_data available.
+    """
+
+    latest_time = 0
+    file_name = ""
+    for cur_file_name in os.listdir(file_dir):
+        if "plot_data_" not in cur_file_name:
+            continue
+        cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name))
+        last_idx = cur_file_fd['unix_time'].size - 1
+        if last_idx < 10:
+            continue
+        cur_file_fd = cur_file_fd['unix_time'][last_idx]
+        if cur_file_fd > latest_time:
+            latest_time = cur_file_fd
+            file_name = os.path.join(file_dir, cur_file_name)
+
+    if file_name == "":
+        print("Error: Cannot find plot_data_* file in dir %s" % (file_dir))
     
     for i in [0]:
         file = pd.read_csv(file_name)
@@ -411,13 +458,37 @@ def plot_sqlancer_corr_over_time(file_name, markevery=2600, line_style = 2, is_d
     plot_with_style(time_avg, corr_rate_avg, style_id=line_style, markevery=markevery)
 
 
-def plot_sql_corr_over_time(file_name, markevery, line_style, is_downsampling = True):
+def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = True):
 
     all_time_delta = []
     all_corr_rate = []
     time_avg = []
     corr_rate_avg = []
     min_size = sys.maxsize
+
+    """
+        Find the longest run plot_data.
+        In some rare cases, the fuzzing could stop in the middle, and cause the plot_data output incomplete.
+        In order to get the latest and longest stable run,
+        we pick the longest run plot_data available.
+    """
+
+    latest_time = 0
+    file_name = ""
+    for cur_file_name in os.listdir(file_dir):
+        if "plot_data_" not in cur_file_name:
+            continue
+        cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name))
+        last_idx = cur_file_fd['unix_time'].size - 1
+        if last_idx < 10:
+            continue
+        cur_file_fd = cur_file_fd['unix_time'][last_idx]
+        if cur_file_fd > latest_time:
+            latest_time = cur_file_fd
+            file_name = os.path.join(file_dir, cur_file_name)
+
+    if file_name == "":
+        print("Error: Cannot find plot_data_* file in dir %s" % (file_dir))
 
     for i in [0]:
         file = pd.read_csv(file_name)

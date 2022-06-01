@@ -10,13 +10,12 @@ if not os.path.exists(postgres_results_dir):
     exit(1)
 
 sqlright_res_dir = os.path.join(postgres_results_dir, "sqlright_postgres_NOREC")
-no_ctx_valid_res_dir = os.path.join(postgres_results_dir, "sqlright_postgres_no_ctx_valid_NOREC")
-no_db_par_ctx_valid_res_dir = os.path.join(postgres_results_dir, "sqlright_postgres_no_db_par_ctx_valid_NOREC")
+sqlancer_res_dir = os.path.join(postgres_results_dir, "sqlancer_postgres")
+sqlancer_config_str = "sqlancer_postgres_NOREC"
 squirrel_oracle_res_dir = os.path.join(postgres_results_dir, "squirrel_oracle_NOREC")
 
 
 copy_sqlright_contents_in_dir(sqlright_res_dir, os.path.join(os.getcwd(), "../SQLRight_NoREC"))
-copy_sqlright_contents_in_dir(no_ctx_valid_res_dir, os.path.join(os.getcwd(), "./SQLRight_with_squ_valid"))
-copy_sqlright_contents_in_dir(no_db_par_ctx_valid_res_dir, os.path.join(os.getcwd(), "./SQLRight_with_squ_parser"))
+copy_sqlancer_contents_in_dir(sqlancer_res_dir, sqlancer_config_str, os.path.join(os.getcwd(), "SQLancer"))
 copy_sqlright_contents_in_dir(squirrel_oracle_res_dir, os.path.join(os.getcwd(), "../Comp_diff_tools_NoREC/Squirrel_with_oracle"))
 
