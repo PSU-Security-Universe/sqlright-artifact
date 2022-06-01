@@ -179,6 +179,11 @@ USER sqlite
 WORKDIR /home/sqlite/fuzzing
 RUN mkdir -p Bug_Analysis
 
+# Setup the SQLite bisecting environment
+USER root
+COPY bisecting /home/sqlite/bisecting
+RUN chown -R sqlite:sqlite /home/sqlite/bisecting
+
 # At last, setup the Docker helper scripts
 USER root
 WORKDIR /home/sqlite

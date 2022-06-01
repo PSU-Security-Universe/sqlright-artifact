@@ -15,6 +15,8 @@ from Bug_Analysis.bi_config import *
 
 class IO:
     total_processed_bug_count_int: int = 0
+    all_files_in_dir = []
+    is_checked = False
 
     @classmethod
     def remove_file_from_abs_path(cls, fd: str):
@@ -26,18 +28,25 @@ class IO:
     ):
 
         all_queries = []
-        all_files_in_dir = os.listdir(file_directory)
-        all_files_in_dir = [os.path.join(file_directory, fn) for fn in all_files_in_dir]
-        all_files_in_dir.sort(key=os.path.getctime)
-        all_files_in_dir = [fn.split("/")[-1] for fn in all_files_in_dir]
+        if len(cls.all_files_in_dir) == 0:
+            if cls.is_checked:
+                return None, "Done"
+            cls.is_checked = True
+            all_files_in_dir = os.listdir(file_directory)
+            all_files_in_dir = [os.path.join(file_directory, fn) for fn in cls.all_files_in_dir]
+            all_files_in_dir.sort(key=os.path.getctime)
+            all_files_in_dir = [fn.split("/")[-1] for fn in all_files_in_dir]
 
+        idx = 0
         current_file_d = ""
-        for iter_file_d in all_files_in_dir:
+        for iter_file_d in cls.all_files_in_dir:
             current_file_d = iter_file_d
-            log_out_line("Found bug sample: {}".format(current_file_d))
+            idx += 1
 
             if current_file_d == "":
                 continue
+
+            log_out_line("Found bug sample: {}".format(current_file_d))
 
             current_file_d = os.path.join(file_directory, current_file_d)
             if not os.path.isfile(current_file_d):
@@ -57,6 +66,12 @@ class IO:
             # Only retrive one file at a time.
             if len(all_queries) != 0:
                 break
+        
+        if i < (len(cls.all_files_in_dir)):
+            cls.all_files_in_dir = cls.all_files_in_dir[i:]
+        else:
+            cls.all_files_in_dir = []
+            cls.is_checked = True
 
         #log_out_line(
         #    "Finished reading current query files from the bug_samples folder. "
@@ -351,15 +366,7 @@ class IO:
         )
 
     @classmethod
-    def gen_unique_bug_output_dir(cls, is_removed_uniq_ori: bool = False):
-        if not os.path.isdir(os.path.join(FUZZING_ROOT_DIR, "Bug_Analysis")):
-            os.mkdir(os.path.join(FUZZING_ROOT_DIR, "Bug_Analysis"))
-        if not os.path.isdir(
-            os.path.join(FUZZING_ROOT_DIR, "Bug_Analysis/bug_samples")
-        ):
-            os.mkdir(os.path.join(FUZZING_ROOT_DIR, "Bug_Analysis/bug_samples"))
-        if os.path.isdir(UNIQUE_BUG_OUTPUT_DIR) and is_removed_uniq_ori == True:
-            shutil.rmtree(UNIQUE_BUG_OUTPUT_DIR)
+    def gen_unique_bug_output_dir(cls):
         if not os.path.isdir(UNIQUE_BUG_OUTPUT_DIR):
             os.mkdir(UNIQUE_BUG_OUTPUT_DIR)
 

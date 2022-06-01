@@ -7,17 +7,19 @@ import getopt
 sys.path.append(os.getcwd())
 
 from bi_config import *
-from helper import VerCon, IO, log_out_line, Bisect, Fuzzer
+from helper import VerCon, IO, log_out_line, Bisect
 from ORACLE import Oracle_TLP, Oracle_NOREC, Oracle_ROWID, Oracle_INDEX, Oracle_LIKELY
 
 
 def main():
 
-    IO.gen_unique_bug_output_dir(is_removed_uniq_ori=True)
+    IO.gen_unique_bug_output_dir()
+
+    oracle_str = ""
 
     try:
 
-    opts, args = getopt.getopt(sys.argv[1:], "O:", ["oracle="])
+        opts, args = getopt.getopt(sys.argv[1:], "O:F:", ["oracle=, feedback="])
 
     except getopt.GetoptError:
         print("Arguments parsing error")
@@ -26,36 +28,18 @@ def main():
         if opt in ("-O", "--oracle"):
             oracle_str = arg
             print("Using oracle: %s " % (oracle_str))
+        elif opt in ("-F", "--feedback"):
+            # Ignored. 
+            pass
         else:
             print("Error. Input arguments not supported. \n")
             exit(1)
 
-    sys.stdout.flush()
+    if oracle_str == "":
+        oracle_str = "NOREC"
+        print("Using oracle: %s " % (oracle_str))
 
-    if len(sys.argv) <= 1:
-        oracle = Oracle_NOREC()
-        oracle_str = "NOREC"
-    elif sys.argv[1] == "NOREC":
-        oracle = Oracle_NOREC()
-        oracle_str = "NOREC"
-    elif sys.argv[1] == "TLP":
-        oracle = Oracle_TLP()
-        oracle_str = "TLP"
-    elif sys.argv[1] == "ROWID":
-        oracle = Oracle_ROWID()
-        oracle_str = "ROWID"
-    elif sys.argv[1] == "INDEX":
-        oracle = Oracle_INDEX()
-        oracle_str = "INDEX"
-    elif sys.argv[1] == "LIKELY":
-        oracle = Oracle_LIKELY()
-        oracle_str = "LIKELY"
-    # Add your own oracle here:
-    else:
-        print("Oracle not specified or not recognized. Defaulting NOREC. ")
-        log_out_line("Oracle not specified or not recognized. Defaulting NOREC. ")
-        oracle = Oracle_NOREC()
-        oracle_str = "NOREC"
+    sys.stdout.flush()
 
     # all_existed_commits_l.clear()
     # Fuzzer.setup_and_run_fuzzing(oracle_str)
@@ -76,10 +60,10 @@ def main():
     while True:
         # Read one file at a time.
         all_new_queries, current_file_d = IO.read_queries_from_files(
-            file_directory=QUERY_SAMPLE_DIR, 
+            file_directory=BUG_SAMPLE_DIR, 
             is_removed_read=True
         )
-        if all_new_queries == [] and current_file_d == "Done":
+        if all_new_queries == None or current_file_d == "Done":
             print("Done")
             break
         elif all_new_queries == []:
@@ -87,7 +71,6 @@ def main():
             continue
 
         start_time = time.time()
-
 
         """ Every cur_new_queries is a pair of oracle statement. 
             If the oracle requires multiple runs, then the cur_new_queries contains
