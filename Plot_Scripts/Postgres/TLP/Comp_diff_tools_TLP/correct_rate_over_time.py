@@ -12,9 +12,9 @@ import paramiko
 sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
-plot_sql_corr_over_time("../SQLRight_TLP/plot_data_0", markevery = 30, line_style = 0)
+plot_sql_corr_over_time("../SQLRight_TLP/", markevery = 30, line_style = 0)
 # plot_sql_corr_over_time_default_all_zeros(markevery = 30, line_style = 1)
-plot_sqlancer_corr_over_time("./SQLancer_TLP/logs_0", markevery = 30, line_style = 2)
+plot_sqlancer_corr_over_time("./SQLancer_TLP/", markevery = 30, line_style = 2)
 
 x = list(np.arange(0, 72.2, 0.2))
 y = [1] * len(x)
