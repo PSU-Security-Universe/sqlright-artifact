@@ -13,9 +13,9 @@ import paramiko
 sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
-plot_sql_mapsize("../SQLRight_TLP/plot_data_2", markevery = 30, line_style = 0)
-plot_sql_mapsize("./Squirrel_TLP/plot_data_1", markevery = 30, line_style = 1)
-plot_sqlancer_mapsize("./SQLancer_TLP/SQLancer_TLP_0/plot_data_35", markevery = 30, line_style = 2)
+plot_sql_mapsize("../SQLRight_TLP/", markevery = 30, line_style = 0)
+plot_sql_mapsize("./Squirrel_TLP/", markevery = 30, line_style = 1)
+plot_sqlancer_mapsize("./SQLancer_TLP/plot_data_0", markevery = 30, line_style = 2)
 
 
 # plt.xlabel('Time (hour)', fontsize = 20)

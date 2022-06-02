@@ -13,10 +13,10 @@ sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
 
-plot_sql_correct_rate("../SQLRight_TLP/plot_data_1", markevery = 10, line_style = 0)
-plot_sql_correct_rate("./drop_all/plot_data_0", markevery = 10, line_style = 1)
-plot_sql_correct_rate("./random_save/plot_data_0", markevery = 10, line_style = 2)
-plot_sql_correct_rate("./save_all/plot_data_0", markevery = 10, line_style = 3)
+plot_sql_correct_rate("../SQLRight_TLP/", markevery = 10, line_style = 0)
+plot_sql_correct_rate("./drop_all/", markevery = 10, line_style = 1)
+plot_sql_correct_rate("./random_save/", markevery = 10, line_style = 2)
+plot_sql_correct_rate("./save_all/", markevery = 10, line_style = 3)
 
 
 

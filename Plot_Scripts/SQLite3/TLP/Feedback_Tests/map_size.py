@@ -12,10 +12,10 @@ import paramiko
 sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
-plot_sql_mapsize("../SQLRight_TLP/plot_data_0", markevery = 10, line_style = 0)
-plot_sql_mapsize("./drop_all/plot_data_0", markevery = 10, line_style = 1)
-plot_sql_mapsize("./random_save/plot_data_0", markevery = 10, line_style = 2)
-plot_sql_mapsize("./save_all/plot_data_0", markevery = 10, line_style = 3)
+plot_sql_mapsize("../SQLRight_TLP/", markevery = 10, line_style = 0)
+plot_sql_mapsize("./drop_all/", markevery = 10, line_style = 1)
+plot_sql_mapsize("./random_save/", markevery = 10, line_style = 2)
+plot_sql_mapsize("./save_all/", markevery = 10, line_style = 3)
 
 
 # plt.xlabel('Time (hour)', fontsize = 20)
