@@ -175,7 +175,7 @@ def plot_sqlancer_mapsize(file_name, markevery=2600, line_style = 2, is_downsamp
     min_size = sys.maxsize
     
     for i in [0]:
-        file = pd.read_csv(file_name)
+        file = pd.read_csv(file_name, error_bad_lines=False)
         file['time'] = pd.to_datetime(file['unix_time'], unit='s')
         time_delta = []
         time_delta.append(0)
@@ -317,7 +317,7 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
     for cur_file_name in os.listdir(file_dir):
         if "plot_data_" not in cur_file_name:
             continue
-        cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name))
+        cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
             continue
@@ -330,7 +330,7 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
         print("Error: Cannot find plot_data_* file in dir %s" % (file_dir))
     
     for i in [0]:
-        file = pd.read_csv(file_name)
+        file = pd.read_csv(file_name, error_bad_lines=False)
         file['time'] = pd.to_datetime(file['unix_time'], unit='s')
         time_delta = []
         time_delta.append(0)
@@ -480,7 +480,7 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
     for cur_file_name in os.listdir(file_dir):
         if "plot_data_" not in cur_file_name:
             continue
-        cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name))
+        cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
             continue
@@ -493,7 +493,7 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
         print("Error: Cannot find plot_data_* file in dir %s" % (file_dir))
 
     for i in [0]:
-        file = pd.read_csv(file_name)
+        file = pd.read_csv(file_name, error_bad_lines=False)
         file['time'] = pd.to_datetime(file['unix_time'], unit='s')
         time_delta = []
         time_delta.append(0)
