@@ -12,8 +12,8 @@ import paramiko
 sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
-plot_sql_corr_over_time("../SQLRight_MySQL_NoREC/plot_data_1", markevery = 30, line_style = 0)
-# plot_sql_corr_over_time("./squirrel/second_run/plot_data_0", markevery = 30, line_style = 1)
+plot_sql_corr_over_time("../SQLRight_MySQL_NoREC/", markevery = 30, line_style = 0)
+# plot_sql_corr_over_time("./squirrel/", markevery = 30, line_style = 1)
 # plot_sqlancer_corr_over_time_2("./SQLancer/plot_data_0", markevery = 30, line_style = 2)
 
 # For Squirrel

@@ -12,11 +12,11 @@ import paramiko
 sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
-plot_sql_mapsize("./non-deter/plot_data_0", markevery = 10, line_style = 4)
-plot_sql_mapsize("./SQLRight_with_squ_valid/plot_data_1", markevery = 10, line_style = 2)
-plot_sql_mapsize("./SQLRight_with_squ_parser_and_valid/plot_data_0", markevery = 10, line_style = 3)
-plot_sql_mapsize("../SQLRight_NoREC/plot_data_3", markevery = 10, line_style = 0)
-plot_sql_mapsize("../Comp_diff_tools_NoREC/Squirrel_with_oracle/first_run_unknown_config/plot_data_0", markevery = 10, line_style = 1)
+plot_sql_mapsize("./non-deter/", markevery = 10, line_style = 4)
+plot_sql_mapsize("./SQLRight_with_squ_valid/", markevery = 10, line_style = 2)
+plot_sql_mapsize("./SQLRight_with_squ_parser_and_valid/", markevery = 10, line_style = 3)
+plot_sql_mapsize("../SQLRight_NoREC/", markevery = 10, line_style = 0)
+plot_sql_mapsize("../Comp_diff_tools_NoREC/Squirrel_with_oracle/first_run_unknown_config/", markevery = 10, line_style = 1)
 
 
 

@@ -13,7 +13,7 @@ sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
 
-plot_sql_correct_rate("../SQLRight_MySQL_TLP/plot_data_0", markevery = 30, line_style = 0)
+plot_sql_correct_rate("../SQLRight_MySQL_TLP/", markevery = 30, line_style = 0)
 
 x = list(np.arange(0, 72.2, 0.2))
 y = [0] * len(x)
