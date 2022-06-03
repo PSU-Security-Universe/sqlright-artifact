@@ -73,7 +73,6 @@ FROM sqlright_mysql_tools AS bisecting_setup
 
 USER root
 RUN mkdir -p /home/mysql/bisecting
-COPY bisecting /home/mysql/bisecting/bisecting
 COPY bisecting_cache_binaries /home/mysql/bisecting/bisecting_cache_binaries 
 RUN chown -R mysql:mysql /home/mysql/bisecting
 
