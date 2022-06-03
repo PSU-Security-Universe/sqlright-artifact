@@ -18,30 +18,30 @@ def setup_logger(debug_level):
 
 
 def enter_bisecting_mode():
-    all_commits = vcs.get_all_commits_hexsha()
+
+    all_commits = utils.json_load(constants.MYSQL_SORTED_COMMITS)
     logger.info(f"Getting {len(all_commits)} number of commits.")
 
     logger.info("Beginning processing files in the target folder.")
 
     for sample, sample_queries in reports.read_queries_from_files():
         for sample_query in sample_queries:
-            _ = bisecting.start_bisect(sample_query)
+            _ = bisecting.start_bisect(sample_query, all_commits)
         # utils.remove_file(sample)
 
 
 def setup_env():
     # remove and re-create the unique bug output directory.
     utils.remove_directory(constants.UNIQUE_BUG_OUTPUT_DIR)
-    constants.UNIQUE_BUG_OUTPUT_DIR.mkdir(parents=True)
+    os.mkdir(constants.UNIQUE_BUG_OUTPUT_DIR)
 
-    # Use the backup of PostgreSQL source code.
-    if constants.MYSQL_CHECKOUT_ROOT.exists():
-        utils.remove_directory(constants.MYSQL_CHECKOUT_ROOT)
-        utils.copy_directory(
-            constants.MYSQL_SOURCE_BACKUP, constants.MYSQL_CHECKOUT_ROOT
-        )
-
-    pgs.clone_mysql_source()
+    ## Use the backup of PostgreSQL source code.
+    #if constants.MYSQL_CHECKOUT_ROOT.exists():
+    #    utils.remove_directory(constants.MYSQL_CHECKOUT_ROOT)
+    #    utils.copy_directory(
+    #        constants.MYSQL_SOURCE_BACKUP, constants.MYSQL_CHECKOUT_ROOT
+    #    )
+    #pgs.clone_mysql_source()
 
 
 @click.command()

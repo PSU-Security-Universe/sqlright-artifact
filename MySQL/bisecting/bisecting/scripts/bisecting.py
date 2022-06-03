@@ -60,10 +60,10 @@ def cross_compare(buggy_commit: str):
     return uniq_id, is_unique_commit
 
 
-def start_bisect(queries: List[str]):
+def start_bisect(queries: List[str], all_commits):
     # newer_tag_commit, older_tag_commit = bisect_tags(queries)
     # current_bisecting_result = bisect_commits(queries, newer_tag_commit, older_tag_commit)
-    current_bisecting_result = bi_secting_commits(queries)
+    current_bisecting_result = bi_secting_commits(queries, all_commits)
     if current_bisecting_result.is_bisecting_error:
         # Unique bug id is Unknown. Meaning unsorted or unknown bug.
         # current_bisecting_result.uniq_bug_id_int = "Unknown"
@@ -243,13 +243,14 @@ def bisect_commits(queries: List[str], newer_tag_commit: str, older_tag_commit: 
     return current_bisecting_result
 
 
-def bi_secting_commits(queries: List[str]):
+def bi_secting_commits(queries: List[str], all_commits_str):
     # Returns Bug introduce commit_ID:str, is_error_result:bool
-    all_commits_str = vcs.get_all_commits_hexsha()
-    all_tags_sorted = vcs.get_all_sorted_tags()
+    all_commits_str
     # The oldest buggy commit, which is the commit that introduce the bug.
-    newer_commit_str = ""
-    older_commit_str = ""  # The latest correct commit.
+    newer_commit_str = all_commits_str[0]
+    older_commit_str = all_commits_str[-1]  # The latest correct commit.
+    newer_commit_index = 0
+    older_commit_index = len(all_commits_str)-1
     last_buggy_res_l = None
     last_buggy_all_result_flags = None
     is_error_returned_from_exec = False
@@ -259,122 +260,9 @@ def bi_secting_commits(queries: List[str]):
 
     current_bisecting_result = constants.BisectingResults()
 
-    for current_tag in all_tags_sorted[::-1]:
-        # From the latest tag to the earliest tag.
-        current_commit_str = current_tag.commit.hexsha
-        current_commit_index = all_commits_str.index(current_commit_str)
-        is_successfully_executed = False
-        is_commit_found = False
-
-        while not is_successfully_executed:
-            current_commit_str = all_commits_str[current_commit_index]
-            (
-                rn_correctness,
-                all_res_flags,
-                all_res_str_l,
-            ) = check_query_execute_correctness(queries, current_commit_str)
-
-            logger.info(
-                f"[*] {rn_correctness} : {current_tag} : {current_commit_index} : {current_commit_str}"
-            )
-
-            if rn_correctness == constants.RESULT.PASS:  # Execution result is correct.
-                older_commit_str = current_commit_str
-                is_successfully_executed = True
-                is_commit_found = True
-                logger.debug(
-                    f"[*] RESULT.PASS: {current_commit_index} {current_commit_str}"
-                )
-                break
-            elif rn_correctness == constants.RESULT.FAIL:  # Execution result is buggy
-                newer_commit_str = current_commit_str
-                is_successfully_executed = True
-                if all_res_str_l is not None:
-                    last_buggy_res_l = all_res_str_l
-                last_buggy_all_result_flags = all_res_flags
-                logger.debug(
-                    f"[*] RESULT.FAIL: {current_commit_index} {current_commit_str}"
-                )
-                break
-            elif rn_correctness == constants.RESULT.ALL_ERROR:
-                # Execution queries all return errors. Treat it similar to execution result is correct.
-                is_successfully_executed = True
-                is_commit_found = True
-                is_error_returned_from_exec = True
-                logger.debug(
-                    f"[*] RESULT.ALL_ERROR: {current_commit_index} {current_commit_str}"
-                )
-                break
-            elif rn_correctness == constants.RESULT.FAIL_TO_COMPILE:
-                newer_commit_str = current_commit_str
-                is_successfully_executed = False
-                is_commit_found = False
-                logger.debug(
-                    f"For commit {current_commit_str}, Bisecting FAIL_TO_COMPILE. \n"
-                )
-                utils.dump_failed_commit(current_commit_str)
-
-                logger.debug(
-                    f"[*] RESULT.FAIL_TO_COMPILE: {current_commit_index} {current_commit_str}"
-                )
-                break
-            else:
-                # Compilation failed or Segmentation Fault!!!!  rn_correctness == -2. Treat it as RESULT.FAIL.
-                older_commit_str = current_commit_str
-                logger.debug(
-                    f"[*] RESULT.ELSE: {current_commit_index} {current_commit_str}"
-                )
-                is_successfully_executed = False
-                is_commit_found = False
-                is_error_returned_from_exec = True
-                break
-
-        if is_commit_found:
-            break
-
-    if newer_commit_str == "" or older_commit_str == "":
-        # Error_reason = "Error: The latest commit: %s already fix this bug, or the latest commit is returnning
-        # errors!!! \nOpt: \"%s\", \nunopt: \"%s\". \nReturning None. \n" % (older_commit_str, opt_unopt_queries[0],
-        # opt_unopt_queries[1])
-        error_reason = (
-            (
-                "Error: The latest commit already fix this bug, "
-                "or the latest commit is returning errors!!!\n\n\n"
-            )
-            if newer_commit_str == ""
-            else (
-                "Error: Cannot find the bug introduced "
-                "commit (already iterating to the earliest version)!!!\n\n\n"
-            )
-        )
-
-        logger.debug(error_reason)
-
-        current_bisecting_result.query = queries
-        if newer_commit_str:
-            current_bisecting_result.first_corr_commit_id = current_commit_str
-
-        current_bisecting_result.is_error_returned_from_exec = (
-            is_error_returned_from_exec
-        )
-        current_bisecting_result.is_bisecting_error = True
-        current_bisecting_result.bisecting_error_reason = error_reason
-        current_bisecting_result.last_buggy_res_str_l = last_buggy_res_l
-        current_bisecting_result.last_buggy_res_flags_l = last_buggy_all_result_flags
-        current_bisecting_result.final_res_flag = rn_correctness
-
-        return current_bisecting_result
-
-    newer_commit_index = all_commits_str.index(newer_commit_str)
-    older_commit_index = all_commits_str.index(older_commit_str)
-
-    logger.info(
-        f"{older_commit_str} : {older_commit_index} - {newer_commit_index} : {newer_commit_str}"
-    )
-
     is_buggy_commit_found = False
 
-    logger.debug("Bisecting between two main releases. \n")
+    logger.debug("Bisecting on pre-compiled binaries. \n")
 
     while not is_buggy_commit_found:
         if abs(newer_commit_index - older_commit_index) <= 1:
