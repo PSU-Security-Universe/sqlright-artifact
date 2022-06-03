@@ -48,33 +48,45 @@ all_prev_shut_time_file.close()
 
 
 # SHUTDOWN MYSQL, periodically. 
-for prev_shutdown_time_idx,_ in all_prev_shutdown_time.items():
-    prev_shutdown_time = all_prev_shutdown_time[prev_shutdown_time_idx]
-    if (time.mktime(time.localtime())  -  prev_shutdown_time)  > MYSQL_REBOOT_TIME_GAP: # 60 sec, restart mysql
-        print("******************\nBegin scheduled MYSQL restart. ID: %d\n" % (prev_shutdown_time_idx))
-        # Politely, restart MySQL. 
-        cur_port_num = port_starting_num + prev_shutdown_time_idx - starting_core_id
-        socket_path = "/tmp/mysql_" + str(prev_shutdown_time_idx) + ".sock"
-        try:
-            db = MySQLdb.connect(host="localhost",    # your host, usually localhost
-                 user="root",         # your username
-                 passwd="",  # your password
-                 port=cur_port_num,
-                 unix_socket=socket_path,
-                 db="test_init")        # name of the data base
-        except MySQLdb._exceptions.OperationalError:
-            print("MYSQL server down, not recovered yet. \n\n\n")
-            continue
-        
-        cur = db.cursor()
-        cur.execute("SHUTDOWN;")
-        db.close()
-        time.sleep(1)
+#for prev_shutdown_time_idx,_ in all_prev_shutdown_time.items():
+#    prev_shutdown_time = all_prev_shutdown_time[prev_shutdown_time_idx]
+#    if (time.mktime(time.localtime())  -  prev_shutdown_time)  > MYSQL_REBOOT_TIME_GAP: # 60 sec, restart mysql
+#        print("******************\nBegin scheduled MYSQL restart. ID: %d\n" % (prev_shutdown_time_idx))
+#        # Politely, restart MySQL. 
+#        cur_port_num = port_starting_num + prev_shutdown_time_idx - starting_core_id
+#        socket_path = "/tmp/mysql_" + str(prev_shutdown_time_idx) + ".sock"
+#        try:
+#            db = MySQLdb.connect(host="localhost",    # your host, usually localhost
+#                 user="root",         # your username
+#                 passwd="",  # your password
+#                 port=cur_port_num,
+#                 unix_socket=socket_path,
+#                 db="test_init")        # name of the data base
+#        except MySQLdb._exceptions.OperationalError:
+#            print("MYSQL server down, not recovered yet. \n\n\n")
+#            continue
+#        
+#        cur = db.cursor()
+#        cur.execute("SHUTDOWN;")
+#        db.close()
+#        time.sleep(1)
+#
+#        print("MYSQL shutdown completed. ID: %d\n\n\n" % (prev_shutdown_time_idx))
+#        # 2 more seconds would be waited until the new MYSQL is being started. Thus, there would be more than 2 seconds between every MYSQL process restart. 
+#        # The actual restart of mysql is being handle by the same MYSQL crash handler. (Above)
+#        continue
 
-        print("MYSQL shutdown completed. ID: %d\n\n\n" % (prev_shutdown_time_idx))
-        # 2 more seconds would be waited until the new MYSQL is being started. Thus, there would be more than 2 seconds between every MYSQL process restart. 
-        # The actual restart of mysql is being handle by the same MYSQL crash handler. (Above)
-        continue
+# SHUTDOWN MYSQL, periodically, using pkill. 
+SHUTDOWN_COMMAND = "pkill mysqld"
+print("Running SHUTDOWN_COMMAND: %s" % (SHUTDOWN_COMMAND))
+p = subprocess.Popen(
+                    SHUTDOWN_COMMAND,
+                    shell=True,
+                    stderr=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,
+                    stdin=subprocess.DEVNULL
+                    ).communicate()
+print("Finished running SHUTDOWN COMMAND. \n")
 
 time.sleep(1)
 
