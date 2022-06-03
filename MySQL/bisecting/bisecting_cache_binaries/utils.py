@@ -23,7 +23,7 @@ def json_load(json_file):
 
 
 def execute_command(
-    command_line: str, cwd=None, timeout=300, input_contents="", failed_message="", output_file=None
+    command_line: str, cwd=None, timeout=100000, input_contents="", failed_message="", output_file=None
 ):
     """Run a command, returning its output."""
     cwd = cwd or Path.cwd()

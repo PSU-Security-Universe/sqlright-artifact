@@ -43,6 +43,8 @@ RUN apt -y install clang
 RUN apt -y install g++-9
 RUN apt -y install gcc-9
 
+RUN apt -y install libsasl2-dev
+
 RUN apt -y install libnuma-dev
 
 
@@ -58,7 +60,7 @@ RUN chown -R mysql:mysql /home/mysql
 # Setup mysql git repo.
 USER mysql
 
-ENV CC=gcc
+ENV CC=gcc-9
 ENV CXX=g++-9
 
 WORKDIR /home/mysql/
