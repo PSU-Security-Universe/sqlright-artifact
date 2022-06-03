@@ -24,7 +24,7 @@ sleep 60
 while :
 do
     python3 mysql_rebooter.py
-    sleep 30
+    sleep 60
 done
 
 EOF
