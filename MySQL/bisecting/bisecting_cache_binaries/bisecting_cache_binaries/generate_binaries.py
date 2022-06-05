@@ -44,6 +44,11 @@ for cur_commit_hash in all_commit_hash:
 
 logger.debug("Getting number %d of filtered_commit_hash. " % (len(filtered_commit_hash)))
 
+filtered_commited_hash_output_dir = "/home/mysql/bisecting/filtered_commit_hash.json"
+utils.json_dump(filtered_commit_hash, filtered_commited_hash_output_dir)
+
+logger.debug("Dumped the filtered_commited_hash as json file in: %s" % (filtered_commited_hash_output_dir))
+
 for cur_commit_hash in filtered_commit_hash:
     logger.debug("Begin compiling MySQL version: %s" % (cur_commit_hash))
     if mysql_builder.setup_mysql_commit(hexsha=cur_commit_hash):

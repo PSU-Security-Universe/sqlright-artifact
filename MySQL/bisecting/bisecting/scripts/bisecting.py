@@ -14,16 +14,18 @@ all_previous_compile_failure = []
 
 
 def check_query_execute_correctness(queries_l: List[str], hexsha: str):
-    install_directory = mysql.setup_mysql_commit(hexsha)
-    if utils.is_failed_commit(hexsha) or not install_directory:
-        utils.dump_failed_commit(hexsha)
-        return constants.FAILED_COMPILE_COMMITS, [], []
+    install_directory = os.path.join(MYSQL_ROOT, hexsha)
+
+    cur_mysqld_binary_dir = os.path.join(install_directory, "bin/mysqld")
+    if not os.path.isfile(cur_mysqld_binary_dir):
+        logger.warning("Cannot find MySQL version %s in the install_directory: %s" % (hexsha, install_directory))
+        return constants.RESULT.SEG_FAULT, [], []
     
-    mysql.start_mysqld_server(install_directory)
+    mysql.start_mysqld_server(hexsha)
 
     all_res_str_l: List[str] = []
     for queries in queries_l:
-        all_res_str, result = mysql.execute_queries(queries, install_directory)
+        all_res_str, result = mysql.execute_queries(queries, hexsha)
         all_res_str_l.append(all_res_str)
 
     if result == constants.RESULT.SEG_FAULT:
@@ -247,7 +249,7 @@ def bi_secting_commits(queries: List[str], all_commits_str):
     # Returns Bug introduce commit_ID:str, is_error_result:bool
     all_commits_str
     # The oldest buggy commit, which is the commit that introduce the bug.
-    newer_commit_str = all_commits_str[0]
+    newer_commit_str = all_commits_str[0]  # The oldest buggy commit.
     older_commit_str = all_commits_str[-1]  # The latest correct commit.
     newer_commit_index = 0
     older_commit_index = len(all_commits_str)-1

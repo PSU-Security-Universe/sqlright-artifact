@@ -14,8 +14,10 @@ def checkout_and_clean_mysql_repo(hexsha: str):
 
 def compile_mysql_source(hexsha: str):
     BLD_PATH = os.path.join(constants.MYSQL_ROOT, "bld")
+    boost_setup_command = "ln -s /home/mysql/boost_versions /home/mysql/mysql-server/boost"
+    utils.execute_command(boost_setup_command, cwd=BLD_PATH)
 
-    run_cmake = "cmake -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost .."
+    run_cmake = "cmake -DWITH_BOOST=../boost .."
     utils.execute_command(run_cmake, cwd=BLD_PATH)
 
     run_make = "make -j$(nproc)"
@@ -53,6 +55,18 @@ def copy_binaries (hexsha: str):
 
 
 def setup_mysql_commit(hexsha: str):
+
+    # First of all, check whether the pre-compiled binary exists in the destination directory.
+    if os.path.isdir(constants.OUTPUT_DIR):
+        cur_output_dir = os.path.join(constants.OUTPUT_DIR, hexsha)
+        if os.path.isdir(cur_output_dir):
+            cur_output_binary = os.path.join(cur_output_dir, "bin/mysql")
+            if os.path.isfile(cur_output_binary):
+                # The precompiled version existed, skip compilation. 
+                logger.debug("MySQL Version: %s existed. Skip compilation. " % (hexsha))
+                is_success = True
+                return is_success
+
 
     logger.debug("Checkout and clean up MySQL root dir.")
     checkout_and_clean_mysql_repo(hexsha)
