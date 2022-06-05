@@ -24,7 +24,11 @@ def compile_mysql_source(hexsha: str):
     utils.execute_command(run_make, cwd=BLD_PATH)
 
     compiled_program_path = os.path.join(BLD_PATH, "bin/mysqld")
-    is_success = os.path.isfile(compiled_program_path)
+    old_compiled_program_path = os.path.join(BLD_PATH, "sql/mysqld")
+    if os.path.isfile(compiled_program_path) or os.path.isfile(old_compiled_program_path):
+        is_success = True
+    else:
+        is_success = False
 
     if is_success:
         logger.debug("Compilation succeed: %s." % (hexsha))
@@ -44,13 +48,21 @@ def copy_binaries (hexsha: str):
     cur_output_data = os.path.join(cur_output_dir, "data")
     utils.execute_command("mkdir -p %s" % (cur_output_data), cwd = cur_output_dir)
 
-    shutil.copy("/home/mysql/mysql-server/bld/bin/mysqld", cur_output_bin)
-    shutil.copy("/home/mysql/mysql-server/bld/bin/mysql", cur_output_bin)
-    shutil.copy("/home/mysql/mysql-server/bld/bin/mysql_ssl_rsa_setup", cur_output_bin)
+    if os.path.isfile("/home/mysql/mysql-server/bld/bin/mysqld"):
+        shutil.copy("/home/mysql/mysql-server/bld/bin/mysqld", cur_output_bin)
+        shutil.copy("/home/mysql/mysql-server/bld/bin/mysql", cur_output_bin)
+        shutil.copy("/home/mysql/mysql-server/bld/bin/mysql_ssl_rsa_setup", cur_output_bin)
+        for lib_file in os.listdir("/home/mysql/mysql-server/bld/library_output_directory"):
+            if "libprotobuf-lite" in lib_file:
+                shutil.copy(os.path.join("/home/mysql/mysql-server/bld/library_output_directory", lib_file), cur_output_bin)
+    elif os.path.isfile("/home/mysql/mysql-server/bld/sql/mysqld"):
+        shutil.copy("/home/mysql/mysql-server/bld/sql/mysqld", cur_output_bin)
+        shutil.copy("/home/mysql/mysql-server/bld/client/mysql", cur_output_bin)
+        shutil.copy("/home/mysql/mysql-server/bld/client/mysqladmin", cur_output_bin)
+    else:
+        logger.error("The mysqld output file not found. Compilation Failed?")
+        return False
 
-    for lib_file in os.listdir("/home/mysql/mysql-server/bld/library_output_directory"):
-        if "libprotobuf-lite" in lib_file:
-            shutil.copy(os.path.join("/home/mysql/mysql-server/bld/library_output_directory", lib_file), cur_output_bin)
     return True
 
 
