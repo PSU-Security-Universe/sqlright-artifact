@@ -62,16 +62,31 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     cur_output_file = os.path.join(cur_output_dir_str, "output.txt")
     cur_output_file = open(cur_output_file, "w")
 
-    fuzzing_command = [
-        "./afl-fuzz",
-        "-i", "./inputs",
-        "-o", cur_output_dir_str,
-        "-c", str(cur_inst_id),
-        "-O", str(oracle_str),
-        "-t", str(timeout_ms),
-        " -- ", sqlite_bin,
-        "&"
-    ]
+    fuzzing_command = []
+
+    if feedback_str == "":
+        fuzzing_command = [
+            "./afl-fuzz",
+            "-i", "./inputs",
+            "-o", cur_output_dir_str,
+            "-c", str(cur_inst_id),
+            "-O", str(oracle_str),
+            "-t", str(timeout_ms),
+            " -- ", sqlite_bin,
+            "&"
+        ]
+    else:
+        fuzzing_command = [
+            "./afl-fuzz",
+            "-i", "./inputs",
+            "-o", cur_output_dir_str,
+            "-c", str(cur_inst_id),
+            "-O", str(oracle_str),
+            "-t", str(timeout_ms),
+            "-F", str(feedback_str)
+            " -- ", sqlite_bin,
+            "&"
+        ]
 
     fuzzing_command = " ".join(fuzzing_command)
     print("Running fuzzing command: " + fuzzing_command)

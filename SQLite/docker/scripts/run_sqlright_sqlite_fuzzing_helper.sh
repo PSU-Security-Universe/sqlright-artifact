@@ -11,6 +11,8 @@ mkdir -p /home/sqlite/fuzzing/Bug_Analysis/bug_samples
 
 cd /home/sqlite/fuzzing/fuzz_root
 
+rm pragma # SQLRight doesn't require pragma file.
+
 cp /home/sqlite/src/afl-fuzz ./
 
 printf "\n\n\n\nStart fuzzing. \n\n\n\n\n"
