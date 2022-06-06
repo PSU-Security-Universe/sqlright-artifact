@@ -56,9 +56,9 @@ def copy_binaries (hexsha: str):
             if "libprotobuf-lite" in lib_file:
                 shutil.copy(os.path.join("/home/mysql/mysql-server/bld/library_output_directory", lib_file), cur_output_bin)
     elif os.path.isfile("/home/mysql/mysql-server/bld/sql/mysqld"):
-        shutil.copy("/home/mysql/mysql-server/bld/sql/mysqld", cur_output_bin)
-        shutil.copy("/home/mysql/mysql-server/bld/client/mysql", cur_output_bin)
-        shutil.copy("/home/mysql/mysql-server/bld/client/mysqladmin", cur_output_bin)
+        shutil.copytree("/home/mysql/mysql-server/bld/sql", os.path.join(cur_output_bin, "sql"))
+        shutil.copytree("/home/mysql/mysql-server/bld/client", os.path.join(cur_output_bin, "client"))
+        shutil.copytree("/home/mysql/mysql-server/bld/scripts", os.path.join(cur_output_bin, "scripts"))
     else:
         logger.error("The mysqld output file not found. Compilation Failed?")
         return False

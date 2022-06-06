@@ -33,6 +33,8 @@ def get_all_commits_hexsha():
 #        return _all_commits_hexsha
 
     if not _all_commits_hexsha:
+        cmd = 'git checkout 8.0'
+        utils.execute_command(cmd, cwd=MYSQL_ROOT)
         cmd = 'git --no-pager log --pretty="%H"'
         commits, _, _ = utils.execute_command(cmd, cwd=MYSQL_ROOT)
         commits = [commit.strip() for commit in commits.splitlines()]
