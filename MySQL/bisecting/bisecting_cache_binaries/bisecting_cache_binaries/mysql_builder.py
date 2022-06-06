@@ -78,7 +78,8 @@ def setup_mysql_commit(hexsha: str):
         cur_output_dir = os.path.join(constants.OUTPUT_DIR, hexsha)
         if os.path.isdir(cur_output_dir):
             cur_output_binary = os.path.join(cur_output_dir, "bin/mysql")
-            if os.path.isfile(cur_output_binary):
+            old_cur_output_binary = os.path.join(cur_output_dir, "client/mysql")
+            if os.path.isfile(cur_output_binary) or os.path.isfile(old_cur_output_binary):
                 # The precompiled version existed, skip compilation. 
                 logger.debug("MySQL Version: %s existed. Skip compilation. " % (hexsha))
                 is_success = True
