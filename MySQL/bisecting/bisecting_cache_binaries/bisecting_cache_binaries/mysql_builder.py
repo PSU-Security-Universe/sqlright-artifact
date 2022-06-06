@@ -24,7 +24,7 @@ def compile_mysql_source(hexsha: str):
     utils.execute_command(run_make, cwd=BLD_PATH)
 
     compiled_program_path = os.path.join(BLD_PATH, "bin/mysqld")
-    old_compiled_program_path = os.path.join(BLD_PATH, "sql/mysqld")
+    old_compiled_program_path = os.path.join(BLD_PATH, "bin/sql/mysqld")
     if os.path.isfile(compiled_program_path) or os.path.isfile(old_compiled_program_path):
         is_success = True
     else:
