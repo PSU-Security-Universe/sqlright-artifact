@@ -8,7 +8,7 @@ def copy_sqlright_contents_in_dir(src:str, dest:str):
         print("The %s folder doesn't exist. Please run the fuzzing first, and then invoke this plot function." % (src))
         exit(5)
     if not os.path.exists(dest):
-        print("The copy dest: %s folder doesn't exist. Creating the folder %s." % (dest))
+        print("The copy dest: %s folder doesn't exist. Creating the folder %s." % (dest, dest))
         os.mkdir(dest)
 
     i = 0

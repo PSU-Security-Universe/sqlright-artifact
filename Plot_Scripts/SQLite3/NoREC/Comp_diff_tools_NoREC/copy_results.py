@@ -10,7 +10,7 @@ if not os.path.exists(sqlite_results_dir):
     exit(1)
 
 sqlright_res_dir = os.path.join(sqlite_results_dir, "sqlright_sqlite_NOREC")
-sqlancer_res_dir = os.path.join(sqlite_results_dir, "sqlancer_sqlite")
+sqlancer_res_dir = os.path.join(sqlite_results_dir, "sqlancer_sqlite_NOREC")
 sqlancer_config_str = "sqlancer_sqlite_NOREC"
 squirrel_oracle_res_dir = os.path.join(sqlite_results_dir, "squirrel_oracle_NOREC")
 
