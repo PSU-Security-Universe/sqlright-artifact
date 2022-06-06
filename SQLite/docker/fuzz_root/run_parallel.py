@@ -83,7 +83,7 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
             "-c", str(cur_inst_id),
             "-O", str(oracle_str),
             "-t", str(timeout_ms),
-            "-F", str(feedback_str)
+            "-F", str(feedback_str),
             " -- ", sqlite_bin,
             "&"
         ]
