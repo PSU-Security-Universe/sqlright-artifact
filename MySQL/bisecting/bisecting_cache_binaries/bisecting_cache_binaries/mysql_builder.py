@@ -49,13 +49,18 @@ def copy_binaries (hexsha: str):
     utils.execute_command("mkdir -p %s" % (cur_output_data), cwd = cur_output_dir)
 
     if os.path.isfile("/home/mysql/mysql-server/bld/bin/mysqld"):
+        utils.execute_command("strip /home/mysql/mysql-server/bld/bin/mysqld", cwd=cur_output_bin)
+        utils.execute_command("strip /home/mysql/mysql-server/bld/bin/mysql", cwd=cur_output_bin)
         shutil.copy("/home/mysql/mysql-server/bld/bin/mysqld", cur_output_bin)
         shutil.copy("/home/mysql/mysql-server/bld/bin/mysql", cur_output_bin)
-        shutil.copy("/home/mysql/mysql-server/bld/bin/mysql_ssl_rsa_setup", cur_output_bin)
+        if os.path.isfile("/home/mysql/mysql-server/bld/bin/mysql_ssl_rsa_setup"):
+            shutil.copy("/home/mysql/mysql-server/bld/bin/mysql_ssl_rsa_setup", cur_output_bin)
         for lib_file in os.listdir("/home/mysql/mysql-server/bld/library_output_directory"):
             if "libprotobuf-lite" in lib_file:
                 shutil.copy(os.path.join("/home/mysql/mysql-server/bld/library_output_directory", lib_file), cur_output_bin)
     elif os.path.isfile("/home/mysql/mysql-server/bld/sql/mysqld"):
+        utils.execute_command("strip /home/mysql/mysql-server/bld/sql/mysqld", cwd=cur_output_bin)
+        utils.execute_command("strip /home/mysql/mysql-server/bld/client/mysql", cwd=cur_output_bin)
         shutil.copytree("/home/mysql/mysql-server/bld/sql", os.path.join(cur_output_bin, "sql"))
         shutil.copytree("/home/mysql/mysql-server/bld/client", os.path.join(cur_output_bin, "client"))
         shutil.copytree("/home/mysql/mysql-server/bld/scripts", os.path.join(cur_output_bin, "scripts"))
