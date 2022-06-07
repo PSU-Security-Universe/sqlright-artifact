@@ -146,6 +146,7 @@ RUN make
 FROM squirrel_oracle AS sqlancer_sqlite
 
 USER root
+RUN apt update
 RUN apt -y install openjdk-11-jdk
 RUN apt -y install maven
 
