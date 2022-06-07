@@ -284,19 +284,19 @@ python3 run_plots.py
 #### 4.1.1 Run the SQLRight SQLite3 Drop All configiguration, for 24 hours:
 ```sh
 cd <sqlright_root>/SQLite/scripts
-bash run_sqlite_fuzzing SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback drop_all 
+bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback drop_all 
 ```
 
 #### 4.1.2 Run the SQLRight SQLite3 Random Save configiguration, for 24 hours:
 ```sh
 cd <sqlright_root>/SQLite/scripts
-bash run_sqlite_fuzzing SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback random_save
+bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback random_save
 ```
 
 #### 4.1.3 Run the SQLRight SQLite3 Save All configiguration, for 24 hours:
 ```sh
 cd <sqlright_root>/SQLite/scripts
-bash run_sqlite_fuzzing SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback save_all
+bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback save_all
 ```
 
 #### 4.1.4 Plot the figures:
@@ -311,19 +311,19 @@ python3 run_plots.py
 #### 4.2.1 Run the SQLRight SQLite3 Drop All configiguration, for 24 hours:
 ```sh
 cd <sqlright_root>/SQLite/scripts
-bash run_sqlite_fuzzing SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --feedback drop_all 
+bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --feedback drop_all 
 ```
 
 #### 4.2.2 Run the SQLRight SQLite3 Random Save configiguration, for 24 hours:
 ```sh
 cd <sqlright_root>/SQLite/scripts
-bash run_sqlite_fuzzing SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --feedback random_save
+bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --feedback random_save
 ```
 
 #### 4.2.3 Run the SQLRight SQLite3 Save All configiguration, for 24 hours:
 ```sh
 cd <sqlright_root>/SQLite/scripts
-bash run_sqlite_fuzzing SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --feedback save_all
+bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --feedback save_all
 ```
 
 #### 4.2.4 Plot the figures:
