@@ -6492,13 +6492,13 @@ EXP_ST void setup_dirs_fds(void) {
   plot_file = fdopen(fd, "w");
   if (!plot_file) PFATAL("fdopen() failed");
 
-  fprintf(plot_file, "# unix_time, cycles_done, cur_path, paths_total, "
-                      "pending_total, pending_favs, map_size, unique_crashes, "
-                      "unique_hangs, max_depth, execs_per_sec, total_input_failed, "
-                      "total_random_valid, total_random_temp, total_random_valid_rate, "
-                      "total_add_to_queue, total_mutate_all_failed, total_mutate_failed, "
-                      "total_append_failed, "
-                      "total_bad_statms, total_good_stmts, total_good_rate, but_output_id, new_edges_on\n");
+  fprintf(plot_file, "unix_time,cycles_done,cur_path,paths_total,"
+                      "pending_total,pending_favs,map_size,unique_crashes,"
+                      "unique_hangs,max_depth,execs_per_sec,total_input_failed,"
+                      "total_random_valid,total_random_temp,total_random_valid_rate,"
+                      "total_add_to_queue,total_mutate_all_failed,total_mutate_failed,"
+                      "total_append_failed,"
+                      "total_bad_statms,total_good_stmts,total_good_rate,but_output_id,new_edges_on\n");
                      /* ignore errors */
 }
 

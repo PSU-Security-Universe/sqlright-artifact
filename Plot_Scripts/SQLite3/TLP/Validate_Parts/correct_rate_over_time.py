@@ -14,10 +14,10 @@ from plot_funcs import *
 
 
 plot_sql_corr_over_time("../SQLRight_TLP/", markevery = 10, line_style = 4)
-plot_sql_corr_over_time("./SQLRight_use_squ_valid/", markevery = 10, line_style = 2)
-plot_sql_corr_over_time("./SQLRight_use_squ_parser/", markevery = 10, line_style = 3)
+plot_sql_corr_over_time("./SQLRight_with_squ_valid/", markevery = 10, line_style = 2)
+plot_sql_corr_over_time("./SQLRight_with_squ_parser/", markevery = 10, line_style = 3)
 plot_sql_corr_over_time("../SQLRight_TLP/", markevery = 10, line_style = 0)
-plot_sql_corr_over_time("../Comp_diff_tools/Squirrel_TLP/", markevery = 10, line_style = 1)
+plot_sql_corr_over_time("../Comp_diff_tools/Squirrel_with_oracle/", markevery = 10, line_style = 1)
 # plot_sqlancer_corr_over_time("./SQLancer/SQLancer_3/plot_data_30",  markevery = 100, line_style = 2)
 
 

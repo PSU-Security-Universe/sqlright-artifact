@@ -13,10 +13,10 @@ sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
 plot_sql_correct_rate("../SQLRight_TLP/", markevery = 10, line_style = 4)
-plot_sql_correct_rate("./SQLRight_use_squ_valid/", markevery = 10, line_style = 2)
-plot_sql_correct_rate("./SQLRight_use_squ_parser/", markevery = 10, line_style = 3)
+plot_sql_correct_rate("./SQLRight_with_squ_valid/", markevery = 10, line_style = 2)
+plot_sql_correct_rate("./SQLRight_with_squ_parser/", markevery = 10, line_style = 3)
 plot_sql_correct_rate("../SQLRight_TLP/", markevery = 10, line_style = 0)
-plot_sql_correct_rate("../Comp_diff_tools/Squirrel_TLP/", markevery = 10, line_style = 1)
+plot_sql_correct_rate("../Comp_diff_tools/Squirrel_with_oracle/", markevery = 10, line_style = 1)
 
 
 plt.xlim(0, 24)
