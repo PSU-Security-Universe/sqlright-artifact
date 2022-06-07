@@ -24,9 +24,11 @@ $(SUB_DIRS): parser
 
 afl-fuzz: $(SUB_DIRS)
 	$(CC) $(CFLAGS) $(AFL_OBJS) -o $@ $(LDFLAGS) -lrt
+	cp afl-fuzz ./fuzz_root
 
 test-parser: $(SUB_DIRS)
 	$(CC) $(CFLAGS) $(TEST_OBJS) -o $@ $(LDFLAGS)
+	cp test-parser ./fuzz_root
 
 query-minimizer: $(SUB_DIRS)
 	$(CC) $(CFLAGS) $(MINIMIZER_OBJS) -o $@ $(LDFLAGS) -lrt
