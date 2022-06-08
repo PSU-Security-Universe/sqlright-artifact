@@ -25,7 +25,7 @@ oracle_str = "NOREC"
 feedback_str = ""
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:", ["odir=", "start-core=", "num-concurrent=", "oracle=", "feedback="])
+    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:T:", ["odir=", "start-core=", "num-concurrent=", "oracle=", "feedback=", "timeout="])
 except getopt.GetoptError:
     print("Arguments parsing error")
     exit(1)
@@ -45,6 +45,9 @@ for opt, arg in opts:
     elif opt in ("-F", "--feedback"):
         feedback_str = arg
         print("Using feedback: %s " % (feedback_str))
+    elif opt in ("-T", "--timeout"):
+        timeout_ms = int(arg)
+        print("Using timeout: %d " % (timeout_ms))
     else:
         print("Error. Input arguments not supported. \n")
         exit(1)
