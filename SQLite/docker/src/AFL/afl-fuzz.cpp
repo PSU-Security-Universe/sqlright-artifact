@@ -5472,11 +5472,11 @@ EXP_ST u8 common_fuzz_stuff(char **argv, vector<string> &query_str, vector<strin
     return 0;
   }
   
-  if (fault == FAULT_NONE &&
-      all_comp_res.final_res == ORA_COMP_RES::ALL_Error){
-    // cerr << "Query all error. " << endl;
-    return 0;
-  }
+//  if (fault == FAULT_NONE &&
+//      all_comp_res.final_res == ORA_COMP_RES::ALL_Error){
+//    // cerr << "Query all error. " << endl;
+//    return 0;
+//  }
 
   queued_discovered +=
     save_if_interesting(argv, query_str_no_marks[0], all_comp_res, fault, explain_diff_id);

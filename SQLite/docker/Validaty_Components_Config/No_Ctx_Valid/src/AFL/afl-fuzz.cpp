@@ -2917,7 +2917,7 @@ void stream_output_res(const ALL_COMP_RES &all_comp_res, ostream &out) {
   }
 }
 
-u8 execute_cmd_string(string cmd_string, vector<int> &explain_diff_id,
+u8 execute_cmd_string(string& cmd_string, vector<int> &explain_diff_id,
                       char **argv, u32 tmout = exec_tmout) {
 
   u8 fault;
@@ -3769,7 +3769,7 @@ static u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
     for (int i = 0; i < len; i++){
       strip_sql += ((char*)mem)[i];
     }
-    strip_sql = p_oracle->remove_valid_stmts_from_str(strip_sql);
+    //strip_sql = p_oracle->remove_valid_stmts_from_str(strip_sql);
 
     if (strip_sql.size() == 0) {
       ck_free(fn);
@@ -5636,6 +5636,41 @@ static void show_stats(void) {
        function is a tad too long... returns 0 if fuzzed successfully, 1 if
        skipped or bailed out. */
 
+    vector <IR*> get_all_ir_node(IR* ir_root) {
+        if (ir_root == nullptr) {
+            std::cerr << "Error: ir_root is nullptr.\n";
+        }
+        // Iterate IR binary tree, depth prioritized. (not left depth prioritized)
+        bool is_finished_search = false;
+        std::vector<IR*> ir_vec_iter;
+        std::vector<IR*> all_ir_node_vec;
+        IR* cur_IR = ir_root;
+        // Begin iterating. 
+        while (!is_finished_search) {
+            ir_vec_iter.push_back(cur_IR);
+            if (cur_IR->type_ != kProgram) 
+                {all_ir_node_vec.push_back(cur_IR);} // Ignore kProgram at the moment, put it at the end of the vector. 
+
+            if (cur_IR->left_ != nullptr){
+                cur_IR = cur_IR->left_;
+                continue;
+            } else { // Reaching the most depth. Consulting ir_vec_iter for right_ nodes. 
+                cur_IR = nullptr;
+                while (cur_IR == nullptr){
+                    if (ir_vec_iter.size() == 0){
+                        is_finished_search = true;
+                        break;
+                    }
+                    cur_IR = ir_vec_iter.back()->right_;
+                    ir_vec_iter.pop_back();
+                }
+                continue;
+            }
+        }
+        all_ir_node_vec.push_back(ir_root);
+        return all_ir_node_vec;
+    }
+
     static u8 fuzz_one(char** argv) {
 
       s32 len, fd, temp_len, i, j;
@@ -5797,6 +5832,20 @@ static void show_stats(void) {
         goto abandon_entry;
       }
       program_root->deep_delete();      // We have the IR now, we can delete the bison parser version of the query representation. 
+
+      // Remove the existing SELECT statement. 
+      for (IR* cur_ir : ir_set) {
+          if (cur_ir -> type_ == kSelectStatement && cur_ir->parent_->type_ == kStatement) {
+                  IR* parent_ir = cur_ir->parent_;
+                  if (parent_ir->left_ == cur_ir) {
+                          parent_ir->update_left(NULL);
+                  } else {
+                          parent_ir->update_right(NULL);
+                  }
+                  cur_ir->deep_drop();
+          }
+      }
+      ir_set = get_all_ir_node(ir_set.back());
 
       unsigned long prev_hash, current_hash;
       prev_hash = g_mutator.hash(ir_set[ir_set.size()-1]);
