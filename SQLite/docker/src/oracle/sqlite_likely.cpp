@@ -94,9 +94,11 @@ bool SQL_LIKELY::compare_norm(
   res_int_1 = 0;
   res_int_2 = 0;
 
-  if (res_str_0.find("Error") != string::npos ||
-      res_str_1.find("Error") != string::npos ||
-      res_str_2.find("Error") != string::npos) {
+  if (
+      findStringIn(res_str_0, "error") ||
+      findStringIn(res_str_1, "error") ||
+      findStringIn(res_str_2, "error")
+    ) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
@@ -145,9 +147,11 @@ bool SQL_LIKELY::compare_aggr(COMP_RES &res) {
   int &res_b_int = res.res_int_1;
   int &res_c_int = res.res_int_2;
 
-  if (res_a.find("Error") != string::npos ||
-      res_b.find("Error") != string::npos ||
-      res_c.find("Error") != string::npos) {
+  if (
+      findStringIn(res_a, "error") ||
+      findStringIn(res_b, "error") ||
+      findStringIn(res_c, "error")
+    ) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }

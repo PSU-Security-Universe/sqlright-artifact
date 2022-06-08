@@ -109,7 +109,7 @@ bool SQL_ROWID::compare_norm(COMP_RES &res) { /* Handle normal valid stmt: SELEC
   vector<int> &v_res_int = res.v_res_int;
 
   for (const string &res_str : v_res_str) {
-    if (res_str.find("Error") != string::npos) {
+    if (findStringIn(res_str, "error")) {
       res.comp_res = ORA_COMP_RES::Error;
       return true;
     }
@@ -150,7 +150,10 @@ bool SQL_ROWID::compare_aggr(COMP_RES &res) {
   vector<string> &v_res_str = res.v_res_str;
 
   for (int i = 0; i < v_res_str.size(); i++) {
-    if (v_res_str[i].find("Error") != string::npos) {
+    if (
+      findStringIn(res.v_res_str[0], "error") || 
+      findStringIn(res.v_res_str[i], "error")
+    ) {
       res.comp_res = ORA_COMP_RES::Error;
       return true;
     }

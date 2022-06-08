@@ -54,8 +54,8 @@ bool SQL_TLP::compare_norm(COMP_RES &res) {
   int &res_a_int = res.res_int_0;
   int &res_b_int = res.res_int_1;
 
-  if (res_a.find("Error") != string::npos ||
-      res_b.find("Error") != string::npos) {
+  if (findStringIn(res_a, "error") ||
+      findStringIn(res_b, "error") ) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
@@ -121,8 +121,8 @@ bool SQL_TLP::compare_uniq(COMP_RES &res) {
   int &res_a_int = res.res_int_0;
   int &res_b_int = res.res_int_1;
 
-  if (res_a.find("Error") != string::npos ||
-      res_b.find("Error") != string::npos) {
+  if (findStringIn(res_a, "error") ||
+      findStringIn(res_b, "error") ) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
@@ -202,8 +202,8 @@ bool SQL_TLP::compare_aggr(COMP_RES &res) {
   int &res_a_int = res.res_int_0;
   int &res_b_int = res.res_int_1;
 
-  if (res_a.find("Error") != string::npos ||
-      res_b.find("Error") != string::npos) {
+  if (findStringIn(res_a, "error") ||
+      findStringIn(res_b, "error") ) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
@@ -377,19 +377,30 @@ bool SQL_TLP::is_oracle_select_stmt(IR* cur_IR) {
     }
   }
 
-  /* Limit only ONE parameter in the aggregate function. */
   vector<IR*> v_result_column_list = ir_wrapper.get_result_column_list_in_select_clause(cur_IR);
-  if (v_result_column_list.size() != 0) {
-    vector<IR*> v_aggr_func_ir = ir_wrapper.get_ir_node_in_stmt_with_type(v_result_column_list[0], kFunctionName, false);
-    if (v_aggr_func_ir.size() != 0) {
-      IR* func_aggr_ir = v_aggr_func_ir[0] -> parent_ ->right_; // func_name -> unknown -> kfuncargs
-      if (func_aggr_ir -> type_ == kFunctionArgs && func_aggr_ir -> right_ != NULL && func_aggr_ir ->right_ -> type_ == kExprList) {
-        /* If the stmt has multiple expr_list inside the func_args, ignore current stmt. */
-        if (func_aggr_ir->right_->right_ != NULL) {// Another kExprList.
-          return false;
-        }
+  /* Limit only one result_column in the SELECT clause */
+  if (v_result_column_list.size() != 1) {
+    return false;
+  }
+
+  IR* result_column_list = v_result_column_list[0];
+
+  vector<IR*> v_aggr_func_ir = ir_wrapper.get_ir_node_in_stmt_with_type(result_column_list, kFunctionName, false);
+
+  if (v_aggr_func_ir.size() > 0) {
+    /* Limit only ONE parameter in the aggregate function. */
+    IR* func_aggr_ir = v_aggr_func_ir[0] -> parent_ ->right_; // func_name -> unknown -> kfuncargs
+    if (func_aggr_ir -> type_ == kFunctionArgs && func_aggr_ir -> right_ != NULL && func_aggr_ir ->right_ -> type_ == kExprList) {
+      /* If the stmt has multiple expr_list inside the func_args, ignore current stmt. */
+      if (func_aggr_ir->right_->right_ != NULL) {// Another kExprList.
+        return false;
       }
     }
+  }
+
+  /* If the result_column_list contains binary_op, skip and ignored. */
+  if (ir_wrapper.get_ir_node_in_stmt_with_type(result_column_list, kBinaryOp, false).size() > 0 ) {
+    return false;
   }
 
   if (
@@ -475,13 +486,13 @@ IR* SQL_TLP::transform_aggr(IR* cur_stmt, bool is_UNION_ALL, VALID_STMT_TYPE_TLP
     IR* column_alias_0 = new IR(kColumnAlias, OP1("AS"), alias_id_0);
     if (v_aggr_func_ir[0]->left_->op_ == nullptr) v_aggr_func_ir[0]->left_->op_ = new IROperator();
     /* Change the aggr function from AVG to SUM. Then Deep Copy. */
-    v_aggr_func_ir[0]->left_->op_->prefix_ = "SUM";
+    v_aggr_func_ir[0]->left_->str_val_ = "SUM";
     IR* new_result_column_0 = new IR(kResultColumn, OP0(), ori_result_column_expr_->deep_copy(), column_alias_0);
 
     IR* alias_id_1 = new IR(kIdentifier, "c", id_alias_name);
     IR* column_alias_1 = new IR(kColumnAlias, OP1("AS"), alias_id_1);
     /* Change the aggr function from AVG to COUNT. Then Deep Copy. */
-    v_aggr_func_ir[0]->left_->op_->prefix_ = "COUNT";
+    v_aggr_func_ir[0]->left_->str_val_ = "COUNT";
     IR* new_result_column_1 = new IR(kResultColumn, OP0(), ori_result_column_expr_->deep_copy(), column_alias_1);
 
     /* Chain the two result_column clause. */
@@ -714,8 +725,8 @@ VALID_STMT_TYPE_TLP SQL_TLP::get_stmt_TLP_type (IR* cur_stmt) {
 
   /* Might have aggr function. */
   string aggr_func_str;
-  if (v_aggr_func_ir[0]->left_->op_ && v_agg_func_args[0]->left_->op_->prefix_)
-    aggr_func_str = v_aggr_func_ir[0]->left_->op_->prefix_;
+  if (v_aggr_func_ir[0]->left_)
+    aggr_func_str = v_aggr_func_ir[0]->left_->str_val_;
   if (findStringIn(aggr_func_str, "MIN")) {
     if (default_type_ == VALID_STMT_TYPE_TLP::GROUP_BY) {
       return VALID_STMT_TYPE_TLP::TLP_UNKNOWN;

@@ -1008,22 +1008,29 @@ void log_map_id(u32 i, u8 byte, const string& cur_seed_str){
   if (map_id_out_f.fail()){
     return;
   }
-  i = (MAP_SIZE >> 3) - i - 1 ;
-  u32 actual_idx = i * 8 + byte;
-  if (share_map_id.count(actual_idx)){
-    for (string &debug_info : share_map_id[actual_idx]) {
-      map_id_out_f << actual_idx << "," << debug_info << "," << map_file_id << endl;
-    }
-  } else {
-    map_id_out_f << actual_idx << "," << "-1,-1,-1,-1,0," << map_file_id <<  endl;
-  }
   if (cur_seed_str == "") {
     return;
   }
-  fstream map_id_seed_output;
-  map_id_seed_output.open("./queue_coverage_id/" + to_string(map_file_id) + ".txt", std::fstream::out | std::fstream::trunc);
-  map_id_seed_output << cur_seed_str;
-  map_id_seed_output.close();
+  i = (MAP_SIZE >> 3) - i - 1 ;
+  u32 actual_idx = i * 8 + byte;
+  
+  if (queue_cur) {
+    map_id_out_f << actual_idx << ",-1,-1" <<  endl;
+  } else {
+    map_id_out_f << actual_idx << "," << map_file_id << ",0" << endl;
+  }
+  map_id_out_f.flush();
+
+  if (queue_cur && cur_seed_str != "123") {
+    if ( !filesystem::exists("./queue_coverage_id_core/")) {
+      filesystem::create_directory("./queue_coverage_id_core/");
+    }
+    fstream map_id_seed_output;
+    map_id_seed_output.open("./queue_coverage_id_core/" + to_string(queue_cur->depth) + "_" +to_string(map_file_id) + "_" + to_string(current_entry) + ".txt", std::fstream::out | std::fstream::trunc);
+    map_id_seed_output << cur_seed_str;
+    map_id_seed_output.close();
+  }
+
 }
 
 /* Check if the current execution path brings anything new to the table.
@@ -2222,19 +2229,19 @@ EXP_ST void init_forkserver(char **argv) {
 
     /* Set sane defaults for ASAN if nothing else specified. */
 
-    // setenv("ASAN_OPTIONS", "abort_on_error=1:"
-    //                        "detect_leaks=0:"
-    //                        "symbolize=0:"
-    //                        "allocator_may_return_null=1", 0);
+    setenv("ASAN_OPTIONS", "abort_on_error=1:"
+                           "detect_leaks=0:"
+                           "symbolize=0:"
+                           "allocator_may_return_null=1", 0);
 
     // /* MSAN is tricky, because it doesn't support abort_on_error=1 at this
     //    point. So, we do this in a very hacky way. */
 
-    // setenv("MSAN_OPTIONS", "exit_code=" STRINGIFY(MSAN_ERROR) ":"
-    //                        "symbolize=0:"
-    //                        "abort_on_error=1:"
-    //                        "allocator_may_return_null=1:"
-    //                        "msan_track_origins=0", 0);
+    setenv("MSAN_OPTIONS", "exit_code=" STRINGIFY(MSAN_ERROR) ":"
+                           "symbolize=0:"
+                           "abort_on_error=1:"
+                           "allocator_may_return_null=1:"
+                           "msan_track_origins=0", 0);
 
     execv(target_path, argv); // Used for start up sqlite3 ???
 
@@ -2542,14 +2549,14 @@ static u8 run_target(char **argv, u32 timeout) {
 
       /* Set sane defaults for ASAN if nothing else specified. */
 
-      // setenv("ASAN_OPTIONS", "abort_on_error=1:"
-      //                        "detect_leaks=0:"
-      //                        "symbolize=0:"
-      //                        "allocator_may_return_null=1", 0);
+      setenv("ASAN_OPTIONS", "abort_on_error=1:"
+                             "detect_leaks=0:"
+                             "symbolize=0:"
+                             "allocator_may_return_null=1", 0);
 
-      // setenv("MSAN_OPTIONS", "exit_code=" STRINGIFY(MSAN_ERROR) ":"
-      //                        "symbolize=0:"
-      //                        "msan_track_origins=0", 0);
+      setenv("MSAN_OPTIONS", "exit_code=" STRINGIFY(MSAN_ERROR) ":"
+                             "symbolize=0:"
+                             "msan_track_origins=0", 0);
 
       execv(target_path, argv);
 
@@ -2655,10 +2662,10 @@ static u8 run_target(char **argv, u32 timeout) {
   // /* A somewhat nasty hack for MSAN, which doesn't support abort_on_error and
   //    must use a special exit code. */
 
-  // if (uses_asan && WEXITSTATUS(status) == MSAN_ERROR) {
-  //   kill_signal = 0;
-  //   return FAULT_CRASH;
-  // }
+  if (uses_asan && WEXITSTATUS(status) == MSAN_ERROR) {
+    kill_signal = 0;
+    return FAULT_CRASH;
+  }
 
   if ((dumb_mode == 1 || no_forkserver) && tb4 == EXEC_FAIL_SIG)
     return FAULT_ERROR;
@@ -3828,15 +3835,6 @@ static u8 save_if_interesting(char **argv, string &query_str, const ALL_COMP_RES
     /* Keep only if there are new bits in the map, add to queue for
        future fuzzing, etc. */
 
-    /* For evaluation experiments, if we need to disable coverage feedback and randomly drop queries:
-    **  1/10 of chances to save the interesting seed.
-    **  9/10 of chances to throw away the seed.
-    **/
-    if ( (disable_coverage_feedback == 2) && get_rand_int(10) == 0 ) {
-      // Drop query. 
-      return 0;
-    }
-        
     /* If no_new_bits, dropped. However, if disable_coverage_feedback is specified, ignore has_new_bits. */
     if ( !(hnb = has_new_bits(virgin_bits, query_str)) && !disable_coverage_feedback) {  
       if (crash_mode)
@@ -3845,6 +3843,22 @@ static u8 save_if_interesting(char **argv, string &query_str, const ALL_COMP_RES
       // Drop query. 
       return 0;
     }
+
+    if (disable_coverage_feedback == 1)
+    { // Disable feedbacks. Drop all queries.
+      return keeping;
+    }
+
+    /* For evaluation experiments, if we need to disable coverage feedback and randomly drop queries:
+    **  1/10 of chances to save the interesting seed.
+    **  9/10 of chances to throw away the seed.
+    **/
+    if ( (disable_coverage_feedback == 2) && get_rand_int(10) < 9 ) {
+      // Drop query. 
+      return keeping;
+    }
+
+    /* If disable_coverage_feedback == 3, always go through save_if_interesting. */
 
     char *tmp_name = stage_name;
     //[modify] add
@@ -5458,25 +5472,21 @@ EXP_ST u8 common_fuzz_stuff(char **argv, vector<string> &query_str, vector<strin
     return 0;
   }
   
-  if (fault != FAULT_CRASH && 
+  if (fault == FAULT_NONE &&
       all_comp_res.final_res == ORA_COMP_RES::ALL_Error){
     // cerr << "Query all error. " << endl;
     return 0;
   }
 
-  if (disable_coverage_feedback == 1) {  // Disable feedbacks. Drop all queries. 
-    /* Do nothing. */
-  } else {
-    queued_discovered +=
-      save_if_interesting(argv, query_str_no_marks[0], all_comp_res, fault, explain_diff_id);
-  }
+  queued_discovered +=
+    save_if_interesting(argv, query_str_no_marks[0], all_comp_res, fault, explain_diff_id);
 
   /* Queue size could be overwhelmed if we disable feedbacks with randomly saved queries or completely save all queries. 
   ** In these cases, we clean the queue if q_len exceed 10000. 
   */
-  if (disable_coverage_feedback > 1 && q_len >= 1000) {
-    // destroy_half_queue();
-  }
+  // if (disable_coverage_feedback > 1 && q_len >= 1000) {
+  //   // destroy_half_queue();
+  // }
 
   if (!(stage_cur % stats_update_freq) || stage_cur + 1 == stage_max)
     show_stats();
@@ -7368,35 +7378,11 @@ static void do_libary_initialize() {
 }
 
 static void load_map_id() {
-
   if (dump_library) {
-
-    /* Debug: Load the map_id to the program */
-    fstream map_f("./mapID.csv", fstream::in);
-
-    if (map_f.fail())
-      FATAL("mapID.csv doesn't exist in the current workdir");
-
-    map_id_out_f << "mapID,src,src_line,dest,dest_line,EH,map_file_id" << endl;
-
-    string line;
-    getline(map_f, line); // Ignore the first line. It is the header of the csv file. 
-    while (getline(map_f, line)) {
-      vector<string> line_vec = string_splitter(line, ',');
-      int map_id = stoi(line_vec[0]);
-      string map_info = line_vec[1] + "," + line_vec[2] + "," + line_vec[3] + "," + line_vec[4] + "," + line_vec[5];
-      if (share_map_id.count(map_id) != 0){
-        share_map_id[map_id].push_back(map_info);
-      } else {
-        vector<string> tmp{map_info};
-        share_map_id[map_id] = tmp;
-      }
-      line_vec.clear();
-    }
-    map_f.close();
-    line.clear();
+    map_id_out_f << "mapID,map_file_id,depth" << endl;
   }
-
+  map_id_out_f.flush();
+  return;
 }
 
 int main(int argc, char **argv) {
@@ -7766,8 +7752,11 @@ int main(int argc, char **argv) {
   if (extras_dir)
     load_extras(extras_dir);
 
-  if (!timeout_given)
-    find_timeout();
+  if (!timeout_given) {
+    // find_timeout();
+    /* If timeout is not given for SQLite3, set the timeout to 2000ms. */
+    exec_tmout = 2000;
+  }
 
   detect_file_args(argv + optind + 1);
 

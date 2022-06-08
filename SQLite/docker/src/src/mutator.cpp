@@ -1413,12 +1413,12 @@ void Mutator::add_to_valid_lib(IR *ir, string &select,
   if (is_explain_diff && use_cri_val)
     all_cri_valid_pstr_vec.push_back(new_select);
 
-  if (this->dump_library) {
-    std::ofstream f;
-    f.open("./oracle-select", std::ofstream::out | std::ofstream::app);
-    f << *new_select << endl;
-    f.close();
-  }
+  // if (this->dump_library) {
+  //   std::ofstream f;
+  //   f.open("./oracle-select", std::ofstream::out | std::ofstream::app);
+  //   f << *new_select << endl;
+  //   f.close();
+  // }
 
   add_to_library_core(ir, new_select);
 
@@ -1444,12 +1444,12 @@ void Mutator::add_to_library(IR *ir, string &query) {
   all_query_pstr_set.insert(p_query_str);
   // all_valid_pstr_vec.push_back(p_query_str);
 
-  if (this->dump_library) {
-    std::ofstream f;
-    f.open("./normal-lib", std::ofstream::out | std::ofstream::app);
-    f << *p_query_str << endl;
-    f.close();
-  }
+  // if (this->dump_library) {
+  //   std::ofstream f;
+  //   f.open("./normal-lib", std::ofstream::out | std::ofstream::app);
+  //   f << *p_query_str << endl;
+  //   f.close();
+  // }
 
   add_to_library_core(ir, p_query_str);
 
