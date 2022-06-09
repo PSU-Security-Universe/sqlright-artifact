@@ -187,6 +187,7 @@ RUN make -j$(nproc)
 FROM squirrel_oracle AS sqlancer
 # Setup SQLancer. 
 USER root
+RUN apt update
 RUN apt -y install openjdk-11-jdk
 RUN apt -y install maven
 
