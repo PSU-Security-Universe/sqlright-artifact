@@ -128,29 +128,24 @@ void IR::_to_string(string &res) {
     return;
   }
 
-  if (op_ && op_->prefix_) {
-    res += op_->prefix_;
-    res +=  " ";
-  }
+  if (op_ != NULL)
+    res += op_->prefix_ + " ";
 
-  if (left_) {
+  if (left_ != NULL) {
     left_->_to_string(res);
     res += " ";
   }
 
-  if (op_ && op_->middle_) {
-    res += op_->middle_;
-    res += " ";
-  }
+  if (op_ != NULL)
+    res += op_->middle_ + " ";
 
-  if (right_) {
+  if (right_ != NULL) {
     right_->_to_string(res);
     res += " ";
   }
 
-  if (op_ && op_->suffix_) {
+  if (op_ != NULL)
     res += op_->suffix_;
-  }
 
   return;
 }
@@ -198,7 +193,7 @@ IR *IR::get_root() {
   return node;
 }
 
-IR *IR::get_parent() {
+IR *IR::get_parent() { 
 
   return this->parent_;
 }
@@ -255,7 +250,7 @@ IR *IR::deep_copy() {
     op = OP3(this->op_->prefix_, this->op_->middle_, this->op_->suffix_);
 
   copy_res = new IR(this->type_, op, left, right, this->f_val_, this->str_val_,
-                    this->mutated_times_);
+                    this->name_, this->mutated_times_);
   copy_res->id_type_ = this->id_type_;
   copy_res->parent_ = this->parent_;
   copy_res->str_val_ = this->str_val_;
@@ -264,6 +259,40 @@ IR *IR::deep_copy() {
   copy_res->is_node_struct_fixed = this->is_node_struct_fixed;
 
   return copy_res;
+}
+
+// move it here. seems no active use
+void IR::print_ir() {
+
+  if (this->left_ != NULL)
+    this->left_->print_ir();
+  if (this->right_ != NULL)
+    this->right_->print_ir();
+
+  if (this->operand_num_ == 0) {
+    cout << this->name_ << " = .str." << this->str_val_ << endl;
+  } else if (this->operand_num_ == 1) {
+    string res = "";
+    if (this->op_ != NULL) {
+      res += this->op_->prefix_ + " ";
+      res += this->left_->name_ + " ";
+      res += this->op_->middle_ + " ";
+      res += this->op_->suffix_ + " ";
+    }
+    cout << this->name_ << " = " << res << endl;
+  } else if (this->operand_num_ == 2) {
+    string res = "";
+    if (this->op_ != NULL) {
+      res += this->op_->prefix_ + " ";
+      res += this->left_->name_ + " ";
+      res += this->op_->middle_ + " ";
+      res += this->right_->name_ + " ";
+      res += this->op_->suffix_ + " ";
+    }
+    cout << this->name_ << " = " << res << endl;
+  }
+
+  return;
 }
 
 IR *QualifiedTableName::translate(vector<IR *> &v_ir_collector) {
@@ -429,7 +458,7 @@ IR *DropStatement::translate(vector<IR *> &v_ir_collector) { assert(0); }
 IR *OptIfExists::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
 
-  res = new IR(kOptIfExists, OP1(str_val_));
+  res = new IR(kOptIfExists, str_val_);
 
   TRANSLATEEND
 }
@@ -720,7 +749,7 @@ IR *InsertValue::translate(vector<IR *> &v_ir_collector) {
   res = new IR(kInsertValue, OP0(), tmp0, tmp1);
   CASEEND
   CASESTART(2)
-  res = new IR(kInsertValue, OP1("DEFAULT VALUES"));
+  res = new IR(kInsertValue, string("DEFAULT VALUES"));
   CASEEND
   SWITCHEND
   TRANSLATEEND
@@ -737,7 +766,7 @@ IR *UpdateType::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
   SWITCHSTART
   CASESTART(0)
-  res = new IR(kUpdateType, OP1(str_val_));
+  res = new IR(kUpdateType, str_val_);
   CASEEND
   CASESTART(1)
   res = SAFETRANSLATE(resolve_type_);
@@ -756,7 +785,7 @@ IR *InsertType::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
   SWITCHSTART
   CASESTART(0)
-  res = new IR(kInsertType, OP1(str_val_));
+  res = new IR(kInsertType, str_val_);
   CASEEND
   CASESTART(1)
   res = SAFETRANSLATE(resolve_type_);
@@ -838,7 +867,7 @@ IR *FilePath::translate(vector<IR *> &v_ir_collector) {
 
 IR *OptRecursive::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kOptRecursive, OP1(str_val_));
+  res = new IR(kOptRecursive, str_val_);
   TRANSLATEEND
 }
 
@@ -847,7 +876,7 @@ void OptRecursive::deep_delete() { delete this; }
 IR *OptIfNotExists::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
 
-  res = new IR(kOptIfNotExists, OP1(str_val_));
+  res = new IR(kOptIfNotExists, str_val_);
 
   TRANSLATEEND
 }
@@ -969,7 +998,7 @@ void SelectCoreList::deep_delete() {
 IR *SetOperator::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
 
-  res = new IR(kSetOperator, OP1(str_val_));
+  res = new IR(kSetOperator, str_val_);
 
   TRANSLATEEND
 }
@@ -1005,7 +1034,7 @@ IR *SelectCore::translate(vector<IR *> &v_ir_collector) {
 IR *OptStoredVirtual::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
 
-  res = new IR(kOptStoredVirtual, OP1(str_val_));
+  res = new IR(kOptStoredVirtual, str_val_);
 
   TRANSLATEEND
 }
@@ -1015,7 +1044,7 @@ void OptStoredVirtual::deep_delete() { delete this; }
 IR *OptDistinct::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
 
-  res = new IR(kOptDistinct, OP1(str_val_));
+  res = new IR(kOptDistinct, str_val_);
 
   TRANSLATEEND
 }
@@ -1204,7 +1233,7 @@ IR *OrderTerm::translate(vector<IR *> &v_ir_collector) {
 IR *OptOrderType::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
 
-  res = new IR(kOptOrderType, OP1(str_val_));
+  res = new IR(kOptOrderType, str_val_);
 
   TRANSLATEEND
 }
@@ -1213,7 +1242,7 @@ void OptWithoutRowID::deep_delete() { delete this; }
 
 IR *OptWithoutRowID::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kOptWithoutRowID, OP1(str_val_));
+  res = new IR(kOptWithoutRowID, str_val_);
   TRANSLATEEND
 }
 
@@ -1446,7 +1475,7 @@ void OptExpr::deep_delete() {
 
 IR *UnaryOp::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kUnaryOp, OP1(str_val_));
+  res = new IR(kUnaryOp, value_);
   TRANSLATEEND
 }
 
@@ -1483,7 +1512,7 @@ void InTarget::deep_delete() {
 
 IR *BinaryOp::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kBinaryOp, OP1(str_val_));
+  res = new IR(kBinaryOp, value_);
   TRANSLATEEND
 }
 
@@ -2123,7 +2152,7 @@ void JoinConstraint::deep_delete() {
 IR *OptSemicolon::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
 
-  res = new IR(kOptSemicolon, OP1(str_val_));
+  res = new IR(kOptSemicolon, str_val_);
 
   TRANSLATEEND
 }
@@ -2646,10 +2675,10 @@ IR *ForeignKeyOn::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
   SWITCHSTART
   CASESTART(0)
-  res = new IR(kForeignKeyOn, OP1(str_val_));
+  res = new IR(kForeignKeyOn, string(str_val_));
   CASEEND
   CASESTART(1)
-  auto tmp = SAFETRANSLATE(identifier_);
+  auto tmp = SAFETRANSLATE(name_);
   res = new IR(kForeignKeyOn, OP1("MATCH"), tmp);
   CASEEND
   SWITCHEND
@@ -2657,7 +2686,7 @@ IR *ForeignKeyOn::translate(vector<IR *> &v_ir_collector) {
 }
 
 void ForeignKeyOn::deep_delete() {
-  SAFEDELETE(identifier_);
+  SAFEDELETE(name_);
   delete this;
 }
 
@@ -2781,7 +2810,7 @@ void OptConflictClause::deep_delete() {
 
 IR *ResolveType::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kResolveType, OP1(str_val_));
+  res = new IR(kResolveType, str_val_);
   TRANSLATEEND
 }
 
@@ -2789,7 +2818,7 @@ void ResolveType::deep_delete() { delete this; }
 
 IR *OptAutoinc::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kOptAutoinc, OP1(str_val_));
+  res = new IR(kOptAutoinc, str_val_);
   TRANSLATEEND
 }
 
@@ -2797,7 +2826,7 @@ void OptAutoinc::deep_delete() { delete this; }
 
 IR *OptUnique::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kOptUnique, OP1(str_val_));
+  res = new IR(kOptUnique, str_val_);
   TRANSLATEEND
 }
 
@@ -2805,7 +2834,7 @@ void OptUnique::deep_delete() { delete this; }
 
 IR *OptTmp::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kOptTmp, OP1(str_val_));
+  res = new IR(kOptTmp, str_val_);
   TRANSLATEEND
 }
 
@@ -2813,7 +2842,7 @@ void OptTmp::deep_delete() { delete this; }
 
 IR *OptTriggerTime::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kOptTriggerTime, OP1(str_val_));
+  res = new IR(kOptTriggerTime, str_val_);
   TRANSLATEEND
 }
 
@@ -2862,7 +2891,7 @@ void OptOfColumnList::deep_delete() {
 
 IR *OptForEach::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kOptForEach, OP1(str_val_));
+  res = new IR(kOptForEach, str_val_);
   TRANSLATEEND
 }
 
@@ -2876,7 +2905,7 @@ IR *OptWhen::translate(vector<IR *> &v_ir_collector) {
   res = new IR(kOptWhen, OP1("WHEN"), res);
   CASEEND
   CASESTART(1)
-  res = new IR(kOptWhen, OP1(""));
+  res = new IR(kOptWhen, string(""));
   CASEEND
   SWITCHEND
   TRANSLATEEND
@@ -3135,7 +3164,7 @@ void OptFrame::deep_delete() {
 
 IR *RangeOrRows::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kRangeOrRows, OP1(str_val_));
+  res = new IR(kRangeOrRows, str_val_);
   TRANSLATEEND
 }
 
@@ -3303,7 +3332,7 @@ void TableOrSubquery::deep_delete() {
 IR *JoinOp::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
 
-  res = new IR(kJoinOp, OP1(str_val_));
+  res = new IR(kJoinOp, str_val_);
 
   TRANSLATEEND
 }
@@ -3476,7 +3505,14 @@ void OptColumn::deep_delete() { delete this; }
 IR *OptColumn::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
 
-  res = new IR(kOptColumn, OP1(str_val_));
+  SWITCHSTART
+  CASESTART(0)
+  res = new IR(kOptColumn, str_val_);
+  CASEEND
+  CASESTART(1)
+  res = new IR(kOptColumn, str_val_);
+  CASEEND
+  SWITCHEND
 
   TRANSLATEEND
 }
@@ -3549,7 +3585,16 @@ void OptTransaction::deep_delete() { delete this; }
 
 IR *OptTransaction::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kOptTransaction, OP1(str_val_));
+
+  SWITCHSTART
+  CASESTART(0)
+  res = new IR(kOptTransaction, str_val_);
+  CASEEND
+  CASESTART(1)
+  res = new IR(kOptTransaction, str_val_);
+  CASEEND
+  SWITCHEND
+
   TRANSLATEEND
 }
 
@@ -3757,7 +3802,7 @@ IR *AssignList::translate(vector<IR *> &v_ir_collector) {
 
 IR *ExistsOrNot::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kExistsOrNot, OP1(str_val_));
+  res = new IR(kExistsOrNot, str_val_);
   TRANSLATEEND
 }
 
@@ -3765,7 +3810,7 @@ void ExistsOrNot::deep_delete() { delete this; }
 
 IR *NullOfExpr::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
-  res = new IR(kNullOfExpr, OP1(str_val_));
+  res = new IR(kNullOfExpr, str_val_);
   TRANSLATEEND
 }
 
@@ -3774,7 +3819,7 @@ void NullOfExpr::deep_delete() { delete this; }
 IR *OptOrderOfNull::translate(vector<IR *> &v_ir_collector) {
   TRANSLATESTART
 
-  res = new IR(kOptOrderOfNull, OP1(str_val_));
+  res = new IR(kOptOrderOfNull, str_val_);
 
   TRANSLATEEND
 }
@@ -3901,7 +3946,7 @@ IR *RaiseFunction::translate(vector<IR *> &v_ir_collector) {
   CASEEND
   CASESTART(1)
   auto tmp = SAFETRANSLATE(error_msg_);
-  res = new IR(kOptNot, OP2(to_raise_, ")"), tmp);
+  res = new IR(kOptNot, OP2("RAISE ( " + to_raise_ + ",", ")"), tmp);
   CASEEND
   SWITCHEND
   TRANSLATEEND

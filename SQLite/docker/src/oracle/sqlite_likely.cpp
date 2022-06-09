@@ -6,44 +6,394 @@
 #include <regex>
 #include <string>
 
-bool SQL_LIKELY::mark_all_valid_node(vector<IR *> &v_ir_collector) {
-  return true;
+int SQL_LIKELY::count_valid_stmts(const string &input) {
+  int norec_select_count = 0;
+  vector<string> queries_vector = string_splitter(input, ';');
+  for (string &query : queries_vector)
+    if (this->is_oracle_valid_stmt(query))
+      norec_select_count++;
+  return norec_select_count;
 }
 
+bool SQL_LIKELY::is_oracle_valid_stmt(const string &query) {
+  if (
+      /* By enforcing SELECT COUNT(*) FROM ... WHERE ... seems to lose some
+         performance. */
+      regex_match(query, regex("^\\s*SELECT\\s*COUNT\\s*\\(\\s*\\*\\s*\\)\\s*"
+                               "FROM(.*?)WHERE(.*?)$",
+                               regex::icase)) &&
+      !regex_match(query, regex("^(.*?)GROUP\\s*BY(.*?)$", regex::icase)))
+    return true;
+  return false;
+}
+
+bool SQL_LIKELY::mark_all_valid_node(vector<IR *> &v_ir_collector) {
+  bool is_mark_successfully = false;
+
+  IR *root = v_ir_collector[v_ir_collector.size() - 1];
+  IR *par_ir = nullptr;
+  IR *par_par_ir = nullptr;
+  IR *par_par_par_ir = nullptr; // If we find the correct selectnoparen, this
+                                // should be the statementlist.
+  for (auto ir : v_ir_collector) {
+    if (ir != nullptr)
+      ir->is_node_struct_fixed = false;
+  }
+  for (auto ir : v_ir_collector) {
+    if (ir != nullptr && ir->type_ == kSelectCore) {
+      par_ir = root->locate_parent(ir);
+      if (par_ir != nullptr && par_ir->type_ == kSelectStatement) {
+        par_par_ir = root->locate_parent(par_ir);
+        if (par_par_ir != nullptr && par_par_ir->type_ == kStatement) {
+          par_par_par_ir = root->locate_parent(par_par_ir);
+          if (par_par_par_ir != nullptr &&
+              par_par_par_ir->type_ == kStatementList) {
+            string query = g_mutator->extract_struct(ir);
+            if (!(this->is_oracle_valid_stmt(query)))
+              continue; // Not norec compatible. Jump to the next ir.
+            query.clear();
+            is_mark_successfully = this->mark_node_valid(ir);
+            // cerr << "\n\n\nThe marked norec ir is: " <<
+            // this->extract_struct(ir) << " \n\n\n";
+            par_ir->is_node_struct_fixed = true;
+            par_par_ir->is_node_struct_fixed = true;
+            par_par_par_ir->is_node_struct_fixed = true;
+          }
+        }
+      }
+    }
+  }
+
+  return is_mark_successfully;
+}
+
+void SQL_LIKELY::rewrite_valid_stmt_from_ori(string &query, string &rew_1,
+                                             string &rew_2, string &rew_3,
+                                             unsigned multi_run_id) {
+  // vector<string> stmt_vector = string_splitter(query,
+  // "where|WHERE|SELECT|select|FROM|from");
+
+  while (query[0] == ' ' || query[0] == '\n' ||
+         query[0] == '\t') { // Delete duplicated whitespace at the beginning.
+    query = query.substr(1, query.size() - 1);
+  }
+
+  size_t select_position = 0;
+  size_t from_position = -1;
+  size_t where_position = -1;
+  size_t group_by_position = -1;
+  size_t order_by_position = -1;
+
+  vector<size_t> op_lp_v;
+  vector<size_t> op_rp_v;
+
+  size_t tmp1 = 0, tmp2 = 0;
+  while ((tmp1 = query.find("(", tmp1)) && tmp1 != string::npos) {
+    op_lp_v.push_back(tmp1);
+    tmp1++;
+    if (tmp1 == query.size()) {
+      break;
+    }
+  }
+  while ((tmp2 = query.find(")", tmp2)) && tmp2 != string::npos) {
+    op_rp_v.push_back(tmp2);
+    tmp2++;
+    if (tmp2 == query.size()) {
+      break;
+    }
+  }
+
+  if (op_lp_v.size() !=
+      op_rp_v.size()) { // The symbol of '(' and ')' is not matched. Ignore all
+                        // the '()' symbol.
+    op_lp_v.clear();
+    op_rp_v.clear();
+  }
+
+  for (int i = 0; i < op_lp_v.size();
+       i++) { // The symbol of '(' and ')' is not matched. Ignore all the '()'
+              // symbol.
+    if (op_lp_v[i] > op_rp_v[i]) {
+      op_lp_v.clear();
+      op_rp_v.clear();
+    }
+  }
+
+  tmp1 = -1;
+  tmp2 = -1;
+
+  tmp1 = query.find("SELECT",
+                    0); // The first SELECT statement will always be the correct
+                        // outter most SELECT statement. Pick its pos.
+  tmp2 = query.find("select", 0);
+  if (tmp1 != string::npos) {
+    select_position = tmp1;
+  }
+  if (tmp2 != string::npos && tmp2 < tmp1) {
+    select_position = tmp2;
+  }
+
+  tmp1 = 0;
+  tmp2 = 0;
+  from_position = -1;
+
+  do {
+    if (tmp1 != string::npos)
+      tmp1 = query.find("FROM", tmp1 + 4);
+    if (tmp2 != string::npos)
+      tmp2 = query.find("from", tmp2 + 4);
+
+    if (tmp1 != string::npos) {
+      bool is_ignore = false;
+      for (int i = 0; i < op_lp_v.size(); i++) {
+        if (tmp1 > op_lp_v[i] && tmp1 < op_rp_v[i]) {
+          is_ignore = true;
+          break;
+        }
+      }
+      if (!is_ignore) {
+        from_position = tmp1;
+        break; // from_position is found. Break the outter do...while loop.
+      }
+    }
+
+    if (tmp2 != string::npos) {
+      bool is_ignore = false;
+      for (int i = 0; i < op_lp_v.size(); i++) {
+        if (tmp2 > op_lp_v[i] && tmp2 < op_rp_v[i]) {
+          is_ignore = true;
+          break;
+        }
+      }
+      if (!is_ignore) {
+        from_position = tmp2;
+        break; // from_position is found. Break the outter do...while loop.
+      }
+    }
+
+  } while (tmp1 != string::npos || tmp2 != string::npos);
+
+  tmp1 = 0;
+  tmp2 = 0;
+  where_position = -1;
+
+  do {
+    if (tmp1 != string::npos)
+      tmp1 = query.find("WHERE", tmp1 + 5);
+    if (tmp2 != string::npos)
+      tmp2 = query.find("where", tmp2 + 5);
+
+    if (tmp1 != string::npos) {
+      bool is_ignore = false;
+      for (int i = 0; i < op_lp_v.size(); i++) {
+        if (tmp1 > op_lp_v[i] && tmp1 < op_rp_v[i]) {
+          is_ignore = true;
+          break;
+        }
+      }
+      if (!is_ignore) {
+        where_position = tmp1;
+        break; // where_position is found. Break the outter do...while loop.
+      }
+    }
+
+    if (tmp2 != string::npos) {
+      bool is_ignore = false;
+      for (int i = 0; i < op_lp_v.size(); i++) {
+        if (tmp2 > op_lp_v[i] && tmp2 < op_rp_v[i]) {
+          is_ignore = true;
+          break;
+        }
+      }
+      if (!is_ignore) {
+        where_position = tmp2;
+        break; // where_position is found. Break the outter do...while loop.
+      }
+    }
+
+  } while (tmp1 != string::npos || tmp2 != string::npos);
+
+  /*** Taking care of GROUP BY stmt.   ***/
+  tmp1 = -1, tmp2 = -1;
+  size_t tmp = 0;
+  while ((tmp = query.find("GROUP BY", tmp + 8)) && (tmp != string::npos)) {
+    bool is_ignore = false;
+    for (int i = 0; i < op_lp_v.size(); i++) {
+      if (tmp > op_lp_v[i] && tmp < op_rp_v[i]) {
+        is_ignore = true;
+        break;
+      }
+    }
+    if (!is_ignore) {
+      tmp1 = tmp;
+    }
+  } // The last GROUP BY statement outside the bracket will always be the
+    // correct outter most GROUP BY statement. Pick its pos.
+
+  tmp = -8;
+  while ((tmp = query.find("group by", tmp + 8)) && (tmp != string::npos)) {
+    bool is_ignore = false;
+    for (int i = 0; i < op_lp_v.size(); i++) {
+      if (tmp > op_lp_v[i] && tmp < op_rp_v[i]) {
+        is_ignore = true;
+        break;
+      }
+    }
+    if (!is_ignore) {
+      tmp2 = tmp;
+    }
+  } // The last GROUP BY statement outside the bracket will always be the
+    // correct outter most GROUP BY statement. Pick its pos.
+  if (tmp1 != string::npos) {
+    group_by_position = tmp1;
+  }
+  if (tmp2 != string::npos && tmp2 > tmp1) {
+    group_by_position = tmp2;
+  }
+
+  /*** Taking care of ORDER BY stmt.   ***/
+  tmp1 = -1, tmp2 = -1;
+  tmp = -8;
+  while ((tmp = query.find("ORDER BY", tmp + 8)) && (tmp != string::npos)) {
+    bool is_ignore = false;
+    for (int i = 0; i < op_lp_v.size(); i++) {
+      if (tmp > op_lp_v[i] && tmp < op_rp_v[i]) {
+        is_ignore = true;
+        break;
+      }
+    }
+    if (!is_ignore) {
+      tmp1 = tmp;
+    }
+  } // The last ORDER BY statement outside the bracket will always be the
+    // correct outter most GROUP BY statement. Pick its pos.
+  tmp = -8;
+  while ((tmp = query.find("order by", tmp + 8)) && (tmp != string::npos)) {
+    bool is_ignore = false;
+    for (int i = 0; i < op_lp_v.size(); i++) {
+      if (tmp > op_lp_v[i] && tmp < op_rp_v[i]) {
+        is_ignore = true;
+        break;
+      }
+    }
+    if (!is_ignore) {
+      tmp2 = tmp;
+    }
+  } // The last order by statement outside the bracket will always be the
+    // correct outter most GROUP BY statement. Pick its pos.
+  if (tmp1 != string::npos) {
+    order_by_position = tmp1;
+  }
+  if (tmp2 != string::npos && tmp2 > tmp1) {
+    order_by_position = tmp2;
+  }
+
+  size_t extra_stmt_position = -1;
+  if (group_by_position != string::npos && order_by_position != string::npos)
+    extra_stmt_position =
+        ((group_by_position < order_by_position) ? group_by_position
+                                                 : order_by_position);
+  else if (group_by_position != string::npos)
+    extra_stmt_position = group_by_position;
+  else if (order_by_position != string::npos)
+    extra_stmt_position = order_by_position;
+
+  string before_select_stmt;
+  string select_stmt;
+  string from_stmt;
+  string where_stmt;
+  string extra_stmt;
+
+  before_select_stmt = query.substr(0, select_position - 0);
+
+  select_stmt =
+      query.substr(select_position + 6, from_position - select_position - 6);
+
+  if (from_position == -1)
+    from_stmt = "";
+  else
+    from_stmt =
+        query.substr(from_position + 4, where_position - from_position - 4);
+
+  if (where_position == -1)
+    where_stmt = "";
+  else if (extra_stmt_position == -1)
+    where_stmt =
+        query.substr(where_position + 5, query.size() - where_position - 5);
+  else
+    where_stmt = query.substr(where_position + 5,
+                              extra_stmt_position - where_position - 5);
+
+  if (extra_stmt_position == -1)
+    extra_stmt = "";
+  else
+    extra_stmt =
+        query.substr(extra_stmt_position, query.size() - extra_stmt_position);
+
+  // if (select_stmt.find('*') != string::npos)
+  //   select_stmt = "";
+
+  rew_1 = before_select_stmt + " SELECT COUNT ( * ) FROM " + from_stmt +
+          " WHERE LIKELY ( " + where_stmt + " )";
+  rew_2 = before_select_stmt + " SELECT COUNT ( * ) FROM " + from_stmt +
+          " WHERE UNLIKELY ( " + where_stmt + " )";
+  rew_3 = "";
+}
+
+string SQL_LIKELY::remove_valid_stmts_from_str(string query) {
+  string output_query = "";
+  vector<string> queries_vector = string_splitter(query, ';');
+
+  for (auto current_stmt : queries_vector) {
+    if (is_str_empty(current_stmt))
+      continue;
+    if (!is_oracle_valid_stmt(current_stmt))
+      output_query += current_stmt + "; ";
+  }
+
+  return output_query;
+}
 
 void SQL_LIKELY::get_v_valid_type(
     const string &cmd_str, vector<VALID_STMT_TYPE_LIKELY> &v_valid_type) {
-  /* Look throught first validation stmt's result_1 first */
   size_t begin_idx = cmd_str.find("SELECT 'BEGIN VERI 0';", 0);
   size_t end_idx = cmd_str.find("SELECT 'END VERI 0';", 0);
 
   while (begin_idx != string::npos) {
     if (end_idx != string::npos) {
       string cur_cmd_str =
-          cmd_str.substr(begin_idx + 23, (end_idx - begin_idx - 23));
-      begin_idx = cmd_str.find("SELECT 'BEGIN VERI 0';", begin_idx + 23);
-      end_idx = cmd_str.find("SELECT 'END VERI 0';", end_idx + 21);
+          cmd_str.substr(begin_idx + 21, (end_idx - begin_idx - 21));
+      begin_idx = cmd_str.find("SELECT 'BEGIN VERI", begin_idx + 21);
+      end_idx = cmd_str.find("SELECT 'END VERI", end_idx + 21);
 
-      vector<IR*> v_cur_stmt_ir = g_mutator->parse_query_str_get_ir_set(cur_cmd_str);
-      if ( v_cur_stmt_ir.size() == 0 ) {
-        continue;
+      if (((findStringIter(cur_cmd_str, "SELECT DISTINCT MIN") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT MIN") - cur_cmd_str.begin()) <
+           5) ||
+          ((findStringIter(cur_cmd_str, "SELECT DISTINCT MAX") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT MAX") - cur_cmd_str.begin()) <
+           5) ||
+          ((findStringIter(cur_cmd_str, "SELECT DISTINCT SUM") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT SUM") - cur_cmd_str.begin()) <
+           5) ||
+          ((findStringIter(cur_cmd_str, "SELECT DISTINCT COUNT") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT COUNT") - cur_cmd_str.begin()) <
+           5)) {
+        v_valid_type.push_back(VALID_STMT_TYPE_LIKELY::UNIQ);
+        // cerr << "query: " << cur_cmd_str << " \nMIN. \n";
+      } else {
+        v_valid_type.push_back(VALID_STMT_TYPE_LIKELY::NORM);
+        // cerr << "query: " << cur_cmd_str << " \nNORM. \n";
       }
-      if ( !(v_cur_stmt_ir.back()->left_ != NULL && v_cur_stmt_ir.back()->left_->left_ != NULL) ) {
-        v_cur_stmt_ir.back()->deep_drop();
-        continue;
-      }
-
-      IR* cur_stmt_ir = v_cur_stmt_ir.back()->left_->left_;
-      v_valid_type.push_back(get_stmt_LIKELY_type(cur_stmt_ir));
-
-      v_cur_stmt_ir.back()->deep_drop();
-
     } else {
-      // cerr << "Error: For the current begin_idx, we cannot find the end_idx. \n\n\n";
       break; // For the current begin_idx, we cannot find the end_idx. Ignore
              // the current output.
     }
   }
+  return;
 }
 
 void SQL_LIKELY::compare_results(ALL_COMP_RES &res_out) {
@@ -57,16 +407,13 @@ void SQL_LIKELY::compare_results(ALL_COMP_RES &res_out) {
   int i = 0;
   for (COMP_RES &res : res_out.v_res) {
     switch (v_valid_type[i++]) {
-    case VALID_STMT_TYPE_LIKELY::NORMAL:
+    case VALID_STMT_TYPE_LIKELY::NORM:
       if (!this->compare_norm(res))
         is_all_errors = false;
       break;
-    case VALID_STMT_TYPE_LIKELY::AGGR:
-      if (!this->compare_aggr(res))
+    case VALID_STMT_TYPE_LIKELY::UNIQ:
+      if (!this->compare_uniq(res))
         is_all_errors = false;
-      break;
-    default:
-      res.comp_res = ORA_COMP_RES::Error;
       break;
     }
     if (res.comp_res == ORA_COMP_RES::Fail)
@@ -94,11 +441,9 @@ bool SQL_LIKELY::compare_norm(
   res_int_1 = 0;
   res_int_2 = 0;
 
-  if (
-      findStringIn(res_str_0, "error") ||
-      findStringIn(res_str_1, "error") ||
-      findStringIn(res_str_2, "error")
-    ) {
+  if (res_str_0.find("Error") != string::npos ||
+      res_str_1.find("Error") != string::npos ||
+      res_str_2.find("Error") != string::npos) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
@@ -106,11 +451,6 @@ bool SQL_LIKELY::compare_norm(
   vector<string> v_res_0 = string_splitter(res_str_0, '\n');
   vector<string> v_res_1 = string_splitter(res_str_1, '\n');
   vector<string> v_res_2 = string_splitter(res_str_2, '\n');
-
-  if (v_res_0.size() > 50 || v_res_1.size() > 50 || v_res_2.size() > 50) {
-    res.comp_res = ORA_COMP_RES::Error;
-    return true;
-  }
 
   for (const string &r : v_res_0) {
     if (is_str_empty(r))
@@ -138,45 +478,25 @@ bool SQL_LIKELY::compare_norm(
   return false;
 }
 
-bool SQL_LIKELY::compare_aggr(COMP_RES &res) {
+bool SQL_LIKELY::compare_uniq(COMP_RES &res) {
 
-  string &res_a = res.res_str_0;
-  string &res_b = res.res_str_1;
-  string &res_c = res.res_str_2;
-  int &res_a_int = res.res_int_0;
-  int &res_b_int = res.res_int_1;
-  int &res_c_int = res.res_int_2;
+  const string &res_str_0 = res.res_str_0;
+  const string &res_str_1 = res.res_str_1;
+  const string &res_str_2 = res.res_str_2;
 
-  if (
-      findStringIn(res_a, "error") ||
-      findStringIn(res_b, "error") ||
-      findStringIn(res_c, "error")
-    ) {
+  if (res_str_0.find("Error") != string::npos ||
+      res_str_1.find("Error") != string::npos ||
+      res_str_2.find("Error") != string::npos) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
 
-  try {
-    res_a_int = stoi(res.res_str_0);
-    res_b_int = stoi(res.res_str_1);
-    res_c_int = stoi(res.res_str_2);
-  } catch (std::invalid_argument &e) {
-    res.comp_res = ORA_COMP_RES::Error;
-    return true;
-  } catch (std::out_of_range &e) {
-    res.comp_res = ORA_COMP_RES::Error;
-    return true;
-  } catch (const std::exception& e) {
-    res.comp_res = ORA_COMP_RES::Error;
-    return true;
-  }
-
-  if (res_a_int != res_b_int || res_a_int != res_c_int) {
+  if (res_str_0 != res_str_1 || res_str_0 != res_str_2) {
     res.comp_res = ORA_COMP_RES::Fail;
-  } else {
-    res.comp_res = ORA_COMP_RES::Pass;
+    return false;
   }
 
+  res.comp_res = ORA_COMP_RES::Pass;
   return false;
 }
 
@@ -235,47 +555,5 @@ vector<IR*> SQL_LIKELY::post_fix_transform_select_stmt(IR* cur_stmt, unsigned mu
   trans_IR_vec.push_back(cur_stmt);
 
   return trans_IR_vec;
-
-}
-
-
-VALID_STMT_TYPE_LIKELY SQL_LIKELY::get_stmt_LIKELY_type (IR* cur_stmt) {
-  VALID_STMT_TYPE_LIKELY default_type_ = VALID_STMT_TYPE_LIKELY::NORMAL;
-
-  vector<IR*> v_result_column_list = ir_wrapper.get_result_column_list_in_select_clause(cur_stmt);
-  if (v_result_column_list.size() == 0) {
-    return VALID_STMT_TYPE_LIKELY::ROWID_UNKNOWN;
-  }
-
-  vector<IR*> v_agg_func_args = ir_wrapper.get_ir_node_in_stmt_with_type(v_result_column_list[0], kFunctionArgs, false);
-  if (v_agg_func_args.size() == 0) {
-    return default_type_;
-  }
-
-  vector<IR*> v_aggr_func_ir = ir_wrapper.get_ir_node_in_stmt_with_type(v_result_column_list[0], kFunctionName, false);
-  if (v_aggr_func_ir.size() == 0) {
-    return default_type_;
-  }
-  if (v_aggr_func_ir[0]->left_ == NULL) {
-    return default_type_;
-  }
-
-  /* Might have aggr function. */
-  if (v_aggr_func_ir[0]->left_->op_ && v_aggr_func_ir[0]->left_->op_->prefix_) {
-    string aggr_func_str = v_aggr_func_ir[0]->left_->op_->prefix_;
-    if (findStringIn(aggr_func_str, "MIN")) {
-      return VALID_STMT_TYPE_LIKELY::AGGR;
-    } else if (findStringIn(aggr_func_str, "MAX")){
-      return VALID_STMT_TYPE_LIKELY::AGGR;
-    } else if (findStringIn(aggr_func_str, "COUNT")){
-      return VALID_STMT_TYPE_LIKELY::AGGR;
-    } else if (findStringIn(aggr_func_str, "SUM")) {
-      return VALID_STMT_TYPE_LIKELY::AGGR;
-    } else if (findStringIn(aggr_func_str, "AVG")) {
-      return VALID_STMT_TYPE_LIKELY::AGGR;
-    }
-  }
-
-  return default_type_;
 
 }

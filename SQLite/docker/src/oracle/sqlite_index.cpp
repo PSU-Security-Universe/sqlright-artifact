@@ -5,44 +5,149 @@
 #include <regex>
 #include <string>
 
+int SQL_INDEX::count_valid_stmts(const string &input) {
+  int norec_select_count = 0;
+  vector<string> queries_vector = string_splitter(input, ';');
+  for (string &query : queries_vector)
+    if (this->is_oracle_valid_stmt(query) ||
+        this->is_oracle_valid_stmt_2(query))
+      norec_select_count++;
+  return norec_select_count;
+}
+
+bool SQL_INDEX::is_oracle_valid_stmt(const string &query) {
+  if (((findStringIter(query, "SELECT") - query.begin()) < 5) &&
+      findStringIn(query, "FROM"))
+    return true;
+  return false;
+}
+
+bool SQL_INDEX::is_oracle_valid_stmt_2(const string &query) {
+  if (((findStringIter(query, "CREATE INDEX") - query.begin()) < 5) ||
+      ((findStringIter(query, "CREATE UNIQUE INDEX") - query.begin()) < 5))
+    return true;
+  return false;
+}
+
 /* TODO:: Should we change this function in the not NOREC oracle? */
 bool SQL_INDEX::mark_all_valid_node(vector<IR *> &v_ir_collector) {
-  return true;
+  bool is_mark_successfully = false;
+
+  IR *root = v_ir_collector[v_ir_collector.size() - 1];
+  IR *par_ir = nullptr;
+  IR *par_par_ir = nullptr;
+  IR *par_par_par_ir = nullptr; // If we find the correct selectnoparen, this
+                                // should be the statementlist.
+  for (auto ir : v_ir_collector) {
+    if (ir != nullptr)
+      ir->is_node_struct_fixed = false;
+  }
+  for (auto ir : v_ir_collector) {
+    if (ir != nullptr && ir->type_ == kSelectCore) {
+      par_ir = root->locate_parent(ir);
+      if (par_ir != nullptr && par_ir->type_ == kSelectStatement) {
+        par_par_ir = root->locate_parent(par_ir);
+        if (par_par_ir != nullptr && par_par_ir->type_ == kStatement) {
+          par_par_par_ir = root->locate_parent(par_par_ir);
+          if (par_par_par_ir != nullptr &&
+              par_par_par_ir->type_ == kStatementList) {
+            string query = g_mutator->extract_struct(ir);
+            if (!(this->is_oracle_valid_stmt(query)))
+              continue; // Not norec compatible. Jump to the next ir.
+            query.clear();
+            is_mark_successfully = this->mark_node_valid(ir);
+            // cerr << "\n\n\nThe marked norec ir is: " <<
+            // this->extract_struct(ir) << " \n\n\n";
+            par_ir->is_node_struct_fixed = true;
+            par_par_ir->is_node_struct_fixed = true;
+            par_par_par_ir->is_node_struct_fixed = true;
+          }
+        }
+      }
+    }
+  }
+
+  return is_mark_successfully;
+}
+
+/* Select statements untouched. */
+void SQL_INDEX::rewrite_valid_stmt_from_ori(string &query, string &rew_1,
+                                            string &rew_2, string &rew_3,
+                                            unsigned multi_run_id) {
+  rew_1 = "";
+  rew_2 = "";
+  rew_3 = "";
+  return;
+}
+
+/* If we found CREATE INDEX stmt, delete it. */
+void SQL_INDEX::rewrite_valid_stmt_from_ori_2(string &query,
+                                              unsigned multi_run_id) {
+  /* If the query contains CREATE UNIQUE INDEX, delete no matter what. */
+  if (((findStringIter(query, "CREATE UNIQUE INDEX") - query.begin()) < 5)) {
+    query = "";
+    return;
+  }
+  if (multi_run_id < 1)
+    return; // First run, do not modify anything.
+  query = "";
+  return;
+}
+
+string SQL_INDEX::remove_valid_stmts_from_str(string query) {
+  string output_query = "";
+  vector<string> queries_vector = string_splitter(query, ';');
+
+  for (auto current_stmt : queries_vector) {
+    if (is_str_empty(current_stmt))
+      continue;
+    if (!is_oracle_valid_stmt(current_stmt))
+      output_query += current_stmt + "; ";
+  }
+
+  return output_query;
 }
 
 void SQL_INDEX::get_v_valid_type(const string &cmd_str,
                                  vector<VALID_STMT_TYPE_INDEX> &v_valid_type) {
-  /* Look throught first validation stmt's result_1 first */
   size_t begin_idx = cmd_str.find("SELECT 'BEGIN VERI 0';", 0);
   size_t end_idx = cmd_str.find("SELECT 'END VERI 0';", 0);
 
   while (begin_idx != string::npos) {
     if (end_idx != string::npos) {
       string cur_cmd_str =
-          cmd_str.substr(begin_idx + 23, (end_idx - begin_idx - 23));
-      begin_idx = cmd_str.find("SELECT 'BEGIN VERI 0';", begin_idx + 23);
-      end_idx = cmd_str.find("SELECT 'END VERI 0';", end_idx + 21);
+          cmd_str.substr(begin_idx + 21, (end_idx - begin_idx - 21));
+      begin_idx = cmd_str.find("SELECT 'BEGIN VERI", begin_idx + 21);
+      end_idx = cmd_str.find("SELECT 'END VERI", end_idx + 21);
 
-      vector<IR*> v_cur_stmt_ir = g_mutator->parse_query_str_get_ir_set(cur_cmd_str);
-      if ( v_cur_stmt_ir.size() == 0 ) {
-        continue;
+      if (((findStringIter(cur_cmd_str, "SELECT DISTINCT MIN") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT MIN") - cur_cmd_str.begin()) <
+           5) ||
+          ((findStringIter(cur_cmd_str, "SELECT DISTINCT MAX") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT MAX") - cur_cmd_str.begin()) <
+           5) ||
+          ((findStringIter(cur_cmd_str, "SELECT DISTINCT SUM") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT SUM") - cur_cmd_str.begin()) <
+           5) ||
+          ((findStringIter(cur_cmd_str, "SELECT DISTINCT COUNT") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT COUNT") - cur_cmd_str.begin()) <
+           5)) {
+        v_valid_type.push_back(VALID_STMT_TYPE_INDEX::UNIQ);
+        // cerr << "query: " << cur_cmd_str << " \nMIN. \n";
+      } else {
+        v_valid_type.push_back(VALID_STMT_TYPE_INDEX::NORM);
+        // cerr << "query: " << cur_cmd_str << " \nNORM. \n";
       }
-      if ( !(v_cur_stmt_ir.back()->left_ != NULL && v_cur_stmt_ir.back()->left_->left_ != NULL) ) {
-        v_cur_stmt_ir.back()->deep_drop();
-        continue;
-      }
-
-      IR* cur_stmt_ir = v_cur_stmt_ir.back()->left_->left_;
-      v_valid_type.push_back(get_stmt_INDEX_type(cur_stmt_ir));
-
-      v_cur_stmt_ir.back()->deep_drop();
-
     } else {
-      // cerr << "Error: For the current begin_idx, we cannot find the end_idx. \n\n\n";
       break; // For the current begin_idx, we cannot find the end_idx. Ignore
              // the current output.
     }
   }
+  return;
 }
 
 void SQL_INDEX::compare_results(ALL_COMP_RES &res_out) {
@@ -62,22 +167,16 @@ void SQL_INDEX::compare_results(ALL_COMP_RES &res_out) {
   bool is_all_errors = true;
   int i = 0;
   for (COMP_RES &res : res_out.v_res) {
-    if (i >= v_valid_type.size()) {
-      res.comp_res = ORA_COMP_RES::Error;
-      break; // break the loop
-    }
     switch (v_valid_type[i++]) {
-    case VALID_STMT_TYPE_INDEX::NORMAL:
+    case VALID_STMT_TYPE_INDEX::NORM:
       if (!this->compare_norm(res))
         is_all_errors = false;
       break;
 
-    case VALID_STMT_TYPE_INDEX::AGGR:
-      if (!this->compare_aggr(res))
+    case VALID_STMT_TYPE_INDEX::UNIQ:
+      if (!this->compare_uniq(res))
         is_all_errors = false;
       break;
-    default:
-      res.comp_res == ORA_COMP_RES::Error;
     }
     if (res.comp_res == ORA_COMP_RES::Fail)
       res_out.final_res = ORA_COMP_RES::Fail;
@@ -89,7 +188,9 @@ void SQL_INDEX::compare_results(ALL_COMP_RES &res_out) {
   return;
 }
 
-bool SQL_INDEX::compare_norm(COMP_RES &res) { /* Handle normal valid stmt: SELECT * FROM ...; Return is_err */
+bool SQL_INDEX::compare_norm(
+    COMP_RES
+        &res) { /* Handle normal valid stmt: SELECT * FROM ...; Return is_err */
   if (res.v_res_str.size() <= 1) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
@@ -104,11 +205,6 @@ bool SQL_INDEX::compare_norm(COMP_RES &res) { /* Handle normal valid stmt: SELEC
     }
     int cur_res_int = 0;
     vector<string> v_res_split = string_splitter(res_str, '\n');
-
-    if (v_res_split.size() > 50) {
-      res.comp_res = ORA_COMP_RES::Error;
-      return true;
-    }
     /* Remove NULL results */
     for (const string &r : v_res_split) {
       if (is_str_empty(r))
@@ -131,40 +227,43 @@ bool SQL_INDEX::compare_norm(COMP_RES &res) { /* Handle normal valid stmt: SELEC
   return false;
 }
 
-bool SQL_INDEX::compare_aggr(COMP_RES &res) {
+bool SQL_INDEX::compare_uniq(COMP_RES &res) {
   if (res.v_res_str.size() <= 1) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
   vector<string> &v_res_str = res.v_res_str;
+  // vector<int>& v_res_int = res.v_res_int;
 
+  // for (const string& res_str : v_res_str) {
+  //     if (res_str.find("Error") != string::npos){
+  //         res.comp_res = ORA_COMP_RES::Error;
+  //         return true;
+  //     }
+
+  //     int cur_res_int = 0;
+  //     try {
+  //         cur_res_int = stoi(res_str);
+  //     }
+  //     catch (std::invalid_argument &e) {
+  //         continue;
+  //     }
+  //     catch (std::out_of_range &e) {
+  //         res.comp_res = ORA_COMP_RES::Error;
+  //         return true;
+  //     }
+
+  //     v_res_int.push_back(cur_res_int);
+  // }
   for (int i = 0; i < v_res_str.size(); i++) {
     if (v_res_str[i].find("Error") != string::npos) {
       res.comp_res = ORA_COMP_RES::Error;
       return true;
     }
-    int res_a_int = 0;
-    int res_b_int = 0;
-    try {
-      res_a_int = stoi(res.v_res_str[0]);
-      res_b_int = stoi(res.v_res_str[i]);
-    } catch (std::invalid_argument &e) {
-      res.comp_res = ORA_COMP_RES::Error;
-      return true;
-    } catch (std::out_of_range &e) {
-      res.comp_res = ORA_COMP_RES::Error;
-      return true;
-    } catch (const std::exception& e) {
-      res.comp_res = ORA_COMP_RES::Error;
-      return true;
-    }
-    res.v_res_int.push_back(res_b_int);
-
-    if (res_a_int != res_b_int) {
+    if (v_res_str[0] != v_res_str[i]) {
       res.comp_res = ORA_COMP_RES::Fail;
       return false;
     }
-
   }
 
   res.comp_res = ORA_COMP_RES::Pass;
@@ -172,18 +271,10 @@ bool SQL_INDEX::compare_aggr(COMP_RES &res) {
 }
 
 bool SQL_INDEX::is_oracle_normal_stmt(IR* cur_IR) {
-  if (cur_IR->type_ == kCreateIndexStatement) {
+  if (ir_wrapper.is_exist_ir_node_in_stmt_with_type(cur_IR, kCreateIndexStatement, false)) {
     return true;
   }
   return false;
-}
-
-bool SQL_INDEX::is_oracle_select_stmt(IR* cur_IR) {
-  if (cur_IR->type_ == kSelectStatement) {
-    return true;
-  } else {
-    return false;
-  }
 }
 
 IR* SQL_INDEX::pre_fix_transform_normal_stmt(IR* cur_stmt) {
@@ -193,30 +284,25 @@ IR* SQL_INDEX::pre_fix_transform_normal_stmt(IR* cur_stmt) {
   }
   cur_stmt = cur_stmt->deep_copy();
   vector<IR*> opt_unique_vec = ir_wrapper.get_ir_node_in_stmt_with_type(cur_stmt, kOptUnique, false);
-  for (auto opt_unique_ir : opt_unique_vec) {
-    if (opt_unique_ir->op_)
-      opt_unique_ir->op_->prefix_ = ""; // Remove UNIQUE constraints in the deep_copied cur_stmt. 
+  if (opt_unique_vec.size() != 0) {
+    for (auto opt_unique_ir : opt_unique_vec) {
+      opt_unique_ir->str_val_ = ""; // Remove UNIQUE constraints in the deep_copied cur_stmt. 
+    }
+    return cur_stmt;
   }
-  return cur_stmt;
   cur_stmt->deep_drop();
   return nullptr;
 }
 
 vector<IR*> SQL_INDEX::post_fix_transform_normal_stmt(IR* cur_stmt, unsigned multi_run_id){
   if (multi_run_id == 0) {
-    vector<IR*> v_ret; v_ret.push_back(cur_stmt->deep_copy()); return v_ret;
+    vector<IR*> tmp; return tmp;
   }
   // multi_run_id == 1: return an empty statement. 
   IR* new_empty_stmt = new IR(kStatement, "");
   vector<IR*> output_stmt_vec;
   output_stmt_vec.push_back(new_empty_stmt);
   return output_stmt_vec;
-}
-
-vector<IR*> SQL_INDEX::post_fix_transform_select_stmt(IR* cur_stmt, unsigned multi_run_id) {
-  vector<IR*> ret_vec;
-  ret_vec.push_back(cur_stmt->deep_copy());
-  return ret_vec;
 }
 
 IR* SQL_INDEX::get_random_append_stmts_ir() {
@@ -236,45 +322,4 @@ IR* SQL_INDEX::get_random_append_stmts_ir() {
   IR* first_stmt = stmt_list_vec[0]->deep_copy();
   cur_root->deep_drop();
   return first_stmt;
-}
-
-VALID_STMT_TYPE_INDEX SQL_INDEX::get_stmt_INDEX_type (IR* cur_stmt) {
-  VALID_STMT_TYPE_INDEX default_type_ = VALID_STMT_TYPE_INDEX::NORMAL;
-
-  vector<IR*> v_result_column_list = ir_wrapper.get_result_column_list_in_select_clause(cur_stmt);
-  if (v_result_column_list.size() == 0) {
-    return VALID_STMT_TYPE_INDEX::ROWID_UNKNOWN;
-  }
-
-  vector<IR*> v_agg_func_args = ir_wrapper.get_ir_node_in_stmt_with_type(v_result_column_list[0], kFunctionArgs, false);
-  if (v_agg_func_args.size() == 0) {
-    return default_type_;
-  }
-
-  vector<IR*> v_aggr_func_ir = ir_wrapper.get_ir_node_in_stmt_with_type(v_result_column_list[0], kFunctionName, false);
-  if (v_aggr_func_ir.size() == 0) {
-    return default_type_;
-  }
-  if (v_aggr_func_ir[0]->left_ == NULL) {
-    return default_type_;
-  }
-
-  /* Might have aggr function. */
-  if (v_aggr_func_ir[0]->left_->op_ && v_aggr_func_ir[0]->left_->op_->prefix_) {
-    string aggr_func_str = v_aggr_func_ir[0]->left_->op_->prefix_;
-    if (findStringIn(aggr_func_str, "MIN")) {
-      return VALID_STMT_TYPE_INDEX::AGGR;
-    } else if (findStringIn(aggr_func_str, "MAX")){
-      return VALID_STMT_TYPE_INDEX::AGGR;
-    } else if (findStringIn(aggr_func_str, "COUNT")){
-      return VALID_STMT_TYPE_INDEX::AGGR;
-    } else if (findStringIn(aggr_func_str, "SUM")) {
-      return VALID_STMT_TYPE_INDEX::AGGR;
-    } else if (findStringIn(aggr_func_str, "AVG")) {
-      return VALID_STMT_TYPE_INDEX::AGGR;
-    }
-  }
-
-  return default_type_;
-
 }

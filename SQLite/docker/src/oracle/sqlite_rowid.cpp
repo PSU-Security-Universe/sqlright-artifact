@@ -5,43 +5,165 @@
 #include <regex>
 #include <string>
 
+int SQL_ROWID::count_valid_stmts(const string &input) {
+  int norec_select_count = 0;
+  vector<string> queries_vector = string_splitter(input, ';');
+  for (string &query : queries_vector)
+    if (this->is_oracle_valid_stmt(query) ||
+        this->is_oracle_valid_stmt_2(query))
+      norec_select_count++;
+  return norec_select_count;
+}
+
+bool SQL_ROWID::is_oracle_valid_stmt(const string &query) {
+  if (((findStringIter(query, "SELECT") - query.begin()) < 5) &&
+      findStringIn(query, "FROM"))
+    return true;
+  return false;
+}
+
+bool SQL_ROWID::is_oracle_valid_stmt_2(const string &query) {
+  if (((findStringIter(query, "CREATE TABLE") - query.begin()) < 5) ||
+      ((findStringIter(query, "CREATE TEMP TABLE") - query.begin()) < 5) ||
+      ((findStringIter(query, "CREATE TEMPORARY TABLE") - query.begin()) < 5) ||
+      ((findStringIter(query, "CREATE VIRTUAL TABLE") - query.begin()) < 5))
+    return true;
+  return false;
+}
+
+/* TODO:: Should we change this function in the not NOREC oracle? */
 bool SQL_ROWID::mark_all_valid_node(vector<IR *> &v_ir_collector) {
-  return true;
+  bool is_mark_successfully = false;
+
+  IR *root = v_ir_collector[v_ir_collector.size() - 1];
+  IR *par_ir = nullptr;
+  IR *par_par_ir = nullptr;
+  IR *par_par_par_ir = nullptr; // If we find the correct selectnoparen, this
+                                // should be the statementlist.
+  for (auto ir : v_ir_collector) {
+    if (ir != nullptr)
+      ir->is_node_struct_fixed = false;
+  }
+  for (auto ir : v_ir_collector) {
+    if (ir != nullptr && ir->type_ == kSelectCore) {
+      par_ir = root->locate_parent(ir);
+      if (par_ir != nullptr && par_ir->type_ == kSelectStatement) {
+        par_par_ir = root->locate_parent(par_ir);
+        if (par_par_ir != nullptr && par_par_ir->type_ == kStatement) {
+          par_par_par_ir = root->locate_parent(par_par_ir);
+          if (par_par_par_ir != nullptr &&
+              par_par_par_ir->type_ == kStatementList) {
+            string query = g_mutator->extract_struct(ir);
+            if (!(this->is_oracle_valid_stmt(query)))
+              continue; // Not norec compatible. Jump to the next ir.
+            query.clear();
+            is_mark_successfully = this->mark_node_valid(ir);
+            // cerr << "\n\n\nThe marked norec ir is: " <<
+            // this->extract_struct(ir) << " \n\n\n";
+            par_ir->is_node_struct_fixed = true;
+            par_par_ir->is_node_struct_fixed = true;
+            par_par_par_ir->is_node_struct_fixed = true;
+          }
+        }
+      }
+    }
+  }
+
+  return is_mark_successfully;
+}
+
+/* Select statements untouched. */
+void SQL_ROWID::rewrite_valid_stmt_from_ori(string &query, string &rew_1,
+                                            string &rew_2, string &rew_3,
+                                            unsigned multi_run_id) {
+  rew_1 = "";
+  rew_2 = "";
+  rew_3 = "";
+  return;
+}
+
+/* If CREATE stmt has WITHOUT ROWID, delete it. Otherwise, add it. */
+void SQL_ROWID::rewrite_valid_stmt_from_ori_2(string &query,
+                                              unsigned multi_run_id) {
+  /* If no PRIMARY KEY in the ori and rewritted CREATE TABLE stmt, add it to the
+   * last column in the list. */
+  if (!findStringIn(query, "PRIMARY KEY")) {
+    auto iter = query.rfind(")");
+    if (iter != string::npos) { // Find the iterator for the last ')'
+      query.insert(iter, " PRIMARY KEY ");
+    } else {
+      cerr << "Error: The rewrite_valid_stmt seems to receive a query that is "
+              "not a CREATE TABLE statements? \n Query: "
+           << query << endl;
+      return;
+    }
+  }
+
+  if (multi_run_id < 1)
+    return; // First run, do not modify anything.
+  auto iter = findStringIter(query, "WITHOUT ROWID");
+  if (iter == query.end()) {
+    query += " WITHOUT ROWID";
+  } else {
+    query.erase(iter, iter + 13);
+  }
+  return;
+}
+
+string SQL_ROWID::remove_valid_stmts_from_str(string query) {
+  string output_query = "";
+  vector<string> queries_vector = string_splitter(query, ';');
+
+  for (auto current_stmt : queries_vector) {
+    if (is_str_empty(current_stmt))
+      continue;
+    if (!is_oracle_valid_stmt(current_stmt))
+      output_query += current_stmt + "; ";
+  }
+
+  return output_query;
 }
 
 void SQL_ROWID::get_v_valid_type(const string &cmd_str,
                                  vector<VALID_STMT_TYPE_ROWID> &v_valid_type) {
-  /* Look throught first validation stmt's result_1 first */
   size_t begin_idx = cmd_str.find("SELECT 'BEGIN VERI 0';", 0);
   size_t end_idx = cmd_str.find("SELECT 'END VERI 0';", 0);
 
   while (begin_idx != string::npos) {
     if (end_idx != string::npos) {
       string cur_cmd_str =
-          cmd_str.substr(begin_idx + 23, (end_idx - begin_idx - 23));
-      begin_idx = cmd_str.find("SELECT 'BEGIN VERI 0';", begin_idx + 23);
-      end_idx = cmd_str.find("SELECT 'END VERI 0';", end_idx + 21);
+          cmd_str.substr(begin_idx + 21, (end_idx - begin_idx - 21));
+      begin_idx = cmd_str.find("SELECT 'BEGIN VERI", begin_idx + 21);
+      end_idx = cmd_str.find("SELECT 'END VERI", end_idx + 21);
 
-      vector<IR*> v_cur_stmt_ir = g_mutator->parse_query_str_get_ir_set(cur_cmd_str);
-      if ( v_cur_stmt_ir.size() == 0 ) {
-        continue;
+      if (((findStringIter(cur_cmd_str, "SELECT DISTINCT MIN") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT MIN") - cur_cmd_str.begin()) <
+           5) ||
+          ((findStringIter(cur_cmd_str, "SELECT DISTINCT MAX") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT MAX") - cur_cmd_str.begin()) <
+           5) ||
+          ((findStringIter(cur_cmd_str, "SELECT DISTINCT SUM") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT SUM") - cur_cmd_str.begin()) <
+           5) ||
+          ((findStringIter(cur_cmd_str, "SELECT DISTINCT COUNT") -
+            cur_cmd_str.begin()) < 5) ||
+          ((findStringIter(cur_cmd_str, "SELECT COUNT") - cur_cmd_str.begin()) <
+           5)) {
+        v_valid_type.push_back(VALID_STMT_TYPE_ROWID::UNIQ);
+        // cerr << "query: " << cur_cmd_str << " \nMIN. \n";
+      } else {
+        v_valid_type.push_back(VALID_STMT_TYPE_ROWID::NORM);
+        // cerr << "query: " << cur_cmd_str << " \nNORM. \n";
       }
-      if ( !(v_cur_stmt_ir.back()->left_ != NULL && v_cur_stmt_ir.back()->left_->left_ != NULL) ) {
-        v_cur_stmt_ir.back()->deep_drop();
-        continue;
-      }
-
-      IR* cur_stmt_ir = v_cur_stmt_ir.back()->left_->left_;
-      v_valid_type.push_back(get_stmt_ROWID_type(cur_stmt_ir));
-
-      v_cur_stmt_ir.back()->deep_drop();
-
     } else {
-      // cerr << "Error: For the current begin_idx, we cannot find the end_idx. \n\n\n";
       break; // For the current begin_idx, we cannot find the end_idx. Ignore
              // the current output.
     }
   }
+  return;
 }
 
 void SQL_ROWID::compare_results(ALL_COMP_RES &res_out) {
@@ -73,22 +195,16 @@ void SQL_ROWID::compare_results(ALL_COMP_RES &res_out) {
   bool is_all_errors = true;
   int i = 0;
   for (COMP_RES &res : res_out.v_res) {
-    if (i >= v_valid_type.size()) {
-      res.comp_res = ORA_COMP_RES::Error;
-      break; // break the loop
-    }
     switch (v_valid_type[i++]) {
-    case VALID_STMT_TYPE_ROWID::NORMAL:
+    case VALID_STMT_TYPE_ROWID::NORM:
       if (!this->compare_norm(res))
         is_all_errors = false;
-      break; // break the switch
+      break;
 
-    case VALID_STMT_TYPE_ROWID::AGGR:
-      if (!this->compare_aggr(res))
+    case VALID_STMT_TYPE_ROWID::UNIQ:
+      if (!this->compare_uniq(res))
         is_all_errors = false;
-      break; // break the switch
-    default:
-      res.comp_res == ORA_COMP_RES::Error;
+      break;
     }
     if (res.comp_res == ORA_COMP_RES::Fail)
       res_out.final_res = ORA_COMP_RES::Fail;
@@ -100,7 +216,9 @@ void SQL_ROWID::compare_results(ALL_COMP_RES &res_out) {
   return;
 }
 
-bool SQL_ROWID::compare_norm(COMP_RES &res) { /* Handle normal valid stmt: SELECT * FROM ...; Return is_err */
+bool SQL_ROWID::compare_norm(
+    COMP_RES
+        &res) { /* Handle normal valid stmt: SELECT * FROM ...; Return is_err */
   if (res.v_res_str.size() <= 1) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
@@ -109,17 +227,12 @@ bool SQL_ROWID::compare_norm(COMP_RES &res) { /* Handle normal valid stmt: SELEC
   vector<int> &v_res_int = res.v_res_int;
 
   for (const string &res_str : v_res_str) {
-    if (findStringIn(res_str, "error")) {
+    if (res_str.find("Error") != string::npos) {
       res.comp_res = ORA_COMP_RES::Error;
       return true;
     }
     int cur_res_int = 0;
     vector<string> v_res_split = string_splitter(res_str, '\n');
-
-    if (v_res_split.size() > 50) {
-      res.comp_res = ORA_COMP_RES::Error;
-      return true;
-    }
     /* Remove NULL results */
     for (const string &r : v_res_split) {
       if (is_str_empty(r))
@@ -142,43 +255,43 @@ bool SQL_ROWID::compare_norm(COMP_RES &res) { /* Handle normal valid stmt: SELEC
   return false;
 }
 
-bool SQL_ROWID::compare_aggr(COMP_RES &res) {
+bool SQL_ROWID::compare_uniq(COMP_RES &res) {
   if (res.v_res_str.size() <= 1) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
   vector<string> &v_res_str = res.v_res_str;
+  // vector<int>& v_res_int = res.v_res_int;
 
+  // for (const string& res_str : v_res_str) {
+  //     if (res_str.find("Error") != string::npos){
+  //         res.comp_res = ORA_COMP_RES::Error;
+  //         return true;
+  //     }
+
+  //     int cur_res_int = 0;
+  //     try {
+  //         cur_res_int = stoi(res_str);
+  //     }
+  //     catch (std::invalid_argument &e) {
+  //         continue;
+  //     }
+  //     catch (std::out_of_range &e) {
+  //         res.comp_res = ORA_COMP_RES::Error;
+  //         return true;
+  //     }
+
+  //     v_res_int.push_back(cur_res_int);
+  // }
   for (int i = 0; i < v_res_str.size(); i++) {
-    if (
-      findStringIn(res.v_res_str[0], "error") || 
-      findStringIn(res.v_res_str[i], "error")
-    ) {
+    if (v_res_str[i].find("Error") != string::npos) {
       res.comp_res = ORA_COMP_RES::Error;
       return true;
     }
-    int res_a_int = 0;
-    int res_b_int = 0;
-    try {
-      res_a_int = stoi(res.v_res_str[0]);
-      res_b_int = stoi(res.v_res_str[i]);
-    } catch (std::invalid_argument &e) {
-      res.comp_res = ORA_COMP_RES::Error;
-      return true;
-    } catch (std::out_of_range &e) {
-      res.comp_res = ORA_COMP_RES::Error;
-      return true;
-    } catch (const std::exception& e) {
-      res.comp_res = ORA_COMP_RES::Error;
-      return true;
-    }
-    res.v_res_int.push_back(res_b_int);
-
-    if (res_a_int != res_b_int) {
+    if (v_res_str[0] != v_res_str[i]) {
       res.comp_res = ORA_COMP_RES::Fail;
       return false;
     }
-
   }
 
   res.comp_res = ORA_COMP_RES::Pass;
@@ -188,13 +301,13 @@ bool SQL_ROWID::compare_aggr(COMP_RES &res) {
 bool SQL_ROWID::is_str_error(const string &input_str) {
 
   // check whether if 'Error:' exists in input_str
-  if (input_str.find("Error") != string::npos) {
+  if (input_str.find("Error:") != string::npos) {
 
-    /* check if this is a known error string. */
-    if (input_str.find("NOT NULL") != string::npos ||  // For PRIMARY KEY column, we cannot add NULL values into it.  
-        input_str.find("datatype mismatch") != string::npos) {  // For WITHOUT ROWID PRIMARY KEY column, the only accepted data type is INTEGER
+    // check if this is a known error string.
+    if (input_str.find("NOT NULL") != string::npos ||
+        input_str.find("datatype mismatch") != string::npos) {
 
-      // It's a known error string. Return Error. Give up the current results. 
+      // It's a known error string.
       return true;
     }
   }
@@ -214,30 +327,6 @@ bool SQL_ROWID::is_oracle_normal_stmt(IR* cur_IR) {
   return false;
 }
 
-bool SQL_ROWID::is_oracle_select_stmt(IR* cur_IR) {
-  /* Limit only ONE parameter in the aggregate function. */
-  vector<IR*> v_result_column_list = ir_wrapper.get_result_column_list_in_select_clause(cur_IR);
-  if (v_result_column_list.size() != 0) {
-    vector<IR*> v_aggr_func_ir = ir_wrapper.get_ir_node_in_stmt_with_type(v_result_column_list[0], kFunctionName, false);
-    if (v_aggr_func_ir.size() != 0) {
-      IR* func_aggr_ir = v_aggr_func_ir[0] -> parent_ ->right_; // func_name -> unknown -> kfuncargs
-      if (func_aggr_ir -> type_ == kFunctionArgs && func_aggr_ir -> right_ != NULL && func_aggr_ir ->right_ -> type_ == kExprList) {
-        /* If the stmt has multiple expr_list inside the func_args, ignore current stmt. */
-        if (func_aggr_ir->right_->right_ != NULL) {// Another kExprList.
-          return false;
-        }
-      }
-    }
-  }
-
-  if (
-    cur_IR->type_ == kSelectStatement 
-  ) {
-    return true;
-  }
-  return false;
-}
-
 IR* SQL_ROWID::pre_fix_transform_normal_stmt(IR* cur_stmt) {
   if (!this->is_oracle_normal_stmt(cur_stmt)) {
     cerr << "Error: Detected input stmt is not oracle normal statement. Func: SQL_ROWID::pre_fix_transform_normal_stmt. \n";
@@ -245,42 +334,12 @@ IR* SQL_ROWID::pre_fix_transform_normal_stmt(IR* cur_stmt) {
   }
   cur_stmt = cur_stmt->deep_copy();
 
-  bool is_exist_WITHOUT_ROWID = false;
-  vector<IR*> v_opt_without_rowid_ir = ir_wrapper.get_ir_node_in_stmt_with_type(cur_stmt, kOptWithoutRowID, false);
-  for (IR* opt_without_rowid : v_opt_without_rowid_ir) {
-    if (opt_without_rowid->op_ && opt_without_rowid->op_->prefix_ &&
-        strcmp(opt_without_rowid->op_->prefix_, "WITHOUT ROWID") == 0) {
-      is_exist_WITHOUT_ROWID = true;
-    }
-  }
-  // Insert WIHTOUT ROWID symbol. If is_exist_WIHTOUT_ROWID, then ignore the insertion. 
-  if(!is_exist_WITHOUT_ROWID && !ir_wrapper.add_without_rowid_to_stmt(cur_stmt)) {
+  // Added WIHTOUT ROWID symbol. 
+  if(!ir_wrapper.add_without_rowid_to_stmt(cur_stmt)) {
     cerr << "Error: add_without_rowid_to_stmt failed. Func: SQL_ROWID::pre_fix_transform_normal_stmt. \n";
     cur_stmt->deep_drop();
     return nullptr;
   }
-
-  /* Check whether there are PRAIMRY KEY inside the defined column  
-  ** Two situations, kColumnConstraint and kTableConstraint
-  */
-  vector<IR*> v_column_constraints_exist = ir_wrapper.get_ir_node_in_stmt_with_type(cur_stmt, kColumnConstraint, false);
-  for( IR* cur_column_constraints_exist : v_column_constraints_exist) {
-    if (cur_column_constraints_exist->op_ != NULL && cur_column_constraints_exist->op_->prefix_ &&
-        strcmp(cur_column_constraints_exist->op_->prefix_, "PRIMARY KEY") == 0) {
-      return cur_stmt;
-    }
-  }
-
-  vector<IR*> v_table_constraint_exist = ir_wrapper.get_ir_node_in_stmt_with_type(cur_stmt, kTableConstraint, false);
-  for ( IR* cur_table_constraint_exist : v_table_constraint_exist ) {
-    if (cur_table_constraint_exist-> left_ != NULL &&
-      cur_table_constraint_exist->left_->op_ != NULL && cur_table_constraint_exist->left_->op_->prefix_ &&
-      strcmp(cur_table_constraint_exist->left_->op_->prefix_, "PRIMARY KEY (") == 0
-      ) {
-        return cur_stmt;
-    }
-  }
-
 
   // Arbitarily insert PRIMARY KEY. (Replaced the old column constraints)
   vector<IR*> opt_column_constraintlist_vec = ir_wrapper.get_ir_node_in_stmt_with_type(cur_stmt, kOptColumnConstraintlist, false);
@@ -307,63 +366,14 @@ IR* SQL_ROWID::pre_fix_transform_normal_stmt(IR* cur_stmt) {
 }
 
 vector<IR*> SQL_ROWID::post_fix_transform_normal_stmt(IR* cur_stmt, unsigned multi_run_id) {
-  if (multi_run_id == 0) {vector<IR*> v_ret; v_ret.push_back(cur_stmt->deep_copy()); return v_ret;} // If it is the first run. Do not remove WITHOUT ROWID.
+  if (multi_run_id == 0) {vector<IR*> tmp; return tmp;} // If it is the first run. Do not remove WITHOUT ROWID.
   cur_stmt = cur_stmt->deep_copy();
   if(!ir_wrapper.remove_without_rowid_to_stmt(cur_stmt)) {
     cerr << "Error: remove_without_rowid_to_stmt failed. Func: SQL_ROWID::post_fix_transform_normal_stmt. \n";
     cur_stmt->deep_drop();
     vector<IR*> tmp; return tmp;
   }
-  /* Do we want to remove PRIMARY KEY constraints to the column too? */
   vector<IR*> output_stmt;
   output_stmt.push_back(cur_stmt);
   return output_stmt;
-}
-
-
-VALID_STMT_TYPE_ROWID SQL_ROWID::get_stmt_ROWID_type (IR* cur_stmt) {
-  VALID_STMT_TYPE_ROWID default_type_ = VALID_STMT_TYPE_ROWID::NORMAL;
-
-  vector<IR*> v_result_column_list = ir_wrapper.get_result_column_list_in_select_clause(cur_stmt);
-  if (v_result_column_list.size() == 0) {
-    return VALID_STMT_TYPE_ROWID::ROWID_UNKNOWN;
-  }
-
-  vector<IR*> v_agg_func_args = ir_wrapper.get_ir_node_in_stmt_with_type(v_result_column_list[0], kFunctionArgs, false);
-  if (v_agg_func_args.size() == 0) {
-    return default_type_;
-  }
-
-  vector<IR*> v_aggr_func_ir = ir_wrapper.get_ir_node_in_stmt_with_type(v_result_column_list[0], kFunctionName, false);
-  if (v_aggr_func_ir.size() == 0) {
-    return default_type_;
-  }
-  if (v_aggr_func_ir[0]->left_ == NULL) {
-    return default_type_;
-  }
-
-  /* Might have aggr function. */
-  if (v_aggr_func_ir[0]->left_->op_ && v_aggr_func_ir[0]->left_->op_->prefix_) {
-    string aggr_func_str = v_aggr_func_ir[0]->left_->op_->prefix_;
-    if (findStringIn(aggr_func_str, "MIN")) {
-      return VALID_STMT_TYPE_ROWID::AGGR;
-    } else if (findStringIn(aggr_func_str, "MAX")){
-      return VALID_STMT_TYPE_ROWID::AGGR;
-    } else if (findStringIn(aggr_func_str, "COUNT")){
-      return VALID_STMT_TYPE_ROWID::AGGR;
-    } else if (findStringIn(aggr_func_str, "SUM")) {
-      return VALID_STMT_TYPE_ROWID::AGGR;
-    } else if (findStringIn(aggr_func_str, "AVG")) {
-      return VALID_STMT_TYPE_ROWID::AGGR;
-    }
-  }
-
-  return default_type_;
-
-}
-
-vector<IR*> SQL_ROWID::post_fix_transform_select_stmt(IR* cur_stmt, unsigned multi_run_id) {
-  vector<IR*> ret_stmts;
-  ret_stmts.push_back(cur_stmt->deep_copy());
-  return ret_stmts;
 }

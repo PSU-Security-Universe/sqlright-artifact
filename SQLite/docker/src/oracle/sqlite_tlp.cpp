@@ -7,6 +7,25 @@
 #include <string>
 #include <set>
 
+int SQL_TLP::count_valid_stmts(const string &input) {
+  int norec_select_count = 0;
+  vector<string> queries_vector = string_splitter(input, ';');
+  for (string &query : queries_vector)
+    if (this->is_oracle_valid_stmt(query))
+      norec_select_count++;
+  return norec_select_count;
+}
+
+bool SQL_TLP::is_oracle_valid_stmt(const string &query) {
+
+  if ((((findStringIter(query, "SELECT") - query.begin()) < 5)) &&
+      findStringIn(query, "FROM") && findStringIn(query, "WHERE") &&
+      !findStringIn(query, "INSERT") && !findStringIn(query, "UPDATE"))
+    return true;
+
+  return false;
+}
+
 bool SQL_TLP::mark_all_valid_node(vector<IR *> &v_ir_collector) {
   bool is_mark_successfully = false;
 
@@ -29,7 +48,7 @@ bool SQL_TLP::mark_all_valid_node(vector<IR *> &v_ir_collector) {
           if (par_par_par_ir != nullptr &&
               par_par_par_ir->type_ == kStatementList) {
             string query = g_mutator->extract_struct(ir);
-            if (!(this->is_oracle_select_stmt_str(query)))
+            if (!(this->is_oracle_valid_stmt(query)))
               continue; // Not norec compatible. Jump to the next ir.
             query.clear();
             is_mark_successfully = this->mark_node_valid(ir);
@@ -47,6 +66,420 @@ bool SQL_TLP::mark_all_valid_node(vector<IR *> &v_ir_collector) {
   return is_mark_successfully;
 }
 
+void SQL_TLP::rewrite_valid_stmt_from_ori(string &query, string &rew_1,
+                                          string &rew_2, string &rew_3,
+                                          unsigned multi_run_id) {
+  // vector<string> stmt_vector = string_splitter(query,
+  // "where|WHERE|SELECT|select|FROM|from");
+
+  string ori_query = query;
+
+  while (query[0] == ' ' || query[0] == '\n' ||
+         query[0] == '\t') { // Delete duplicated whitespace at the beginning.
+    query = query.substr(1, query.size() - 1);
+  }
+
+  size_t select_position = 0;
+  size_t from_position = -1;
+  size_t where_position = -1;
+  size_t group_by_position = -1;
+  size_t order_by_position = -1;
+
+  vector<size_t> op_lp_v;
+  vector<size_t> op_rp_v;
+
+  size_t tmp1 = 0, tmp2 = 0;
+  while ((tmp1 = query.find("(", tmp1)) && tmp1 != string::npos) {
+    op_lp_v.push_back(tmp1);
+    tmp1++;
+    if (tmp1 == query.size()) {
+      break;
+    }
+  }
+  while ((tmp2 = query.find(")", tmp2)) && tmp2 != string::npos) {
+    op_rp_v.push_back(tmp2);
+    tmp2++;
+    if (tmp2 == query.size()) {
+      break;
+    }
+  }
+
+  if (op_lp_v.size() !=
+      op_rp_v.size()) { // The symbol of '(' and ')' is not matched. Ignore all
+                        // the '()' symbol.
+    op_lp_v.clear();
+    op_rp_v.clear();
+  }
+
+  for (int i = 0; i < op_lp_v.size();
+       i++) { // The symbol of '(' and ')' is not matched. Ignore all the '()'
+              // symbol.
+    if (op_lp_v[i] > op_rp_v[i]) {
+      op_lp_v.clear();
+      op_rp_v.clear();
+    }
+  }
+
+  tmp1 = -1;
+  tmp2 = -1;
+
+  tmp1 = query.find("SELECT",
+                    0); // The first SELECT statement will always be the correct
+                        // outter most SELECT statement. Pick its pos.
+  tmp2 = query.find("select", 0);
+  if (tmp1 != string::npos) {
+    select_position = tmp1;
+  }
+  if (tmp2 != string::npos && tmp2 < tmp1) {
+    select_position = tmp2;
+  }
+
+  tmp1 = 0;
+  tmp2 = 0;
+  from_position = -1;
+
+  do {
+    if (tmp1 != string::npos)
+      tmp1 = query.find("FROM", tmp1 + 4);
+    if (tmp2 != string::npos)
+      tmp2 = query.find("from", tmp2 + 4);
+
+    if (tmp1 != string::npos) {
+      bool is_ignore = false;
+      for (int i = 0; i < op_lp_v.size(); i++) {
+        if (tmp1 > op_lp_v[i] && tmp1 < op_rp_v[i]) {
+          is_ignore = true;
+          break;
+        }
+      }
+      if (!is_ignore) {
+        from_position = tmp1;
+        break; // from_position is found. Break the outter do...while loop.
+      }
+    }
+
+    if (tmp2 != string::npos) {
+      bool is_ignore = false;
+      for (int i = 0; i < op_lp_v.size(); i++) {
+        if (tmp2 > op_lp_v[i] && tmp2 < op_rp_v[i]) {
+          is_ignore = true;
+          break;
+        }
+      }
+      if (!is_ignore) {
+        from_position = tmp2;
+        break; // from_position is found. Break the outter do...while loop.
+      }
+    }
+
+  } while (tmp1 != string::npos || tmp2 != string::npos);
+
+  tmp1 = 0;
+  tmp2 = 0;
+  where_position = -1;
+
+  do {
+    if (tmp1 != string::npos)
+      tmp1 = query.find("WHERE", tmp1 + 5);
+    if (tmp2 != string::npos)
+      tmp2 = query.find("where", tmp2 + 5);
+
+    if (tmp1 != string::npos) {
+      bool is_ignore = false;
+      for (int i = 0; i < op_lp_v.size(); i++) {
+        if (tmp1 > op_lp_v[i] && tmp1 < op_rp_v[i]) {
+          is_ignore = true;
+          break;
+        }
+      }
+      if (!is_ignore) {
+        where_position = tmp1;
+        break; // where_position is found. Break the outter do...while loop.
+      }
+    }
+
+    if (tmp2 != string::npos) {
+      bool is_ignore = false;
+      for (int i = 0; i < op_lp_v.size(); i++) {
+        if (tmp2 > op_lp_v[i] && tmp2 < op_rp_v[i]) {
+          is_ignore = true;
+          break;
+        }
+      }
+      if (!is_ignore) {
+        where_position = tmp2;
+        break; // where_position is found. Break the outter do...while loop.
+      }
+    }
+
+  } while (tmp1 != string::npos || tmp2 != string::npos);
+
+  /*** Taking care of GROUP BY stmt.   ***/
+  tmp1 = -1, tmp2 = -1;
+  size_t tmp = 0;
+  while ((tmp = query.find("GROUP BY", tmp + 8)) && (tmp != string::npos)) {
+    bool is_ignore = false;
+    for (int i = 0; i < op_lp_v.size(); i++) {
+      if (tmp > op_lp_v[i] && tmp < op_rp_v[i]) {
+        is_ignore = true;
+        break;
+      }
+    }
+    if (!is_ignore) {
+      tmp1 = tmp;
+    }
+  } // The last GROUP BY statement outside the bracket will always be the
+    // correct outter most GROUP BY statement. Pick its pos.
+
+  tmp = -8;
+  while ((tmp = query.find("group by", tmp + 8)) && (tmp != string::npos)) {
+    bool is_ignore = false;
+    for (int i = 0; i < op_lp_v.size(); i++) {
+      if (tmp > op_lp_v[i] && tmp < op_rp_v[i]) {
+        is_ignore = true;
+        break;
+      }
+    }
+    if (!is_ignore) {
+      tmp2 = tmp;
+    }
+  } // The last GROUP BY statement outside the bracket will always be the
+    // correct outter most GROUP BY statement. Pick its pos.
+  if (tmp1 != string::npos) {
+    group_by_position = tmp1;
+  }
+  if (tmp2 != string::npos && tmp2 > tmp1) {
+    group_by_position = tmp2;
+  }
+
+  /*** Taking care of ORDER BY stmt.   ***/
+  tmp1 = -1, tmp2 = -1;
+  tmp = -8;
+  while ((tmp = query.find("ORDER BY", tmp + 8)) && (tmp != string::npos)) {
+    bool is_ignore = false;
+    for (int i = 0; i < op_lp_v.size(); i++) {
+      if (tmp > op_lp_v[i] && tmp < op_rp_v[i]) {
+        is_ignore = true;
+        break;
+      }
+    }
+    if (!is_ignore) {
+      tmp1 = tmp;
+    }
+  } // The last ORDER BY statement outside the bracket will always be the
+    // correct outter most GROUP BY statement. Pick its pos.
+  tmp = -8;
+  while ((tmp = query.find("order by", tmp + 8)) && (tmp != string::npos)) {
+    bool is_ignore = false;
+    for (int i = 0; i < op_lp_v.size(); i++) {
+      if (tmp > op_lp_v[i] && tmp < op_rp_v[i]) {
+        is_ignore = true;
+        break;
+      }
+    }
+    if (!is_ignore) {
+      tmp2 = tmp;
+    }
+  } // The last order by statement outside the bracket will always be the
+    // correct outter most GROUP BY statement. Pick its pos.
+  if (tmp1 != string::npos) {
+    order_by_position = tmp1;
+  }
+  if (tmp2 != string::npos && tmp2 > tmp1) {
+    order_by_position = tmp2;
+  }
+
+  size_t order_by_len = 0, group_by_len = 0;
+  if (group_by_position != string::npos && order_by_position != string::npos) {
+    if (group_by_position < order_by_position) {
+      group_by_len = order_by_position - group_by_position;
+      order_by_len = ori_query.size() - order_by_position;
+    } else {
+      order_by_len = group_by_position - order_by_position;
+      group_by_len = ori_query.size() - group_by_position;
+    }
+  } else if (group_by_position != string::npos) {
+    group_by_len = ori_query.size() - group_by_position;
+  } else if (order_by_position != string::npos) {
+    order_by_len = ori_query.size() - order_by_position;
+  }
+
+  size_t extra_stmt_position =
+      min((size_t)(group_by_position), (size_t)(order_by_position));
+  // size_t extra_stmt_position = -1;
+  // if (group_by_position != string::npos && order_by_position != string::npos)
+  //   extra_stmt_position = ((group_by_position < order_by_position) ?
+  //   group_by_position : order_by_position);
+  // else if (group_by_position != string::npos)
+  //   extra_stmt_position = group_by_position;
+  // else if (order_by_position != string::npos)
+  //   extra_stmt_position = order_by_position;
+
+  string before_select_stmt;
+  string select_stmt;
+  string from_stmt;
+  string where_stmt;
+  // string extra_stmt;
+  string order_by_stmt;
+
+  before_select_stmt = query.substr(0, select_position - 0);
+
+  select_stmt =
+      query.substr(select_position + 6, from_position - select_position - 6);
+
+  if (from_position == -1)
+    from_stmt = "";
+  else
+    from_stmt =
+        query.substr(from_position + 4, where_position - from_position - 4);
+
+  if (where_position == -1)
+    where_stmt = "";
+  else if (extra_stmt_position == -1)
+    where_stmt =
+        query.substr(where_position + 5, query.size() - where_position - 5);
+  else
+    where_stmt = query.substr(where_position + 5,
+                              extra_stmt_position - where_position - 5);
+
+  if (order_by_position == string::npos)
+    order_by_stmt = "";
+  else
+    order_by_stmt = query.substr(order_by_position, order_by_len);
+
+  /* Muted GROUP BY */
+  // if (group_by_position == string::npos)
+  //   group_by_stmt = "";
+  // else
+  //   group_by_stmt = query.substr(group_by_position, group_by_len);
+
+  // if (extra_stmt_position == -1)
+  //   extra_stmt = "";
+  // else
+  //   extra_stmt = query.substr(extra_stmt_position, query.size() -
+  //   extra_stmt_position);
+
+  if (!findStringIn(
+          ori_query,
+          "HAVING")) { // This is not a having stmts. Handle with where stmt.
+    if (
+        /* Do not use UNION ALL, if we have SELECT DISTINCT. */
+        !((findStringIter(ori_query, "SELECT DISTINCT") - ori_query.begin()) < 5)
+      ) {
+
+      rewrite_where(query, rew_1, before_select_stmt, select_stmt, from_stmt,
+                    where_stmt, "", order_by_stmt, true);
+
+    } else {
+
+      rewrite_where(query, rew_1, before_select_stmt, select_stmt, from_stmt,
+                    where_stmt, "", order_by_stmt, false);
+    }
+
+    // if (group_by_stmt != "")
+    //   cerr << "GROUP BY stmt is: " << group_by_stmt << endl;
+    // if (order_by_stmt != "")
+    //   cerr << "ORDER BY stmt is: " << order_by_stmt << endl;
+
+  } else {
+    // TODO:: Handling HAVING stmt.
+    query = "";
+    rew_1 = "";
+  }
+
+  /* For now, do not process the stmt with the following contents. . */
+  if (((findStringIter(ori_query, "SELECT DISTINCT AVG") - ori_query.begin()) <
+       5) ||
+      ((findStringIter(ori_query, "SELECT AVG") - ori_query.begin()) < 5) ||
+      findStringIn(ori_query, "UNION") || findStringIn(ori_query, "EXCEPT") ||
+      findStringIn(ori_query, "OVER") || findStringIn(ori_query, "INTERSECT")) {
+    query = "";
+    rew_1 = "";
+  }
+
+  if (findStringIn(ori_query, "MIN") ||
+      findStringIn(ori_query, "MAX") ||
+      findStringIn(ori_query, "SUM") ||
+      findStringIn(ori_query, "COUNT") ||
+      findStringIn(ori_query, "AVG")) {
+        query = "";
+        rew_1 = "";
+      }
+
+  rew_2 = "";
+  rew_3 = "";
+}
+
+void SQL_TLP::rewrite_where(string &ori, string &rew_1,
+                            const string &bef_sel_stmt, const string &sel_stmt,
+                            const string &from_stmt, const string &where_stmt,
+                            const string &group_by_stmt,
+                            const string &order_by_stmt,
+                            const bool is_union_all) {
+  /* Taking care of TLP select stmt: SELECT x FROM x [joins] */
+  if (where_stmt == "") {
+    rew_1 = bef_sel_stmt + " SELECT " + sel_stmt + " FROM " + from_stmt +
+            " WHERE TRUE " + group_by_stmt;
+    if (is_union_all)
+      rew_1 += " UNION ALL ";
+    else
+      rew_1 += " UNION ";
+    rew_1 += bef_sel_stmt + " SELECT " + sel_stmt + " FROM " + from_stmt +
+             " WHERE NOT TRUE " + group_by_stmt;
+    if (is_union_all)
+      rew_1 += " UNION ALL ";
+    else
+      rew_1 += " UNION ";
+    rew_1 += bef_sel_stmt + " SELECT " + sel_stmt + " FROM " + from_stmt +
+             " WHERE TRUE IS NULL " + group_by_stmt + " " + order_by_stmt;
+
+  } else {
+
+    rew_1 = bef_sel_stmt + " SELECT " + sel_stmt + " FROM " + from_stmt +
+            " WHERE (" + where_stmt + ") " + group_by_stmt;
+    if (is_union_all)
+      rew_1 += " UNION ALL ";
+    else
+      rew_1 += " UNION ";
+    rew_1 += bef_sel_stmt + " SELECT " + sel_stmt + " FROM " + from_stmt +
+             " WHERE NOT (" + where_stmt + ") " + group_by_stmt;
+    if (is_union_all)
+      rew_1 += " UNION ALL ";
+    else
+      rew_1 += " UNION ";
+    rew_1 += bef_sel_stmt + " SELECT " + sel_stmt + " FROM " + from_stmt +
+             " WHERE (" + where_stmt + ") IS NULL " + group_by_stmt + " " +
+             order_by_stmt;
+
+    ori = bef_sel_stmt + " SELECT " + sel_stmt + " FROM " + from_stmt + " " +
+          group_by_stmt + " " + order_by_stmt;
+  }
+}
+
+string SQL_TLP::rewrite_having(string &ori, string &rew_1,
+                               const string &before_select_stmt,
+                               const string &select_stmt,
+                               const string &from_stmt,
+                               const string &where_stmt,
+                               const string &extra_stmt) {
+  // TODO:: Implement having stmts.
+  return "";
+}
+
+string SQL_TLP::remove_valid_stmts_from_str(string query) {
+  string output_query = "";
+  vector<string> queries_vector = string_splitter(query, ';');
+
+  for (auto current_stmt : queries_vector) {
+    if (is_str_empty(current_stmt))
+      continue;
+    if (!is_oracle_valid_stmt(current_stmt))
+      output_query += current_stmt + "; ";
+  }
+
+  return output_query;
+}
+
 bool SQL_TLP::compare_norm(COMP_RES &res) {
 
   string &res_a = res.res_str_0;
@@ -54,8 +487,8 @@ bool SQL_TLP::compare_norm(COMP_RES &res) {
   int &res_a_int = res.res_int_0;
   int &res_b_int = res.res_int_1;
 
-  if (findStringIn(res_a, "error") ||
-      findStringIn(res_b, "error") ) {
+  if (res_a.find("Error") != string::npos ||
+      res_b.find("Error") != string::npos) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
@@ -121,8 +554,8 @@ bool SQL_TLP::compare_uniq(COMP_RES &res) {
   int &res_a_int = res.res_int_0;
   int &res_b_int = res.res_int_1;
 
-  if (findStringIn(res_a, "error") ||
-      findStringIn(res_b, "error") ) {
+  if (res_a.find("Error") != string::npos ||
+      res_b.find("Error") != string::npos) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
@@ -202,8 +635,8 @@ bool SQL_TLP::compare_aggr(COMP_RES &res) {
   int &res_a_int = res.res_int_0;
   int &res_b_int = res.res_int_1;
 
-  if (findStringIn(res_a, "error") ||
-      findStringIn(res_b, "error") ) {
+  if (res_a.find("Error") != string::npos ||
+      res_b.find("Error") != string::npos) {
     res.comp_res = ORA_COMP_RES::Error;
     return true;
   }
@@ -305,6 +738,16 @@ void SQL_TLP::get_v_valid_type(const string &cmd_str,
       begin_idx = cmd_str.find("SELECT 'BEGIN VERI 0';", begin_idx + 23);
       end_idx = cmd_str.find("SELECT 'END VERI 0';", end_idx + 21);
 
+      // if (findStringIn(cur_cmd_str, "SELECT MIN") ||
+      //     findStringIn(cur_cmd_str, "SELECT MAX") ||
+      //     findStringIn(cur_cmd_str, "SELECT SUM") ||
+      //     findStringIn(cur_cmd_str, "SELECT COUNT") ||
+      //     findStringIn(cur_cmd_str, "SELECT AVG")) {
+      //   v_valid_type.push_back(VALID_STMT_TYPE_TLP::UNIQ);
+      // } else {
+      //   v_valid_type.push_back(VALID_STMT_TYPE_TLP::NORM);
+      //   // cerr << "query: " << cur_cmd_str << " \nNORM. \n";
+      // }
       vector<IR*> v_cur_stmt_ir = g_mutator->parse_query_str_get_ir_set(cur_cmd_str);
       if ( v_cur_stmt_ir.size() == 0 ) {
         continue;
@@ -366,10 +809,10 @@ bool SQL_TLP::is_oracle_select_stmt(IR* cur_IR) {
   if (v_opt_over_clause.size() > 0) {
     for (IR* opt_over_clause : v_opt_over_clause) {
       if (
-        opt_over_clause->op_ != NULL && opt_over_clause->op_->prefix_ != NULL &&
+        opt_over_clause->op_ != NULL && 
         (
-          strcmp(opt_over_clause->op_->prefix_, "OVER") == 0 ||
-          strcmp(opt_over_clause->op_->prefix_, "OVER (") == 0
+          opt_over_clause->op_->prefix_ == "OVER" ||
+          opt_over_clause->op_->prefix_ == "OVER ("
         )
       ) {
           return false;
@@ -377,30 +820,19 @@ bool SQL_TLP::is_oracle_select_stmt(IR* cur_IR) {
     }
   }
 
+  /* Limit only ONE parameter in the aggregate function. */
   vector<IR*> v_result_column_list = ir_wrapper.get_result_column_list_in_select_clause(cur_IR);
-  /* Limit only one result_column in the SELECT clause */
-  if (v_result_column_list.size() != 1) {
-    return false;
-  }
-
-  IR* result_column_list = v_result_column_list[0];
-
-  vector<IR*> v_aggr_func_ir = ir_wrapper.get_ir_node_in_stmt_with_type(result_column_list, kFunctionName, false);
-
-  if (v_aggr_func_ir.size() > 0) {
-    /* Limit only ONE parameter in the aggregate function. */
-    IR* func_aggr_ir = v_aggr_func_ir[0] -> parent_ ->right_; // func_name -> unknown -> kfuncargs
-    if (func_aggr_ir -> type_ == kFunctionArgs && func_aggr_ir -> right_ != NULL && func_aggr_ir ->right_ -> type_ == kExprList) {
-      /* If the stmt has multiple expr_list inside the func_args, ignore current stmt. */
-      if (func_aggr_ir->right_->right_ != NULL) {// Another kExprList.
-        return false;
+  if (v_result_column_list.size() != 0) {
+    vector<IR*> v_aggr_func_ir = ir_wrapper.get_ir_node_in_stmt_with_type(v_result_column_list[0], kFunctionName, false);
+    if (v_aggr_func_ir.size() != 0) {
+      IR* func_aggr_ir = v_aggr_func_ir[0] -> parent_ ->right_; // func_name -> unknown -> kfuncargs
+      if (func_aggr_ir -> type_ == kFunctionArgs && func_aggr_ir -> right_ != NULL && func_aggr_ir ->right_ -> type_ == kExprList) {
+        /* If the stmt has multiple expr_list inside the func_args, ignore current stmt. */
+        if (func_aggr_ir->right_->right_ != NULL) {// Another kExprList.
+          return false;
+        }
       }
     }
-  }
-
-  /* If the result_column_list contains binary_op, skip and ignored. */
-  if (ir_wrapper.get_ir_node_in_stmt_with_type(result_column_list, kBinaryOp, false).size() > 0 ) {
-    return false;
   }
 
   if (
@@ -484,7 +916,6 @@ IR* SQL_TLP::transform_aggr(IR* cur_stmt, bool is_UNION_ALL, VALID_STMT_TYPE_TLP
 
     IR* alias_id_0 = new IR(kIdentifier, "s", id_alias_name);
     IR* column_alias_0 = new IR(kColumnAlias, OP1("AS"), alias_id_0);
-    if (v_aggr_func_ir[0]->left_->op_ == nullptr) v_aggr_func_ir[0]->left_->op_ = new IROperator();
     /* Change the aggr function from AVG to SUM. Then Deep Copy. */
     v_aggr_func_ir[0]->left_->str_val_ = "SUM";
     IR* new_result_column_0 = new IR(kResultColumn, OP0(), ori_result_column_expr_->deep_copy(), column_alias_0);
@@ -683,8 +1114,7 @@ VALID_STMT_TYPE_TLP SQL_TLP::get_stmt_TLP_type (IR* cur_stmt) {
 
   vector<IR*> v_opt_distinct = ir_wrapper.get_ir_node_in_stmt_with_type(cur_stmt, kOptDistinct, false);
   for (IR* opt_distinct : v_opt_distinct) {
-    if (opt_distinct->op_ && opt_distinct->op_->prefix_ && 
-        strcmp(opt_distinct->op_->prefix_, "DISTINCT") == 0) {
+    if (opt_distinct->str_val_ == "DISTINCT") {
       default_type_ = VALID_STMT_TYPE_TLP::DISTINCT;
     }
   }
@@ -692,8 +1122,7 @@ VALID_STMT_TYPE_TLP SQL_TLP::get_stmt_TLP_type (IR* cur_stmt) {
   /* Has GROUP BY clause. Attention, cannot mix GROUP BY with Aggr. (FPs) */
   vector<IR*> v_opt_group = ir_wrapper.get_ir_node_in_stmt_with_type(cur_stmt, kOptGroup, false);
   for (IR* opt_group : v_opt_group) {
-    if (opt_group->op_ != NULL && opt_group->op_->prefix_ &&
-        strcmp(opt_group->op_->prefix_, "GROUP BY") == 0) {
+    if (opt_group->op_ != NULL && opt_group->op_->prefix_ == "GROUP BY") {
       default_type_ = VALID_STMT_TYPE_TLP::GROUP_BY;
     }
   }
@@ -724,9 +1153,7 @@ VALID_STMT_TYPE_TLP SQL_TLP::get_stmt_TLP_type (IR* cur_stmt) {
   }
 
   /* Might have aggr function. */
-  string aggr_func_str;
-  if (v_aggr_func_ir[0]->left_)
-    aggr_func_str = v_aggr_func_ir[0]->left_->str_val_;
+  string aggr_func_str = v_aggr_func_ir[0]->left_->str_val_;
   if (findStringIn(aggr_func_str, "MIN")) {
     if (default_type_ == VALID_STMT_TYPE_TLP::GROUP_BY) {
       return VALID_STMT_TYPE_TLP::TLP_UNKNOWN;

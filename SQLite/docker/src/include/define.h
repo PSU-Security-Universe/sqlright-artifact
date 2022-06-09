@@ -447,9 +447,9 @@
 
 #define OPSTART(a) new IROperator(a)
 
-#define OPMID(a) new IROperator(NULL, a, NULL)
+#define OPMID(a) new IROperator("", a, "")
 
-#define OPEND(a) new IROperator(NULL, NULL, a)
+#define OPEND(a) new IROperator("", "", a)
 
 #define OP0() new IROperator()
 

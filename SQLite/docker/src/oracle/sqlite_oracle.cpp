@@ -256,34 +256,3 @@ void SQL_ORACLE::remove_all_select_stmt_from_ir(IR* ir_root){
     if (this->is_select_stmt(cur_stmt)) ir_wrapper.remove_stmt_and_free(cur_stmt);
   }
 }
-
-bool SQL_ORACLE::is_oracle_select_stmt_str(const string &query) {
-  vector<IR *> ir_set = g_mutator->parse_query_str_get_ir_set(query);
-  if (ir_set.size() == 0) {
-    return false;
-  }
-  IR *cur_root = ir_set.back();
-  if (!(cur_root->left_ != NULL && cur_root->left_->left_ != NULL)) {
-    cur_root->deep_drop();
-    return false;
-  }
-
-  IR *cur_stmt = cur_root->left_->left_;
-  bool res = is_oracle_select_stmt(cur_stmt);
-  cur_root->deep_drop();
-  return res;
-};
-
-string SQL_ORACLE::remove_oracle_select_stmts_from_str(string query) {
-  string output_query = "";
-  vector<string> queries_vector = string_splitter(query, ';');
-
-  for (auto current_stmt : queries_vector) {
-    if (is_str_empty(current_stmt))
-      continue;
-    if (!is_oracle_select_stmt_str(current_stmt))
-      output_query += current_stmt + "; ";
-  }
-
-  return output_query;
-}

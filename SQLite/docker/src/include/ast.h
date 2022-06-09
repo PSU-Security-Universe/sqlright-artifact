@@ -18,6 +18,8 @@ ALLCLASS(DECLARE_CLASS);
 //#include "../parser/bison_parser.h"
 //#include "../parser/flex_lexer.h"
 
+#define GEN_NAME() name_ = gen_id_name();
+
 #define reset_counter() g_id_counter = 0;
 
 static unsigned long g_id_counter;
@@ -107,14 +109,12 @@ typedef NODETYPE IRTYPE;
 
 class IROperator {
 public:
-  IROperator(const char *prefix = NULL,
-             const char *middle = NULL,
-             const char *suffix = NULL)
+  IROperator(string prefix = "", string middle = "", string suffix = "")
       : prefix_(prefix), middle_(middle), suffix_(suffix) {}
 
-  const char *prefix_;
-  const char *middle_;
-  const char *suffix_;
+  string prefix_;
+  string middle_;
+  string suffix_;
 };
 
 class IR {
@@ -122,6 +122,7 @@ public:
   IR(IRTYPE type, IROperator *op, IR *left = NULL, IR *right = NULL)
       : type_(type), op_(op), left_(left), right_(right), parent_(NULL),
         operand_num_((!!right) + (!!left)), id_type_(id_whatever) {
+    GEN_NAME();
     if (left_)
       left_->parent_ = this;
     if (right_)
@@ -131,27 +132,31 @@ public:
   IR(IRTYPE type, string str_val, IDTYPE id_type = id_whatever)
       : type_(type), str_val_(str_val), op_(NULL), left_(NULL), right_(NULL),
         parent_(NULL), operand_num_(0), id_type_(id_type) {
+    GEN_NAME();
   }
 
   IR(IRTYPE type, bool b_val)
       : type_(type), b_val_(b_val), left_(NULL), op_(NULL), right_(NULL),
         parent_(NULL), operand_num_(0), id_type_(id_whatever) {
+    GEN_NAME();
   }
 
   IR(IRTYPE type, unsigned long int_val)
       : type_(type), int_val_(int_val), left_(NULL), op_(NULL), right_(NULL),
         parent_(NULL), operand_num_(0), id_type_(id_whatever) {
+    GEN_NAME();
   }
 
   IR(IRTYPE type, double f_val)
       : type_(type), f_val_(f_val), left_(NULL), op_(NULL), right_(NULL),
         parent_(NULL), operand_num_(0), id_type_(id_whatever) {
+    GEN_NAME();
   }
 
   IR(IRTYPE type, IROperator *op, IR *left, IR *right, double f_val,
-     string str_val, unsigned int mutated_times)
+     string str_val, string name, unsigned int mutated_times)
       : type_(type), op_(op), left_(left), right_(right), parent_(NULL),
-        operand_num_((!!right) + (!!left)), str_val_(str_val),
+        operand_num_((!!right) + (!!left)), name_(name), str_val_(str_val),
         f_val_(f_val), mutated_times_(mutated_times), id_type_(id_whatever) {
     if (left_)
       left_->parent_ = this;
@@ -168,6 +173,7 @@ public:
   int uniq_id_in_tree_;
   IDTYPE id_type_;
   IRTYPE type_;
+  string name_;
   string str_val_;
   IROperator *op_;
   IR *left_;
@@ -199,6 +205,7 @@ public:
   void update_left(IR *);
   void update_right(IR *);
 
+  void print_ir();
 };
 
 class IRCollector {
@@ -490,14 +497,14 @@ class OptRecursive : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptIfNotExists : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class ColumnDefList : public Node {
@@ -527,14 +534,14 @@ class OptColumnNullable : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptIfExists : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptColumnListParen : public Opt {
@@ -564,7 +571,7 @@ class SetOperator : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class SelectCoreList : public Node {
@@ -592,14 +599,14 @@ class OptDistinct : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptStoredVirtual : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class SelectList : public Node {
@@ -689,7 +696,7 @@ class OptOrderType : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptLimit : public Opt {
@@ -762,7 +769,7 @@ class UnaryOp : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string value_;
 };
 
 class InTarget : public Node {
@@ -778,7 +785,7 @@ class BinaryOp : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string value_;
 };
 
 class CaseCondition : public Node {
@@ -849,7 +856,7 @@ class DeferrableClause : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
   OptNot *opt_not_;
 };
 
@@ -871,8 +878,8 @@ class ForeignKeyOn : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
-  Identifier *identifier_;
+  string str_val_;
+  Identifier *name_;
 };
 
 class ForeignKeyClause : public Node {
@@ -889,7 +896,7 @@ class SignedNumber : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char * str_sign_;
+  string str_sign_;
   NumericLiteral *numeric_literal_;
 };
 
@@ -1091,14 +1098,14 @@ public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
   OptSemicolon *opt_semicolon_;
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptWithoutRowID : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptColumnConstraintlist : public Opt {
@@ -1162,21 +1169,21 @@ class ResolveType : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptAutoinc : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptUnique : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class TableName : public Node {
@@ -1207,14 +1214,14 @@ class OptTmp : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptTriggerTime : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class TriggerEvent : public Node {
@@ -1235,7 +1242,7 @@ class OptForEach : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptWhen : public Opt {
@@ -1355,14 +1362,14 @@ class RangeOrRows : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class FrameBoundS : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
   NewExpr *expr_;
 };
 
@@ -1370,7 +1377,7 @@ class FrameBoundE : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
   NewExpr *expr_;
 };
 
@@ -1379,14 +1386,14 @@ public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
   NewExpr *expr_;
-  const char *str_val_;
+  string str_val_;
 };
 
 class FrameExclude : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptFrameExclude : public Node {
@@ -1409,7 +1416,7 @@ class UpdateType : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
   ResolveType *resolve_type_;
 };
 
@@ -1417,7 +1424,7 @@ class InsertType : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
   ResolveType *resolve_type_;
 };
 
@@ -1444,7 +1451,7 @@ class JoinOp : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptIndex : public Node {
@@ -1512,7 +1519,7 @@ class OptColumn : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class VacuumStatement : public PreparableStatement {
@@ -1542,7 +1549,7 @@ class OptTransaction : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptToSavepoint : public Opt {
@@ -1630,21 +1637,21 @@ class NullOfExpr : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class ExistsOrNot : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class OptOrderOfNull : public Opt {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *str_val_;
+  string str_val_;
 };
 
 class AssignClause : public Node {
@@ -1703,7 +1710,7 @@ class RaiseFunction : public Node {
 public:
   virtual void deep_delete();
   virtual IR *translate(vector<IR *> &v_ir_collector);
-  const char *to_raise_;
+  string to_raise_;
   Identifier *error_msg_;
 };
 

@@ -116,7 +116,7 @@
 #define INIT_LIB_PATH "./init_lib"
 double min_stab_radio;
 char *save_file_name = NULL;
-char *g_library_path = INIT_LIB_PATH;
+char *g_library_path;
 char *g_current_input = NULL;
 IR *g_current_ir = NULL;
 
@@ -207,11 +207,7 @@ EXP_ST u8 skip_deterministic, /* Skip deterministic stages?       */
     deferred_mode,            /* Deferred forkserver mode?        */
     fast_cal;                 /* Try to calibrate faster?         */
 
-EXP_ST u8 disable_coverage_feedback = 0;  
-                              /* 0: not disabled, 
-                               * 1: Drop all queries. 
-                               * 2: Randomly save queries. 
-                               * 3: Save all queries. */
+EXP_ST u8 disable_coverage_feedback = 0;  /* 0: not disabled, 1: Drop all queries. 2: Randomly save queries. 3: Save all queries. */
 
 static s32 out_fd, /* Persistent fd for out_file       */
     program_output_fd,
@@ -1008,29 +1004,22 @@ void log_map_id(u32 i, u8 byte, const string& cur_seed_str){
   if (map_id_out_f.fail()){
     return;
   }
+  i = (MAP_SIZE >> 3) - i - 1 ;
+  u32 actual_idx = i * 8 + byte;
+  if (share_map_id.count(actual_idx)){
+    for (string &debug_info : share_map_id[actual_idx]) {
+      map_id_out_f << actual_idx << "," << debug_info << "," << map_file_id << endl;
+    }
+  } else {
+    map_id_out_f << actual_idx << "," << "-1,-1,-1,-1,0," << map_file_id <<  endl;
+  }
   if (cur_seed_str == "") {
     return;
   }
-  i = (MAP_SIZE >> 3) - i - 1 ;
-  u32 actual_idx = i * 8 + byte;
-  
-  if (queue_cur) {
-    map_id_out_f << actual_idx << ",-1,-1" <<  endl;
-  } else {
-    map_id_out_f << actual_idx << "," << map_file_id << ",0" << endl;
-  }
-  map_id_out_f.flush();
-
-  if (queue_cur && cur_seed_str != "123") {
-    if ( !filesystem::exists("./queue_coverage_id_core/")) {
-      filesystem::create_directory("./queue_coverage_id_core/");
-    }
-    fstream map_id_seed_output;
-    map_id_seed_output.open("./queue_coverage_id_core/" + to_string(queue_cur->depth) + "_" +to_string(map_file_id) + "_" + to_string(current_entry) + ".txt", std::fstream::out | std::fstream::trunc);
-    map_id_seed_output << cur_seed_str;
-    map_id_seed_output.close();
-  }
-
+  fstream map_id_seed_output;
+  map_id_seed_output.open("./queue_coverage_id/" + to_string(map_file_id) + ".txt", std::fstream::out | std::fstream::trunc);
+  map_id_seed_output << cur_seed_str;
+  map_id_seed_output.close();
 }
 
 /* Check if the current execution path brings anything new to the table.
@@ -2229,19 +2218,19 @@ EXP_ST void init_forkserver(char **argv) {
 
     /* Set sane defaults for ASAN if nothing else specified. */
 
-    setenv("ASAN_OPTIONS", "abort_on_error=1:"
-                           "detect_leaks=0:"
-                           "symbolize=0:"
-                           "allocator_may_return_null=1", 0);
+    // setenv("ASAN_OPTIONS", "abort_on_error=1:"
+    //                        "detect_leaks=0:"
+    //                        "symbolize=0:"
+    //                        "allocator_may_return_null=1", 0);
 
     // /* MSAN is tricky, because it doesn't support abort_on_error=1 at this
     //    point. So, we do this in a very hacky way. */
 
-    setenv("MSAN_OPTIONS", "exit_code=" STRINGIFY(MSAN_ERROR) ":"
-                           "symbolize=0:"
-                           "abort_on_error=1:"
-                           "allocator_may_return_null=1:"
-                           "msan_track_origins=0", 0);
+    // setenv("MSAN_OPTIONS", "exit_code=" STRINGIFY(MSAN_ERROR) ":"
+    //                        "symbolize=0:"
+    //                        "abort_on_error=1:"
+    //                        "allocator_may_return_null=1:"
+    //                        "msan_track_origins=0", 0);
 
     execv(target_path, argv); // Used for start up sqlite3 ???
 
@@ -2549,14 +2538,14 @@ static u8 run_target(char **argv, u32 timeout) {
 
       /* Set sane defaults for ASAN if nothing else specified. */
 
-      setenv("ASAN_OPTIONS", "abort_on_error=1:"
-                             "detect_leaks=0:"
-                             "symbolize=0:"
-                             "allocator_may_return_null=1", 0);
+      // setenv("ASAN_OPTIONS", "abort_on_error=1:"
+      //                        "detect_leaks=0:"
+      //                        "symbolize=0:"
+      //                        "allocator_may_return_null=1", 0);
 
-      setenv("MSAN_OPTIONS", "exit_code=" STRINGIFY(MSAN_ERROR) ":"
-                             "symbolize=0:"
-                             "msan_track_origins=0", 0);
+      // setenv("MSAN_OPTIONS", "exit_code=" STRINGIFY(MSAN_ERROR) ":"
+      //                        "symbolize=0:"
+      //                        "msan_track_origins=0", 0);
 
       execv(target_path, argv);
 
@@ -2662,10 +2651,10 @@ static u8 run_target(char **argv, u32 timeout) {
   // /* A somewhat nasty hack for MSAN, which doesn't support abort_on_error and
   //    must use a special exit code. */
 
-  if (uses_asan && WEXITSTATUS(status) == MSAN_ERROR) {
-    kill_signal = 0;
-    return FAULT_CRASH;
-  }
+  // if (uses_asan && WEXITSTATUS(status) == MSAN_ERROR) {
+  //   kill_signal = 0;
+  //   return FAULT_CRASH;
+  // }
 
   if ((dumb_mode == 1 || no_forkserver) && tb4 == EXEC_FAIL_SIG)
     return FAULT_ERROR;
@@ -2736,6 +2725,93 @@ inline void print_exec_debug_info(ostream &out) {
       << "bug_samples reports num: " << bug_output_id << "\n";
 
   return;
+}
+
+string expand_valid_stmts_str(vector<string> &queries_vector,
+                              const bool is_mark = false,
+                              const unsigned mul_run_id = 0) {
+  bool is_explain = g_mutator.get_is_use_cri_val();
+  string current_output = "";
+
+  for (string &query : queries_vector) {
+    if (is_str_empty(query))
+      continue;
+    if (p_oracle->is_oracle_valid_stmt(query)) {
+      string rew_1 = "", rew_2 = "", rew_3 = "";
+      p_oracle->rewrite_valid_stmt_from_ori(query, rew_1, rew_2, rew_3,
+                                            mul_run_id);
+
+      if (query != "") {
+        if (is_mark)
+          current_output += "SELECT 'BEGIN VERI 0'; \n";
+        current_output += query + "; \n";
+        if (is_mark)
+          current_output += "SELECT 'END VERI 0'; \n";
+        /* Use EXPLAIN QUERY PLAN to see whether the query triggers critical
+         * optimization changes. */
+        if (is_explain) {
+          if (is_mark)
+            current_output += "SELECT 'BEGIN EXPLAIN 0'; \n";
+          current_output += "EXPLAIN QUERY PLAN " + query + "; \n";
+          if (is_mark)
+            current_output += "SELECT 'END EXPLAIN 0'; \n";
+        }
+      }
+
+      if (rew_1 != "" && mul_run_id <= 1) {
+        if (is_mark)
+          current_output += "SELECT 'BEGIN VERI 1'; \n";
+        current_output += rew_1 + "; \n";
+        if (is_mark)
+          current_output += "SELECT 'END VERI 1'; \n";
+        if (is_explain) {
+          if (is_mark)
+            current_output += "SELECT 'BEGIN EXPLAIN 1'; \n";
+          current_output += "EXPLAIN QUERY PLAN " + rew_1 + "; \n";
+          if (is_mark)
+            current_output += "SELECT 'END EXPLAIN 1'; \n";
+        }
+      }
+
+      if (rew_2 != "" && mul_run_id <= 1) {
+        if (is_mark)
+          current_output += "SELECT 'BEGIN VERI 2'; \n";
+        current_output += rew_2 + "; \n";
+        if (is_mark)
+          current_output += "SELECT 'END VERI 2'; \n";
+        if (is_explain) {
+          if (is_mark)
+            current_output += "SELECT 'BEGIN EXPLAIN 2'; \n";
+          current_output += "EXPLAIN QUERY PLAN " + rew_2 + "; \n";
+          if (is_mark)
+            current_output += "SELECT 'END EXPLAIN 2'; \n";
+        }
+      }
+
+      if (rew_3 != "" && mul_run_id <= 1) {
+        if (is_mark)
+          current_output += "SELECT 'BEGIN VERI 3'; \n";
+        current_output += rew_3 + "; \n";
+        if (is_mark)
+          current_output += "SELECT 'END VERI 3'; \n";
+
+        if (is_explain) {
+          if (is_mark)
+            current_output += "SELECT 'BEGIN EXPLAIN 3'; \n";
+          current_output += "EXPLAIN QUERY PLAN " + rew_3 + "; \n";
+          if (is_mark)
+            current_output += "SELECT 'END EXPLAIN 3'; \n";
+        }
+      }
+    } else if (p_oracle->is_oracle_valid_stmt_2(
+                   query)) { // If required to rewrite non-select statement
+      p_oracle->rewrite_valid_stmt_from_ori_2(query, mul_run_id);
+      current_output += query + "; \n";
+    } else {
+      current_output += query + "; \n";
+    }
+  }
+  return current_output;
 }
 
 void log_error(const string &cmd_str, string &err_str) {
@@ -3824,7 +3900,7 @@ static u8 save_if_interesting(char **argv, string &query_str, const ALL_COMP_RES
 
   /* Do not strip the string when saving to queue. Strip it when loading. */
   string stripped_query_string =
-      p_oracle->remove_oracle_select_stmts_from_str(query_str);
+      p_oracle->remove_valid_stmts_from_str(query_str);
   if (is_str_empty(stripped_query_string)){
     // cerr << "stripped query_str empty" << endl;
     return keeping;
@@ -3835,6 +3911,15 @@ static u8 save_if_interesting(char **argv, string &query_str, const ALL_COMP_RES
     /* Keep only if there are new bits in the map, add to queue for
        future fuzzing, etc. */
 
+    /* For evaluation experiments, if we need to disable coverage feedback and randomly drop queries:
+    **  1/10 of chances to save the interesting seed.
+    **  9/10 of chances to throw away the seed.
+    **/
+    if ( (disable_coverage_feedback == 2) && get_rand_int(10) == 0 ) {
+      // Drop query. 
+      return 0;
+    }
+        
     /* If no_new_bits, dropped. However, if disable_coverage_feedback is specified, ignore has_new_bits. */
     if ( !(hnb = has_new_bits(virgin_bits, query_str)) && !disable_coverage_feedback) {  
       if (crash_mode)
@@ -3843,22 +3928,6 @@ static u8 save_if_interesting(char **argv, string &query_str, const ALL_COMP_RES
       // Drop query. 
       return 0;
     }
-
-    if (disable_coverage_feedback == 1)
-    { // Disable feedbacks. Drop all queries.
-      return keeping;
-    }
-
-    /* For evaluation experiments, if we need to disable coverage feedback and randomly drop queries:
-    **  1/10 of chances to save the interesting seed.
-    **  9/10 of chances to throw away the seed.
-    **/
-    if ( (disable_coverage_feedback == 2) && get_rand_int(10) < 9 ) {
-      // Drop query. 
-      return keeping;
-    }
-
-    /* If disable_coverage_feedback == 3, always go through save_if_interesting. */
 
     char *tmp_name = stage_name;
     //[modify] add
@@ -5472,21 +5541,25 @@ EXP_ST u8 common_fuzz_stuff(char **argv, vector<string> &query_str, vector<strin
     return 0;
   }
   
-//  if (fault == FAULT_NONE &&
+//  if (fault != FAULT_CRASH && 
 //      all_comp_res.final_res == ORA_COMP_RES::ALL_Error){
 //    // cerr << "Query all error. " << endl;
 //    return 0;
 //  }
 
-  queued_discovered +=
-    save_if_interesting(argv, query_str_no_marks[0], all_comp_res, fault, explain_diff_id);
+  if (disable_coverage_feedback == 1) {  // Disable feedbacks. Drop all queries. 
+    /* Do nothing. */
+  } else {
+    queued_discovered +=
+      save_if_interesting(argv, query_str_no_marks[0], all_comp_res, fault, explain_diff_id);
+  }
 
   /* Queue size could be overwhelmed if we disable feedbacks with randomly saved queries or completely save all queries. 
   ** In these cases, we clean the queue if q_len exceed 10000. 
   */
-  // if (disable_coverage_feedback > 1 && q_len >= 1000) {
-  //   // destroy_half_queue();
-  // }
+  if (disable_coverage_feedback > 1 && q_len >= 1000) {
+    // destroy_half_queue();
+  }
 
   if (!(stage_cur % stats_update_freq) || stage_cur + 1 == stage_max)
     show_stats();
@@ -6019,9 +6092,7 @@ static u8 fuzz_one(char **argv) {
     }
     // cerr << "Getting cur_app_stmt: " << cur_app_stmt->to_string() << endl;
     p_oracle->init_ir_wrapper(cur_ir_root);
-    /* Choose insert position. Do not insert as the very first statement. */
-    int insert_pos = get_rand_int(p_oracle->ir_wrapper.get_stmt_num(cur_ir_root));
-    p_oracle->ir_wrapper.append_stmt_after_idx(cur_app_stmt, insert_pos);
+    p_oracle->ir_wrapper.append_stmt_at_end(cur_app_stmt);
   }
 
   // cerr << "Just after random append statements, the statement is: \n" << cur_ir_root->to_string() << "\n\n\n";
@@ -7352,9 +7423,92 @@ static void save_cmdline(u32 argc, char **argv) {
 
 /* Main entry point */
 
+/* new entry point
+
+
+struct Testcase{
+  IR * root;
+  IR * mutated_node;
+};
+
+int main(int argc, char ** argv){
+  //setup_shm();
+  //generate a set of initial testcases into queue
+  //read a testcase from queue
+  //read_shm();
+  //run each testcase
+  //detect if it is crash
+  //detect if bitmap changed (has_new_bit()), if so, update bitmap. Update
+testcase library
+  //mutate testcase
+  //move them into process queue
+
+  queue<Testcase> tqueue = initial(); //initialize the initial testcase from
+file, allocate test queue setup_shm(); //initial
+
+  while(!tqueue.empty()){
+    Testcase testcase = tqueue.pop_front();
+
+    run_testcase(testcase.root);// call ir->translate(), fork to run testcase,
+record exec status unsigned int result = check_result(); //check exec result,
+check bitmap, update bitmap (by using has_new_bits())
+
+    if(result == DETECT_CRASH){
+      save_testcase_and_node(testcase);
+    }
+    else if(result == DETECT_NEW_PATH){
+      save_node(testcase.nmutated_node);
+    }
+    else{
+      //nothing to do
+    }
+
+    vector<IR *> v_ir_collector = build_ir_collector(testcase.root);
+    if(v_ir_collector.empty()) return -1;
+
+    vector<Testcase> mutated_roots = mutator->mutate_all(v_ir_collector);
+    if(mutated_roots.empty()){
+      re_mutated(); //if no new testcase generated, we need to randomly mutated
+again.
+    }
+    for(auto root: mutated_root){
+      tqueue.push_back(root);
+    }
+  }
+}
+
+queue<Testcase> initial(){
+  queue<Testcase> res;
+  ifstream input_test("sqltest");
+  string line;
+  if(input_test){
+
+    while(getline(input_test, line)){
+      Program * ast_root = parser(line);
+      vector<IR *> v_ir;
+      IR * root = ast_root->translate(v_ir);
+      delete Program; //need a helper to delete all the ast
+
+      Testcase testcase = {root, NULL};
+      res.push_back(testcase);
+
+    }
+  }
+
+  return res;
+}
+
+
+int run_testcase()
+
+*/
+
 static void do_libary_initialize() {
 
-  SSAY("SqlRight: initialize the libary");
+  if (g_library_path == NULL)
+    g_library_path = INIT_LIB_PATH;
+
+  cerr << "We should initialize the libary" << endl;
 
   vector<string> file_list = get_all_files_in_dir(g_library_path);
   for (auto &f : file_list) {
@@ -7375,14 +7529,6 @@ static void do_libary_initialize() {
 
   cout << "The size of ir_libary_2D_hash_ for kStatement is: "
        << g_mutator.get_ir_libary_2D_hash_kStatement_size() << endl;
-}
-
-static void load_map_id() {
-  if (dump_library) {
-    map_id_out_f << "mapID,map_file_id,depth" << endl;
-  }
-  map_id_out_f.flush();
-  return;
 }
 
 int main(int argc, char **argv) {
@@ -7672,9 +7818,36 @@ int main(int argc, char **argv) {
     p_oracle = new SQL_NOREC();
   p_oracle->set_mutator(&g_mutator);
   g_mutator.set_p_oracle(p_oracle);
-  g_mutator.set_dump_library(dump_library);
 
-  load_map_id();
+  g_mutator.set_dump_library(dump_library);
+  g_mutator.set_disable_coverage_feedback(disable_coverage_feedback);
+
+  if (dump_library) {
+    /* Debug: Load the map_id to the program */
+    fstream map_f("./mapID.csv");
+    if (map_f.fail()){
+      cerr << "ERROR: mapID.csv doesn't exist in the current workdir. ";
+    } else {
+      map_id_out_f << "mapID,src,src_line,dest,dest_line,EH,map_file_id" << endl;
+    }
+
+    string line;
+    getline(map_f, line); // Ignore the first line. It is the header of the csv file. 
+    while (getline(map_f, line)){
+      vector<string> line_vec = string_splitter(line, ",");
+      int map_id = stoi(line_vec[0]);
+      string map_info = line_vec[1] + "," + line_vec[2] + "," + line_vec[3] + "," + line_vec[4] + "," + line_vec[5];
+      if (share_map_id.count(map_id) != 0){
+        share_map_id[map_id].push_back(map_info);
+      } else {
+        vector<string> tmp{map_info};
+        share_map_id[map_id] = tmp;
+      }
+      line_vec.clear();
+    }
+    map_f.close();
+    line.clear();
+  }
 
   if (optind == argc || !in_dir || !out_dir)
     usage(argv[0]);
@@ -7752,11 +7925,8 @@ int main(int argc, char **argv) {
   if (extras_dir)
     load_extras(extras_dir);
 
-  if (!timeout_given) {
-    // find_timeout();
-    /* If timeout is not given for SQLite3, set the timeout to 2000ms. */
-    exec_tmout = 2000;
-  }
+  if (!timeout_given)
+    find_timeout();
 
   detect_file_args(argv + optind + 1);
 
@@ -7765,15 +7935,17 @@ int main(int argc, char **argv) {
 
   check_binary(argv[optind]);
 
+  start_time = get_cur_time();
+
   if (qemu_mode)
     use_argv = get_qemu_argv(argv[0], argv + optind, argc - optind);
   else
     use_argv = argv + optind;
 
-  start_time = get_cur_time();
+  u64 start_time = get_cur_time();
   do_libary_initialize(); //[modify]
   cerr << "do_library_initialize() takes "
-       << (get_cur_time() - start_time) / 1000. << " seconds\n";
+       << (get_cur_time() - start_time) / 1000 << " seconds\n";
 
   perform_dry_run(use_argv);
 
