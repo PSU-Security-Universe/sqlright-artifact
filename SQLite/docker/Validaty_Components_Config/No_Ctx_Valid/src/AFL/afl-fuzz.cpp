@@ -2973,8 +2973,8 @@ u8 execute_cmd_string(string& cmd_string, vector<int> &explain_diff_id,
     }
     res_str = read_sqlite_output_and_reset_output_file();
 
-    all_comp_res.cmd_str = std::move(cmd_string);
-    all_comp_res.res_str = std::move(res_str);
+    all_comp_res.cmd_str = cmd_string;
+    all_comp_res.res_str = res_str;
     compare_query_result(all_comp_res, explain_diff_id);
   } else {
     /* Compare results of the same validation stmts in different runs. */
@@ -3005,8 +3005,8 @@ u8 execute_cmd_string(string& cmd_string, vector<int> &explain_diff_id,
       }
       res_str = read_sqlite_output_and_reset_output_file();
 
-      all_comp_res.v_cmd_str.push_back(std::move(cmd_string));
-      all_comp_res.v_res_str.push_back(std::move(res_str));
+      all_comp_res.v_cmd_str.push_back(cmd_string);
+      all_comp_res.v_res_str.push_back(res_str);
 
     } // End for run_id loop.
 
@@ -3718,7 +3718,7 @@ static void write_crash_readme(void) {
    save or queue the input test case for further analysis if so. Returns 1 if
    entry is saved, 0 otherwise. */
 
-static u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
+static u8 save_if_interesting(char** argv, char* mem, u32 len, u8 fault) {
 
   u8  *fn = "";
   u8  hnb;
@@ -3740,7 +3740,10 @@ static u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
     //[modify] add
     // if it is interesting, we update our library with it.
     stage_name = "add_to_library";
-    string strip_sql = g_mutator.extract_struct(g_current_ir); //g_current_ir will be deleted in fuzz_one's abandon_entry
+    string strip_sql = "";
+    for (int ki = 0; ki < len; ki ++) {
+            strip_sql += mem[ki];
+    }
     if (strip_sql.size() == 0) {
       return 0;
     }
