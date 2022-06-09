@@ -208,6 +208,7 @@ EXP_ST u8 skip_deterministic, /* Skip deterministic stages?       */
     fast_cal;                 /* Try to calibrate faster?         */
 
 EXP_ST u8 disable_coverage_feedback = 0;  /* 0: not disabled, 1: Drop all queries. 2: Randomly save queries. 3: Save all queries. */
+static bool is_using_non_deter = 0; /* Is using non-deterministic queries. Default No. */
 
 static s32 out_fd, /* Persistent fd for out_file       */
     program_output_fd,
@@ -3062,7 +3063,12 @@ u8 execute_cmd_string(vector<string>& cmd_string_vec, vector<int> &explain_diff_
 
   string res_str = "";
 
+  // Check for non-deter queries. 
   for (auto cmd_string : cmd_string_vec) {
+    if (is_using_non_deter) {
+        /* If it is using the non-deter queries, do not check for the non-deter keywords.  */
+        break;
+    }
     if ((cmd_string.find("RANDOM") != std::string::npos) ||
         (cmd_string.find("random") != std::string::npos) ||
         (cmd_string.find("JULIANDAY") != std::string::npos) ||
@@ -7546,6 +7552,7 @@ int main(int argc, char **argv) {
   u8 mem_limit_given = 0;
   u8 exit_1 = !!getenv("AFL_BENCH_JUST_ONE");
   char **use_argv;
+  is_using_non_deter = false;
 
   struct timeval tv;
   struct timezone tz;
@@ -7558,7 +7565,7 @@ int main(int argc, char **argv) {
   gettimeofday(&tv, &tz);
   srandom(tv.tv_sec ^ tv.tv_usec ^ getpid());
 
-  while ((opt = getopt(argc, argv, "+i:o:f:m:t:T:dnCB:S:M:x:QDF:c:EO:s:")) > 0)
+  while ((opt = getopt(argc, argv, "+i:o:f:m:t:T:dnCB:S:M:x:QDF:c:EO:s:w")) > 0)
 
     switch (opt) {
 
@@ -7788,6 +7795,10 @@ int main(int argc, char **argv) {
       if (!mem_limit_given)
         mem_limit = MEM_LIMIT_QEMU;
 
+      break;
+
+    case 'w': /* Using non-deterministic query or not. Default No.  */
+      is_using_non_deter = true; 
       break;
 
     case 'O': /* Oracle */
