@@ -5547,11 +5547,11 @@ EXP_ST u8 common_fuzz_stuff(char **argv, vector<string> &query_str, vector<strin
     return 0;
   }
   
-//  if (fault != FAULT_CRASH && 
-//      all_comp_res.final_res == ORA_COMP_RES::ALL_Error){
-//    // cerr << "Query all error. " << endl;
-//    return 0;
-//  }
+  if (fault != FAULT_CRASH && 
+      all_comp_res.final_res == ORA_COMP_RES::ALL_Error){
+    // cerr << "Query all error. " << endl;
+    return 0;
+  }
 
   if (disable_coverage_feedback == 1) {  // Disable feedbacks. Drop all queries. 
     /* Do nothing. */
@@ -7799,6 +7799,7 @@ int main(int argc, char **argv) {
 
     case 'w': /* Using non-deterministic query or not. Default No.  */
       is_using_non_deter = true; 
+      cerr << "Attention: Using non-deterministic queries in the fuzzing. Will generate False Positives. \n";
       break;
 
     case 'O': /* Oracle */
