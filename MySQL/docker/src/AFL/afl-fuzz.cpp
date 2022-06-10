@@ -561,17 +561,17 @@ public:
 
     for (string cur_cmd_str : v_cmd_str) {
 
-//      /* DEBUG: Remove all statements related to global optimization settings. */
-//      if (
-//        findStringIn(cur_cmd_str, "SET") ||
-//        findStringIn(cur_cmd_str, "@") ||
-//        findStringIn(cur_cmd_str, "PREPARE") ||
-//        findStringIn(cur_cmd_str, "DEALLOCATE") ||
-//        findStringIn(cur_cmd_str, "GRANT") 
-//      ) {
-//        /* Skip the current statement.  */
-//        continue;
-//      }
+      /* DEBUG: Remove all statements related to global optimization settings. */
+      if (
+        findStringIn(cur_cmd_str, "SET") ||
+        findStringIn(cur_cmd_str, "@") ||
+        findStringIn(cur_cmd_str, "PREPARE") ||
+        findStringIn(cur_cmd_str, "DEALLOCATE") ||
+        findStringIn(cur_cmd_str, "GRANT") 
+      ) {
+        /* Skip the current statement.  */
+        continue;
+      }
 
       if (cur_cmd_str.find("#MutationMark ") != string::npos) {
         // We are executing the mutating query
