@@ -84,7 +84,7 @@ RUN mkdir bld
 WORKDIR /home/mysql/mysql-server/bld
 ENV CC=/home/mysql/AFL/afl-clang-fast
 ENV CXX=/home/mysql/AFL/afl-clang-fast++
-RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost -DWITH_DEBUG=1
+RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost -DWITH_UNIT_TESTS=OFF -DUSE_LD_GOLD=1
 RUN make -j$(nproc)
 
 # Recover the original compiler. 
