@@ -78,7 +78,132 @@ bool AFLCoverage::runOnModule(Module &M) {
 
   std::string cur_file_name = M.getSourceFileName();
 
-  //std::cerr << "\n\n\nCurrent file name is: " << cur_file_name << "\n\n\n";
+//  if (
+//	cur_file_name.find("sql_yacc") == std::string::npos &&
+//	cur_file_name.find("sql_alter") == std::string::npos &&
+//	cur_file_name.find("sql_db") == std::string::npos &&
+//	cur_file_name.find("sql_delete") == std::string::npos &&
+//	cur_file_name.find("sql_derived") == std::string::npos &&
+//	cur_file_name.find("sql_insert") == std::string::npos &&
+//	cur_file_name.find("sql_join_buffer") == std::string::npos &&
+//	cur_file_name.find("sql_lex") == std::string::npos &&
+//	cur_file_name.find("sql_parse") == std::string::npos &&
+//	cur_file_name.find("sql_rename") == std::string::npos &&
+//	cur_file_name.find("sql_parse") == std::string::npos &&
+//	cur_file_name.find("sql_select") == std::string::npos &&
+//	cur_file_name.find("sql_show") == std::string::npos &&
+//	cur_file_name.find("sql_table") == std::string::npos &&
+//	cur_file_name.find("sql_truncate") == std::string::npos &&
+//	cur_file_name.find("sql_udf") == std::string::npos &&
+//	cur_file_name.find("sql_union") == std::string::npos &&
+//	cur_file_name.find("sql_update") == std::string::npos &&
+//	cur_file_name.find("sql_view") == std::string::npos &&
+////
+////	cur_file_name.find("sql_") == std::string::npos
+//	cur_file_name.find("join_") == std::string::npos &&
+//	cur_file_name.find("opt_") == std::string::npos &&
+//	cur_file_name.find("/range_optimizer/") == std::string::npos &&
+//	cur_file_name.find("/join_optimizer/") == std::string::npos &&
+//	cur_file_name.find("/partitioning/") == std::string::npos &&
+//	cur_file_name.find("item_") == std::string::npos
+//     ) {
+//	  return false;
+//  }
+//
+//  if (
+//	cur_file_name.find("binlog") != std::string::npos ||
+//	cur_file_name.find("admin") != std::string::npos ||
+//	cur_file_name.find("error") != std::string::npos ||
+//	cur_file_name.find("audit") != std::string::npos ||
+//	cur_file_name.find("event") != std::string::npos ||
+//	cur_file_name.find("trigger") != std::string::npos ||
+//	cur_file_name.find("lock") != std::string::npos ||
+//	cur_file_name.find("backup") != std::string::npos ||
+//	cur_file_name.find("bootstrap") != std::string::npos ||
+//	cur_file_name.find("client") != std::string::npos ||
+//	cur_file_name.find("exception") != std::string::npos ||
+//	cur_file_name.find("profile") != std::string::npos ||
+//	cur_file_name.find("thd") != std::string::npos ||
+//	cur_file_name.find("timer") != std::string::npos
+//)  {
+//	  return false;
+//  }
+
+
+// if (cur_file_name.find("/sql_") == std::string::npos) {
+//       return false;
+// }
+
+
+///* Remove from blacklist */
+//if (cur_file_name.find("binlog") != std::string::npos) {
+//  return false;
+//}
+//if (cur_file_name.find("log") != std::string::npos) {
+//  return false;
+//}
+//if (cur_file_name.find("/auth/") != std::string::npos) {
+//  return false;
+//}
+//if (cur_file_name.find("mysys/") != std::string::npos) {
+//  return false;
+//}
+//if (cur_file_name.find("/dd/") != std::string::npos) {
+//  return false;
+//}
+//if (cur_file_name.find("boost") != std::string::npos) {
+//  return false;
+//}
+//if (cur_file_name.find("rpl_") != std::string::npos) {
+//  return false;
+//}
+//if (cur_file_name.find("srv_") != std::string::npos) {
+//  return false;
+//}
+//if (cur_file_name.find("plugin/") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("storage") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("error") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("audit") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("event") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("trigger") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("lock") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("backup") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("bootstrap") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("client") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("exception") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("profile") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("thd") != std::string::npos) {
+//	return false;
+//}
+//if (cur_file_name.find("timer") != std::string::npos) {
+//	return false;
+//}
+
+
 
   IntegerType *Int8Ty  = IntegerType::getInt8Ty(C);
   IntegerType *Int32Ty = IntegerType::getInt32Ty(C);
@@ -198,5 +323,3 @@ static RegisterStandardPasses RegisterAFLPass(
 
 static RegisterStandardPasses RegisterAFLPass0(
     PassManagerBuilder::EP_EnabledOnOptLevel0, registerAFLPass);
-
-
