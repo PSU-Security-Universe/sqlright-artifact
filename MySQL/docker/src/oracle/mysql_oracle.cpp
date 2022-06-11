@@ -215,20 +215,25 @@ IR* SQL_ORACLE::get_random_mutated_select_stmt() {
       // g_mutator->debug(new_ir_verified.back(), 0);
       // cerr << "\n\n\n\n\n\n";
 
-      /* Check whether there are non-deterministic function in the statement.  */
-      if (
-        findStringIn(new_valid_select_struct, "CURDATE") ||
-        findStringIn(new_valid_select_struct, "CURRENT_DATE") ||
-        findStringIn(new_valid_select_struct, "CURRENT_TIME") ||
-        findStringIn(new_valid_select_struct, "CURRENT_TIMESTAMP") ||
-        findStringIn(new_valid_select_struct, "CURTIME") ||
-        findStringIn(new_valid_select_struct, "NOW") ||
-        findStringIn(new_valid_select_struct, "UNIX_TIMESTAMP") ||
-        findStringIn(new_valid_select_struct, "RAND") 
-      ) {
-        new_ir_verified.back()->deep_drop();
-        continue;
-      }
+       /* Check whether there are non-deterministic function in the statement.  */
+       if (
+         findStringIn(new_valid_select_struct, "CURDATE") ||
+         findStringIn(new_valid_select_struct, "CURRENT_DATE") ||
+         findStringIn(new_valid_select_struct, "CURRENT_TIME") ||
+         findStringIn(new_valid_select_struct, "CURRENT_TIMESTAMP") ||
+         findStringIn(new_valid_select_struct, "CURTIME") ||
+         findStringIn(new_valid_select_struct, "NOW") ||
+         findStringIn(new_valid_select_struct, "UNIX_TIMESTAMP") ||
+         findStringIn(new_valid_select_struct, "RAND")
+       ) {
+         new_ir_verified.back()->deep_drop();
+         continue;
+       }
+
+       /*
+        * Last check, see whether our generated select stmt matches for the oracle needs.
+        * And then check whether the extract struct version of the stmts are the same.
+```
 
       /*
        * Last check, see whether our generated select stmt matches for the oracle needs.

@@ -84,7 +84,6 @@
 #include <thread>
 #include <fstream>
 #include <filesystem>
-#include <sstream>
 
 #include "../oracle/mysql_oracle.h"
 #include "../oracle/mysql_norec.h"
@@ -179,8 +178,6 @@ u64 timeout_seed_num = 0;
 u64 mysql_execute_ok = 0;
 u64 mysql_execute_error = 0;
 u64 mysql_execute_total = 0;
-
-EXP_ST u8 *trace_bits; /* SHM with instrumentation bitmap  */
 
 u64 test_id = 0;
 
@@ -368,12 +365,12 @@ public:
     return result_count;
   }
 
-  string retrieve_query_results(MYSQL* m_, string cur_cmd_str, int server_response = 0)
+  string retrieve_query_results(MYSQL* m_, string cur_cmd_str)
   {
     MYSQL_ROW row;
     // string result_string = ""
     stringstream result_string_stream;
-    int status = server_response;
+    int status = 0;
     MYSQL_RES *result;
 
     do
@@ -425,20 +422,9 @@ public:
     // cerr << "\n\n";
 
     string ret_str;
-    /* If any errors are detected, abandon the results. 
-     * If error occurs, mysql_errno() or mysql_real_query return non-zero.  
-     */
-    if (mysql_errno(m_) || (server_response)) {
-	    string err_msg = string(mysql_error(m_));
-
-	    if (err_msg != "") {
-        ret_str = "Error: " + string(mysql_error(m_)) + "  " + result_string_stream.str();
-	    } else {
-		    ret_str = "Error" + to_string(server_response);
-	    }
-
+    if (mysql_errno(m_)) {
+      ret_str = string(mysql_error(m_)) + "  " + result_string_stream.str();
     } else {
-      // No errors. 
       ret_str = result_string_stream.str();
     }
     return ret_str;
@@ -532,8 +518,6 @@ public:
       res_str += "Reset database ERROR!!!\n\n\n";
     }
 
-    memset(trace_bits, 0, MAP_SIZE);
-
     string cmd_str = cmd;
     std::replace(cmd_str.begin(), cmd_str.end(), '\n', ' ');
 
@@ -553,25 +537,13 @@ public:
 
     std::thread(timeout_query, m_->thread_id, timeout_id).detach();
 
-    // has_new_bits(virgin_bits, "123");
+    has_new_bits(virgin_bits, "123");
 
     bool is_mutate_error = false;
 
     bool is_oracle_select = false;
 
     for (string cur_cmd_str : v_cmd_str) {
-
-      /* DEBUG: Remove all statements related to global optimization settings. */
-      if (
-        findStringIn(cur_cmd_str, "SET") ||
-        findStringIn(cur_cmd_str, "@") ||
-        findStringIn(cur_cmd_str, "PREPARE") ||
-        findStringIn(cur_cmd_str, "DEALLOCATE") ||
-        findStringIn(cur_cmd_str, "GRANT") 
-      ) {
-        /* Skip the current statement.  */
-        continue;
-      }
 
       if (cur_cmd_str.find("#MutationMark ") != string::npos) {
         // We are executing the mutating query
@@ -580,7 +552,7 @@ public:
         // cerr << "Testing with MUTATED cur_cmd_str: \n " << cur_cmd_str << "\n\n\n";
 
         server_response = mysql_real_query(m_, cur_cmd_str.c_str(), cur_cmd_str.length());
-        res_str += retrieve_query_results(m_, cur_cmd_str, server_response) + "\n";
+        res_str += retrieve_query_results(m_, cur_cmd_str) + "\n";
         correctness = clean_up_connection(m_);
 
         if ( is_oracle_select ) {
@@ -595,7 +567,7 @@ public:
         // cerr << "Testing with normal cur_cmd_str: \n " << cur_cmd_str << "\n\n\n";
 
         server_response = mysql_real_query(m_, cur_cmd_str.c_str(), cur_cmd_str.length());
-        res_str += retrieve_query_results(m_, cur_cmd_str, server_response) + "\n";
+        res_str += retrieve_query_results(m_, cur_cmd_str) + "\n";
         correctness = clean_up_connection(m_);
 
         if ( is_oracle_select ) {
@@ -713,7 +685,7 @@ public:
         is_error = true;
       }
       // cerr << "reset_database results: "  << retrieve_query_results(&tmp_m, cmd) << "\n\n\n";
-      retrieve_query_results(m_, "", is_error);
+      retrieve_query_results(m_, "");
       clean_up_connection(&tmp_m);
     }
 
@@ -791,6 +763,8 @@ static s32 out_fd,       /* Persistent fd for out_file       */
 static s32 forksrv_pid, /* PID of the fork server           */
     child_pid = -1,     /* PID of the fuzzed program        */
     out_dir_fd = -1;    /* FD of the lock file              */
+
+EXP_ST u8 *trace_bits; /* SHM with instrumentation bitmap  */
 
 static u8 var_bytes[MAP_SIZE]; /* Bytes that appear to be variable */
 
@@ -1611,19 +1585,14 @@ void log_map_id(u32 i, u8 byte, const string& cur_seed_str){
   } else {
     map_id_out_f << actual_idx << "," << map_file_id << ",0" << endl;
   }
-  map_id_out_f.flush();
 
-  if (cur_seed_str != "123") {
-    if ( !filesystem::exists("./queue_coverage_id_core_" + to_string(bind_to_core_id)) ) {
-      filesystem::create_directory( "./queue_coverage_id_core_" + to_string(bind_to_core_id) );
+  if (queue_cur && cur_seed_str != "123") {
+    if ( !filesystem::exists("./queue_coverage_id_core/")) {
+      filesystem::create_directory("./queue_coverage_id_core/");
     }
     fstream map_id_seed_output;
-    std::ostringstream ss;
-    ss << std::setw(5) << std::setfill('0') << map_file_id;
-    string map_file_id_str = ss.str();
-    map_id_seed_output.open( "./queue_coverage_id_core_" + to_string(bind_to_core_id) + "/" + map_file_id_str + "_" + to_string(current_entry) + ".txt", std::fstream::out | std::fstream::trunc);
+    map_id_seed_output.open("./queue_coverage_id_core/" + to_string(queue_cur->depth) + "_" +to_string(map_file_id) + "_" + to_string(current_entry) + ".txt", std::fstream::out | std::fstream::trunc);
     map_id_seed_output << cur_seed_str;
-    map_id_seed_output.flush();
     map_id_seed_output.close();
   }
 }
@@ -1717,9 +1686,8 @@ static inline u8 has_new_bits(u8 *virgin_map, const string cur_seed_str = "") {
     virgin++;
   }
 
-  if (ret && virgin_map == virgin_bits) {
+  if (ret && virgin_map == virgin_bits)
     bitmap_changed = 1;
-  }
 
   return ret;
 }
@@ -3352,7 +3320,7 @@ static u8 calibrate_case(char **argv, struct queue_entry *q, u8 *use_mem,
 
     if (q->exec_cksum != cksum)
     {
-      u8 hnb = has_new_bits(virgin_bits, program_input_str);
+      u8 hnb = has_new_bits(virgin_bits);
       if (hnb > new_bits)
         new_bits = hnb;
 
@@ -3496,9 +3464,8 @@ static void perform_dry_run(char **argv)
     int ret = run_parser_multi_stmt(query_str, ir_tree);
     if (ret != 0 || ir_tree.size() == 0)
     {
-      cerr << "For original seed query_str: \n" << query_str << ", parse failed!\n\n\n";
-      q = q->next;
-      continue;
+      // cerr << "Query seed: " << query_str << " is not passing the parser!"
+      //      << endl;
     }
     else
     {
@@ -3672,7 +3639,7 @@ static void perform_dry_run(char **argv)
           useless_at_start++;
 
           if (!in_bitmap && !shuffle_queue)
-            WARNF("No new instrumentation output, test case may be useless.\n\n\n");
+            WARNF("No new instrumentation output, test case may be useless.");
 
           break;
         }
@@ -3992,9 +3959,9 @@ static u8 save_if_interesting(char **argv, string &query_str, u8 fault,
 
     IR * tmp_ir = ir_tree.back();
     g_mutator.extract_struct(tmp_ir);
-    // g_mutator.add_all_to_library(
-    //     tmp_ir->to_string(),
-    //     explain_diff_id);
+    g_mutator.add_all_to_library(
+        tmp_ir->to_string(),
+        explain_diff_id);
     ir_tree.back()->deep_drop();
 
 #ifndef SIMPLE_FILES
@@ -5908,19 +5875,6 @@ u8 execute_cmd_string(vector<string>& cmd_string_vec, vector<int> &explain_diff_
 
     string res_str = "";
     fault = run_target(argv, tmout, cmd_string, res_str);
-
-    if (dump_library) {
-      if ( !filesystem::exists("./core_" + std::to_string(bind_to_core_id) + "_log/")){
-        filesystem::create_directory("./core_" + std::to_string(bind_to_core_id) + "_log/");
-      }
-      string all_sql_out_log_str = "./core_" + std::to_string(bind_to_core_id) + "_log/log_" + to_string(log_output_id++) + "_src_" + to_string(current_entry) + ".txt";
-      ofstream log_output_file;
-      log_output_file.open(all_sql_out_log_str, std::ofstream::out);
-      log_output_file << cmd_string;
-      log_output_file.close();
-  }
-
-
     // cerr << "Getting fault: " << static_cast<int16_t>(fault) << "from run_target(); \n\n\n"; 
     if (stop_soon)
       return fault;
@@ -6009,7 +5963,7 @@ u8 execute_cmd_string(vector<string>& cmd_string_vec, vector<int> &explain_diff_
   // }
 
   /* Some useful debug output. That could show what queries are being tested. */
-  stream_output_res(all_comp_res, cerr);
+  // stream_output_res(all_comp_res, cerr);
 
   /***********************/
   /* Debug: output logs for all execs */
@@ -8702,10 +8656,11 @@ int main(int argc, char *argv[])
   // to do
   perform_dry_run(use_argv);
 
-  cerr << "\nTimeout seed number: " << timeout_seed_num << "/" << queued_paths << "\n\n\n";
-  cerr << "\nUseless at start: " << useless_at_start << "/" << queued_paths << "\n\n\n";
+  // show_stats();
 
   // exit(0);
+
+  cerr << "\nTimeout seed number: " << timeout_seed_num << "/" << queued_paths << "\n\n\n";
 
   cull_queue();
 
