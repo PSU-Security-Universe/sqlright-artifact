@@ -225,6 +225,14 @@ USER root
 COPY fuzz_root /home/mysql/fuzzing/fuzz_root
 RUN chown -R mysql:mysql /home/mysql/fuzzing/
 
+# Not sure why, but user MySQL doesn't have the permission to open the database.
+USER root
+RUN chown -R mysql:mysql /home/mysql/mysql-server/bld/bin
+RUN chown -R mysql:mysql /home/mysql/mysql-server/bld/library_output_directory
+RUN chown mysql:mysql /home/mysql/mysql-server/bld
+RUN chown -R mysql:mysql /var
+RUN chown -R mysql:mysql /tmp
+
 # set up MySQL database
 USER mysql
 WORKDIR /home/mysql/mysql-server/bld/
@@ -239,8 +247,6 @@ USER mysql
 WORKDIR /home/mysql/scripts
 RUN python3 setup_database.py
 
-# Not sure why, but user Postgres doesn't have the permission to open the database.
-RUN chown -R mysql:mysql /home/mysql/mysql-server/bld/data_all
 
 USER root
 WORKDIR /home/mysql/fuzzing/fuzz_root

@@ -74,6 +74,8 @@ for prev_shutdown_time_idx,_ in all_prev_shutdown_time.items():
         # The actual restart of mysql is being handle by the same MYSQL crash handler. (Above)
         continue
 
+time.sleep(1)
+
 # SHUTDOWN MYSQL, periodically, using pkill. 
 SHUTDOWN_COMMAND = "pkill mysqld"
 print("Running SHUTDOWN_COMMAND: %s" % (SHUTDOWN_COMMAND))
@@ -86,7 +88,6 @@ p = subprocess.Popen(
                     ).communicate()
 
 print("Finished running SHUTDOWN COMMAND. \n")
-time.sleep(1)
 
 for cur_inst_id,_ in all_mysql_p_list.items():
     cur_shm_str = all_mysql_p_list[cur_inst_id]
@@ -131,7 +132,7 @@ for cur_inst_id,_ in all_mysql_p_list.items():
     # Reinvoke mysql
     # Prepare for env shared by the fuzzer and mysql. 
     # Set up SQLRight output folder
-    cur_output_dir_str = "./outputs_" + str(cur_inst_id - starting_core_id)
+    cur_output_dir_str = "./outputs"
     cur_output_file = os.path.join(cur_output_dir_str, "output.txt")
     if os.path.isfile(cur_output_file):
         os.remove(cur_output_file)
@@ -168,12 +169,6 @@ for cur_inst_id,_ in all_mysql_p_list.items():
                         )
     print("Finished running popen. \n")
     time.sleep(1)
-    
-    cur_output_file_r = os.path.join(cur_output_dir_str, "output.txt")
-    if not os.path.isfile(cur_output_file_r):
-        # Failed to boot mysql. Try again later. 
-        print("Waiting for the mysql to reboot. Current output dir is: " + cur_output_file_r + "\n")
-        continue
 
     is_restarted_mysql = True
 
