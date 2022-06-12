@@ -6547,8 +6547,7 @@ static u8 fuzz_one(char **argv)
 //        return 1;
 //    }
 //  }
-
-#endif /* ^IGNORE_FINDS */
+// #endif /* ^IGNORE_FINDS */
 
   if (not_on_tty)
   {
