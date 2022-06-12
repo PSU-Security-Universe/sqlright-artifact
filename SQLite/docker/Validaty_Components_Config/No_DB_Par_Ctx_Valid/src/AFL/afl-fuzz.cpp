@@ -3024,11 +3024,12 @@ u8 execute_cmd_string(string cmd_string, vector<int> &explain_diff_id,
   /* Some useful debug output. That could show what queries are being tested. */
   // stream_output_res(all_comp_res, cerr);
 
-  if (all_comp_res.final_res == ORA_COMP_RES::Fail) {
+  if (all_comp_res.final_res == ORA_COMP_RES::Fail && bug_output_id <= 1200) {
 
     ofstream outputfile;
 
     int outputfile_fd = 0;
+    string bug_output_dir;
     while (true) {
       DIR *dir = opendir("../Bug_Analysis/bug_samples/");
       if (!dir) {
@@ -3037,7 +3038,7 @@ u8 execute_cmd_string(string cmd_string, vector<int> &explain_diff_id,
       }
       closedir(dir);
       bug_output_id++;
-      string bug_output_dir =
+      bug_output_dir =
         "../Bug_Analysis/bug_samples/bug:" + to_string(bug_output_id) + ":src:" + to_string(current_entry) + ":core:" + std::to_string(bind_to_core_id) + ".txt";
       outputfile_fd =
           open(bug_output_dir.c_str(), O_CREAT | O_EXCL,
@@ -3052,8 +3053,8 @@ u8 execute_cmd_string(string cmd_string, vector<int> &explain_diff_id,
         break;
       }
     }
-    string bug_output_dir =
-        "../Bug_Analysis/bug_samples/bug:" + to_string(bug_output_id) + ":src:" + to_string(current_entry) + ":core:" + std::to_string(bind_to_core_id) + ".txt";
+//    string bug_output_dir =
+//        "../Bug_Analysis/bug_samples/bug:" + to_string(bug_output_id) + ":src:" + to_string(current_entry) + ":core:" + std::to_string(bind_to_core_id) + ".txt";
     // cerr << "Bug output dir is: " << bug_output_dir << endl;
     outputfile.open(bug_output_dir, std::ofstream::out | std::ofstream::app);
     stream_output_res(all_comp_res, outputfile);

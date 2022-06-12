@@ -3025,11 +3025,14 @@ u8 execute_cmd_string(string& cmd_string, vector<int> &explain_diff_id,
   /* Some useful debug output. That could show what queries are being tested. */
   // stream_output_res(all_comp_res, cerr);
 
-  if (all_comp_res.final_res == ORA_COMP_RES::Fail) {
+  // If the result is error, output the results. 
+  // If the buggy output is exceeding number of 1200, must be too many FPs, ignored bug outputs.
+  if (all_comp_res.final_res == ORA_COMP_RES::Fail && bug_output_id <= 1200) {
 
     ofstream outputfile;
 
     int outputfile_fd = 0;
+    string bug_output_dir;
     while (true) {
       DIR *dir = opendir("../Bug_Analysis/bug_samples/");
       if (!dir) {
@@ -3053,8 +3056,8 @@ u8 execute_cmd_string(string& cmd_string, vector<int> &explain_diff_id,
         break;
       }
     }
-    string bug_output_dir =
-        "../Bug_Analysis/bug_samples/" + to_string(bug_output_id) + ".txt";
+//    string bug_output_dir =
+//        "../Bug_Analysis/bug_samples/" + to_string(bug_output_id) + ".txt";
     // cerr << "Bug output dir is: " << bug_output_dir << endl;
     outputfile.open(bug_output_dir, std::ofstream::out | std::ofstream::app);
     stream_output_res(all_comp_res, outputfile);
@@ -3065,7 +3068,7 @@ u8 execute_cmd_string(string& cmd_string, vector<int> &explain_diff_id,
   } else if (all_comp_res.final_res == ORA_COMP_RES::Pass) {
     total_execs++;
   } else {
-    /* Query being skipped, or all select stmts return error results. */
+    /* Query being skipped, or all select stmts return error results, or too many FPs. */
     total_execs++;
   }
 
