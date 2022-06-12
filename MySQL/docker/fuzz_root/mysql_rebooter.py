@@ -152,7 +152,6 @@ for cur_inst_id,_ in all_mysql_p_list.items():
         "--port=" + str(cur_port_num),
         "--socket=" + socket_path,
         "--performance_schema=OFF",
-        "&>", cur_output_file,
         "'"  # right quote
     ]
     mysql_modi_env = dict()

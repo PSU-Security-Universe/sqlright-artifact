@@ -123,8 +123,8 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
                         fuzzing_command,
                         cwd=os.getcwd(),
                         shell=True,
-                        stderr=cur_output_file_2,
-                        stdout=cur_output_file_2,
+                        stderr=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL,
                         stdin=subprocess.DEVNULL,
                         env=modi_env
                         )
@@ -162,7 +162,6 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
         "--port=" + str(cur_port_num),
         "--socket=" + socket_path,
         "--performance_schema=OFF",
-        "&>", cur_output_file,
         "'"  # right quote
      ]
     mysql_modi_env = dict()
