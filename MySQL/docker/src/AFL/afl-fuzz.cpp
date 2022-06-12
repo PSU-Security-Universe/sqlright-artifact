@@ -6498,55 +6498,55 @@ static u8 fuzz_one(char **argv)
   // DEBUG
   string ori_input_str;
 
-  /* If this is a timeout query, skip it immediately. */
-  if (queue_cur->is_timeout) {
-    SAYF("\n" cLRD "[-] " cRST
-                 "DEBUG: Skip test case due to its seeds' timeout .\n\n\n");
-    return 1;
-  }
-
-
-#ifdef IGNORE_FINDS
-
-  /* In IGNORE_FINDS mode, skip any entries that weren't in the
-     initial data set. */
-
-  if (queue_cur->depth > 1)
-    return 1;
-
-#else
-
-  if (pending_favored)
-  {
-
-    /* If we have any favored, non-fuzzed new arrivals in the queue,
-       possibly skip to them at the expense of already-fuzzed or non-favored
-       cases. */
-
-    if ((queue_cur->was_fuzzed || !queue_cur->favored) &&
-        UR(100) < SKIP_TO_NEW_PROB)
-      return 1;
-  }
-  else if (!dumb_mode && !queue_cur->favored && queued_paths > 10)
-  {
-
-    /* Otherwise, still possibly skip non-favored cases, albeit less often.
-       The odds of skipping stuff are higher for already-fuzzed inputs and
-       lower for never-fuzzed entries. */
-
-    if (queue_cycle > 1 && !queue_cur->was_fuzzed)
-    {
-
-      if (UR(100) < SKIP_NFAV_NEW_PROB)
-        return 1;
-    }
-    else
-    {
-
-      if (UR(100) < SKIP_NFAV_OLD_PROB)
-        return 1;
-    }
-  }
+//  /* If this is a timeout query, skip it immediately. */
+//  if (queue_cur->is_timeout) {
+//    SAYF("\n" cLRD "[-] " cRST
+//                 "DEBUG: Skip test case due to its seeds' timeout .\n\n\n");
+//    return 1;
+//  }
+//
+//
+//#ifdef IGNORE_FINDS
+//
+//  /* In IGNORE_FINDS mode, skip any entries that weren't in the
+//     initial data set. */
+//
+//  if (queue_cur->depth > 1)
+//    return 1;
+//
+//#else
+//
+//  if (pending_favored)
+//  {
+//
+//    /* If we have any favored, non-fuzzed new arrivals in the queue,
+//       possibly skip to them at the expense of already-fuzzed or non-favored
+//       cases. */
+//
+//    if ((queue_cur->was_fuzzed || !queue_cur->favored) &&
+//        UR(100) < SKIP_TO_NEW_PROB)
+//      return 1;
+//  }
+//  else if (!dumb_mode && !queue_cur->favored && queued_paths > 10)
+//  {
+//
+//    /* Otherwise, still possibly skip non-favored cases, albeit less often.
+//       The odds of skipping stuff are higher for already-fuzzed inputs and
+//       lower for never-fuzzed entries. */
+//
+//    if (queue_cycle > 1 && !queue_cur->was_fuzzed)
+//    {
+//
+//      if (UR(100) < SKIP_NFAV_NEW_PROB)
+//        return 1;
+//    }
+//    else
+//    {
+//
+//      if (UR(100) < SKIP_NFAV_OLD_PROB)
+//        return 1;
+//    }
+//  }
 
 #endif /* ^IGNORE_FINDS */
 
