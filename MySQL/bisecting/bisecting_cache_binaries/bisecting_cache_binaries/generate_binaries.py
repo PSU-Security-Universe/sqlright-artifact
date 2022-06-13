@@ -55,6 +55,7 @@ for cur_commit_hash in filtered_commit_hash:
         logger.debug("MySQL version %s compilation succeed" % (cur_commit_hash))
     else:
         logger.debug("MySQL version %s compilation failed" % (cur_commit_hash))
+        exit(1)
 
 
 
