@@ -33,6 +33,7 @@ RUN apt -y install watch
 RUN apt -y install unzip
 RUN pip install libtmux
 RUN apt -y install wget
+RUN apt -y install unzip
 RUN pip3 install gitpython
 RUN pip3 install loguru
 RUN pip3 install rich
@@ -73,11 +74,16 @@ FROM sqlright_mysql_tools AS bisecting_setup
 
 USER root
 RUN mkdir -p /home/mysql/bisecting
+RUN chown -R mysql:mysql /home/mysql/bisecting
 
-COPY scripts /home/mysql/scripts
-RUN chown -R mysql:mysql /home/mysql/scripts
-COPY mysql_binaries /home/mysql/mysql-server
-RUN chown -R mysql:mysql /home/mysql/mysql-server
+COPY bisecting_scripts /home/mysql/bisecting_scripts
+COPY mysql_binary_zip.zip /home/mysql/
+RUN chown -R mysql:mysql /home/mysql/bisecting_scripts
+RUN chown -R mysql:mysql /home/mysql/mysql_binary_zip.zip
+
+USER mysql
+WORKDIR /home/mysql/
+RUN unzip mysql_binary_zip.zip
 
 USER root
 WORKDIR /home/mysql
