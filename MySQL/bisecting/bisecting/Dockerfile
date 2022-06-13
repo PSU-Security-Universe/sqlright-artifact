@@ -9,7 +9,7 @@ RUN chmod 777 /tmp
 RUN apt -y update
 RUN apt -y upgrade
 RUN apt -y install bison
-RUN apt -y install build-essential
+RUN apt -y update && apt -y install build-essential
 RUN apt -y install clang
 RUN apt -y install cmake
 RUN apt -y install flex
@@ -37,6 +37,7 @@ RUN apt -y install unzip
 RUN pip3 install gitpython
 RUN pip3 install loguru
 RUN pip3 install rich
+RUN apt -y install libaio1
 
 RUN apt -y install llvm
 RUN apt -y install clang
