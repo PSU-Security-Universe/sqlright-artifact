@@ -92,6 +92,14 @@ for hexsha in os.listdir(mysql_binary_dir):
             print("Commit %s init failed. " % (hexsha) )
             exit(1)
 
+    cur_data_all_dir = os.path.join(cur_dir, "data_all")
+    if os.path.isdir(cur_data_all_dir):
+        shutil.rmtree(cur_data_all_dir)
+    os.mkdir(cur_data_all_dir)
+
+    shutil.move(cur_data_dir, os.path.join(cur_data_all_dir, "ori_data"))
+    print("Commit %s init succeed. " % (hexsha))
+
 
 
 
