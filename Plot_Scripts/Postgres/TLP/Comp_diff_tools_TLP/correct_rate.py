@@ -16,7 +16,7 @@ from plot_funcs import *
 
 plot_sql_correct_rate("../SQLRight_TLP/", markevery = 30, line_style = 0)
 plot_sql_correct_rate("./Squirrel_TLP/", markevery = 30, line_style = 1)
-plot_sqlancer_correct_rate("./SQLancer_TLP/", markevery = 30, line_style = 2)
+plot_sqlancer_correct_rate("./SQLancer_TLP/plot_data_0", markevery = 30, line_style = 2)
  
 plt.xlim(0, 72)
 
