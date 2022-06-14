@@ -15,7 +15,7 @@ cp /home/sqlite/src/afl-fuzz ./
 
 printf "\n\n\n\nStart fuzzing. \n\n\n\n\n"
 
-python3 run_parallel.py -o /home/sqlite/fuzzing/fuzz_root/outputs $@
+python3 run_parallel.py -o /home/sqlite/fuzzing/fuzz_root/outputs -E $@
 
 EOF
 )

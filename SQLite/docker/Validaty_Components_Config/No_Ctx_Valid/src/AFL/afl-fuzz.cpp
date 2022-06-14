@@ -3027,7 +3027,7 @@ u8 execute_cmd_string(string& cmd_string, vector<int> &explain_diff_id,
 
   // If the result is error, output the results. 
   // If the buggy output is exceeding number of 1200, must be too many FPs, ignored bug outputs.
-  if (all_comp_res.final_res == ORA_COMP_RES::Fail && bug_output_id <= 1200) {
+  if (all_comp_res.final_res == ORA_COMP_RES::Fail && bug_output_id <= 400) {
 
     ofstream outputfile;
 
