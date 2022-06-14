@@ -87,7 +87,7 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
         fuzzing_command.append("-F " + str(feedback_str))
 
     fuzzing_command.append(" -- ")
-    fuzzing_command.append(" aaa ")
+    fuzzing_command.append(sqlite_bin)
     fuzzing_command.append("&")
 
     fuzzing_command = " ".join(fuzzing_command)
