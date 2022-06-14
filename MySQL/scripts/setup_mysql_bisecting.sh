@@ -16,7 +16,7 @@ cd "$(dirname "$0")"/../bisecting/bisecting
 #            bash -c "$command"
 #        fi
 #    done
-fi
+#fi
 
 ## For debug purpose, keep all intermediate steps to fast reproduce the run results.
 #sudo docker build --rm=false -f ./Dockerfile -t sqlright_mysql_bisecting .  
