@@ -2,11 +2,11 @@ from typing import List, Tuple
 
 import constants
 import norec
-import mysql
+from ORACLE import Oracle_NoREC
 import reports
 import utils
-import vcs
 from loguru import logger
+import os
 
 uniq_bug_id_int = 0
 all_unique_results_dict = dict()
@@ -14,7 +14,7 @@ all_previous_compile_failure = []
 
 
 def check_query_execute_correctness(queries_l: List[str], hexsha: str):
-    install_directory = os.path.join(MYSQL_ROOT, hexsha)
+    install_directory = os.path.join(constants.MYSQL_ROOT, hexsha)
 
     cur_mysqld_binary_dir = os.path.join(install_directory, "bin/mysqld")
     if not os.path.isfile(cur_mysqld_binary_dir):

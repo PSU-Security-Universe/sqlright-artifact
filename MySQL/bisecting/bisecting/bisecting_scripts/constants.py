@@ -1,12 +1,12 @@
 from enum import Enum
 import os
 
-BISECTING_SCRIPTS_ROOT = "/home/mysql/scripts"
-MYSQL_ROOT = "/home/mysql/mysql-server"
+BISECTING_SCRIPTS_ROOT = "/home/mysql/bisecting_scripts"
+MYSQL_ROOT = "/home/mysql/mysql_binary"
 
 BUG_SAMPLES_PATH = os.path.join(BISECTING_SCRIPTS_ROOT, "bug_samples")
-LOT_OUTPUT_PATH = os.path.join(BISECTING_SCRIPTS_ROOT, "logs.txt")
-UNIQUE_BUG_OUTPUT_DIR = os.path.join(BISECTING_SCRIPTS_ROOT, "unique_bug_output")
+LOG_OUTPUT_FILE = os.path.join(BISECTING_SCRIPTS_ROOT, "logs.txt")
+UNIQUE_BUG_OUTPUT_DIR = os.path.join(BISECTING_SCRIPTS_ROOT, "bug_samples/unique_bug_output")
 MYSQL_SORTED_COMMITS = os.path.join( BISECTING_SCRIPTS_ROOT, "assets/sorted_commits.json")
 
 MYSQL_SERVER_SOCKET = "/tmp/mysql_0.sock"

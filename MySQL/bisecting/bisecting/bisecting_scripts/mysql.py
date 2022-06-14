@@ -8,8 +8,8 @@ from loguru import logger
 import subprocess
 
 def force_copy_data_backup(hexsha: str):
-    backup_data = os.path.join(MYSQL_ROOT, hexsha, "data")
-    cur_data = os.path.join(MYSQL_ROOT, hexsha, "data_0")
+    backup_data = os.path.join(constants.MYSQL_ROOT, hexsha, "data")
+    cur_data = os.path.join(constants.MYSQL_ROOT, hexsha, "data_0")
     utils.remove_directory(cur_data)
     utils.copy_directory(backup_data, cur_data)
 
@@ -27,9 +27,9 @@ def force_copy_data_backup(hexsha: str):
 #    logger.debug(f"Checkout commit completed: {hexsha}")
 
 def start_mysqld_server(hexsha: str):
-    cur_mysql_root = os.path.join(MYSQL_ROOT, hexsha)
+    cur_mysql_root = os.path.join(constants.MYSQL_ROOT, hexsha)
     cur_mysql_data_dir = os.path.join(cur_mysql_root, "data_0")
-    cur_output_file = os.path.join(BISECTING_SCRIPTS_ROOT, "mysql_output.txt")
+    cur_output_file = os.path.join(constants.BISECTING_SCRIPTS_ROOT, "mysql_output.txt")
 
     # Firstly, restore the database backup. 
     force_copy_data_backup(hexsha)
@@ -37,7 +37,7 @@ def start_mysqld_server(hexsha: str):
     # And then, call MySQL server process. 
     mysql_command = [
         "./bin/mysqld",
-        "--basedir=" + str(mysql_root_dir),
+        "--basedir=" + str(cur_mysql_root),
         "--datadir=" + str(cur_mysql_data_dir),
         "--port=" + str(constants.MYSQL_SERVER_PORT),
         "--socket=" + str(constants.MYSQL_SERVER_SOCKET),
@@ -48,17 +48,15 @@ def start_mysqld_server(hexsha: str):
 
     p = subprocess.Popen(
                         mysql_command,
-                        cwd=mysql_root_dir,
+                        cwd=cur_mysql_root,
                         shell=True,
-                        stderr=str(cur_output_file),
-                        stdout=str(cur_output_file),
                         stdin=subprocess.DEVNULL,
                         )
     # Do not block the Popen, let it run and return. We will later use `pkill` to kill the mysqld process.
 
 def execute_queries(queries: str, hexsha: str):
     
-    cur_mysql_root = os.path.join(MYSQL_ROOT, hexsha)
+    cur_mysql_root = os.path.join(constants.MYSQL_ROOT, hexsha)
 
     clean_database_query = "RESET PERSIST; " + \
         "RESET MASTER; " + \

@@ -5,10 +5,11 @@ from typing import List
 import constants
 from pathlib import Path
 from loguru import logger
+import os
 
 
 def read_queries_from_files():
-    mysql_samples = PATH(constants.BUG_SAMPLES_PATH)
+    mysql_samples = Path(constants.BUG_SAMPLES_PATH)
     sample_files = [sample for sample in mysql_samples.glob("*")]
     sample_files = list(filter(lambda x: x.is_file(), sample_files))
     sample_files.sort(key=os.path.getctime)

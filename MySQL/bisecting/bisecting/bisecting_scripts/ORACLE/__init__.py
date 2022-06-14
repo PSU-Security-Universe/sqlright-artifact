@@ -1,1 +1,1 @@
-form .Oracle_NoREC import *
+from .Oracle_NoREC import *
