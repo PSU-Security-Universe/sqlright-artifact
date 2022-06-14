@@ -20,6 +20,7 @@ def read_queries_from_files():
 
         contents = re.sub(r"[^\x00-\x7F]+", " ", contents)
         contents = contents.replace("\ufffd", " ")
+        contents = contents.replace("#MutationMark", " ")
         return contents
 
     def get_queries(contents):
@@ -216,6 +217,6 @@ def dump_unique_bugs(current_bisecting_result: constants.BisectingResults):
         )
 
     bug_id = current_bisecting_result.unique_bug_id_int
-    current_unique_bug_output = constants.UNIQUE_BUG_OUTPUT_DIR / f"bug_{bug_id}"
+    current_unique_bug_output = os.path.join(constants.UNIQUE_BUG_OUTPUT_DIR, f"bug_{bug_id}")
     with open(current_unique_bug_output, "a+") as f:
         f.write("\n".join(report_contents))

@@ -6,10 +6,11 @@ import utils
 # import pymysql
 from loguru import logger
 import subprocess
+import time
 
 def force_copy_data_backup(hexsha: str):
-    backup_data = os.path.join(constants.MYSQL_ROOT, hexsha, "data")
-    cur_data = os.path.join(constants.MYSQL_ROOT, hexsha, "data_0")
+    backup_data = os.path.join(constants.MYSQL_ROOT, hexsha, "data_all/ori_data")
+    cur_data = os.path.join(constants.MYSQL_ROOT, hexsha, "data_all/data_0")
     utils.remove_directory(cur_data)
     utils.copy_directory(backup_data, cur_data)
 
@@ -27,12 +28,22 @@ def force_copy_data_backup(hexsha: str):
 #    logger.debug(f"Checkout commit completed: {hexsha}")
 
 def start_mysqld_server(hexsha: str):
+
+    p = subprocess.run("pkill mysqld",
+                        shell=True,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        stdin=subprocess.DEVNULL
+                        )
+
     cur_mysql_root = os.path.join(constants.MYSQL_ROOT, hexsha)
-    cur_mysql_data_dir = os.path.join(cur_mysql_root, "data_0")
+    cur_mysql_data_dir = os.path.join(cur_mysql_root, "data_all/data_0")
     cur_output_file = os.path.join(constants.BISECTING_SCRIPTS_ROOT, "mysql_output.txt")
 
     # Firstly, restore the database backup. 
     force_copy_data_backup(hexsha)
+
+    logger.debug("Starting mysqld server with hash: %s" % (hexsha))
 
     # And then, call MySQL server process. 
     mysql_command = [
@@ -50,32 +61,32 @@ def start_mysqld_server(hexsha: str):
                         mysql_command,
                         cwd=cur_mysql_root,
                         shell=True,
-                        stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        stdin=subprocess.DEVNULL
                         )
     # Do not block the Popen, let it run and return. We will later use `pkill` to kill the mysqld process.
+    #time.sleep(3)
 
 def execute_queries(queries: str, hexsha: str):
     
     cur_mysql_root = os.path.join(constants.MYSQL_ROOT, hexsha)
 
-    clean_database_query = "RESET PERSIST; " + \
-        "RESET MASTER; " + \
-        "DROP DATABASE IF NOT EXISTS test_sqlright1; " + \
-        "CREATE DATABASE IF NOT EXISTS test_sqlright1; " + \
+    clean_database_query = " CREATE DATABASE IF NOT EXISTS test_sqlright1; " + \
         "USE test_sqlright1; "
 
     safe_queries = clean_database_query + "\n" + queries
     logger.debug("Running query: \n%s\n" % clean_database_query)
 
-    mysql_client = "./bin/mysql -u root --socket=%s" % (MYSQL_SERVER_SOCKET)
+    mysql_client = "./bin/mysql -u root --socket=%s" % (constants.MYSQL_SERVER_SOCKET)
     output, status, error_msg = utils.execute_command(
-        mysql_client, input_contents=safe_queries, cwd=install_directory, timeout=3  # 3 seconds timeout. 
+        mysql_client, input_contents=safe_queries, cwd=cur_mysql_root, timeout=3  # 3 seconds timeout. 
     )
     # mysql_client = pymysql.connect(host="127.0.0.1", user="root", port=constants.MYSQL_SERVER_PORT, charset='utf8',unix_socket=str(constants.MYSQL_CONNECT_SOCKET))
 
     logger.debug(f"Query:\n\n{queries}")
     logger.debug(f"Result: \n\n{output}\n")
-    logger.debug(f"Directory: {install_directory}")
+    logger.debug(f"Directory: {cur_mysql_root}")
     logger.debug(f"Return Code: {status}")
 
     if not output:

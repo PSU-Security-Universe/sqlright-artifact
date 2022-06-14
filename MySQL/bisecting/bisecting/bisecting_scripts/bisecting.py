@@ -36,7 +36,7 @@ def check_query_execute_correctness(queries_l: List[str], hexsha: str):
         logger.debug("Result all Errors. \n")
         return constants.RESULT.ALL_ERROR, [], []
 
-    final_flag, all_res_flags = norec.comp_query_res(all_res_str_l)
+    final_flag, all_res_flags = Oracle_NoREC.comp_query_res(all_res_str_l)
     return final_flag, all_res_flags, all_res_str_l
 
 
