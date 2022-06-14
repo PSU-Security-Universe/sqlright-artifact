@@ -1,8 +1,8 @@
 #!/bin/bash -e
 cd "$(dirname "$0")"/../bisecting/bisecting
 
-if [ ! -f "mysql_binary_zip.zip" ]; then 
-    cat ./mysql_binary_zip/mysql_binary_zip.zip* > ./mysql_binary_zip.zip
+#if [ ! -f "mysql_binary_zip.zip" ]; then 
+#    cat ./mysql_binary_zip/mysql_binary_zip.zip* > ./mysql_binary_zip.zip
 #    for i in $(seq 1 59);
 #    do
 #        if [[ "$i" -lt "10" ]]
