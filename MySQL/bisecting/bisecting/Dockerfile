@@ -37,6 +37,8 @@ RUN apt -y install unzip
 RUN pip3 install gitpython
 RUN pip3 install loguru
 RUN pip3 install rich
+RUN pip3 install click
+RUN pip3 install pathlib
 RUN apt -y install libaio1
 RUN apt -y install zip
 
@@ -66,14 +68,11 @@ USER mysql
 ENV CC=gcc-9
 ENV CXX=g++-9
 
-# Copy the bisecting python script to the repo. 
 FROM sqlright_mysql_tools AS bisecting_setup
 
+# Copy the MySQL binaries to the repo. 
 USER root
-COPY bisecting_scripts /home/mysql/bisecting_scripts
 COPY mysql_binary.zip /home/mysql/mysql_binary.zip
-RUN chown -R mysql:mysql /home/mysql/bisecting_scripts
-#RUN chown -R mysql:mysql /home/mysql/mysql_binary_zip
 RUN chown -R mysql:mysql /home/mysql/mysql_binary.zip
 
 USER mysql
@@ -81,7 +80,6 @@ USER mysql
 #RUN zip -FF mysql_binary.zip --out mysql_binary_zip.zip -fz
 #RUN unzip mysql_binary_zip.zip > /dev/null
 #RUN mv mysql_binary /home/mysql/mysql_binary
-
 WORKDIR /home/mysql/
 RUN unzip mysql_binary.zip
 
@@ -90,6 +88,8 @@ WORKDIR /home/mysql/mysql_binary
 RUN cp ./c0b52f22ef8d8aa14f37083d9fa698839106c7cf/bin/libprotobuf-lite.so.3.11.4 /usr/lib
 RUN cp ./91a17cedb1ee880fe7915fb14cfd74c04e8d6588/bin/libprotobuf-lite.so.3.6.1 /usr/lib
 
+COPY bisecting_scripts /home/mysql/bisecting_scripts
+RUN chown -R mysql:mysql /home/mysql/bisecting_scripts
 
 USER root
 WORKDIR /home/mysql

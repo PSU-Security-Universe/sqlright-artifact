@@ -28,7 +28,12 @@ def read_queries_from_files():
         current_queries_out = ""
         is_adding = False
         output_all_queries = []
+        res_flags = []
+        buggy_idx_list = []
         for query in contents.splitlines():
+            if "RESULT FLAGS" in query:
+                res_flags.append(query)
+
             if "Result string" in query:
                 is_adding = False
                 output_all_queries.append(current_queries_out)
@@ -41,9 +46,14 @@ def read_queries_from_files():
                 continue
             if is_adding:
                 current_queries_out += query + " \n"
-        return output_all_queries
 
-    def seperate_queries(output_all_queries):
+        for buggy_idx in range(len(res_flags)):
+            if "0" in res_flags[buggy_idx]:
+                buggy_idx_list.append(buggy_idx)
+
+        return output_all_queries, buggy_idx_list
+
+    def seperate_queries(output_all_queries, buggy_idx_list):
         """Next, separate the SELECT statements into different query sequences.
         If one buggy query contains multiple SELECT oracle mismatch,
         these mismatches could due to different reasons,
@@ -64,7 +74,14 @@ def read_queries_from_files():
                 else:
                     output_all_queries_tmp[i - 1].append(output_queries_out)
 
-        return output_all_queries_tmp
+        output_all_queries = []
+        for i in range (len(output_all_queries_tmp)):
+            if i in buggy_idx_list:
+                output_all_queries.append(output_all_queries_tmp[i])
+            else:
+                continue
+
+        return output_all_queries
 
     def debug_print_queries(queries):
         logger.debug("print queries for debug purpose. \n")
@@ -77,8 +94,8 @@ def read_queries_from_files():
     for index, sample in enumerate(sample_files):
         logger.debug(f"Got sample - {index}: {sample}")
         sample_contents = get_contents(sample)
-        sample_queries = get_queries(sample_contents)
-        sample_queries = seperate_queries(sample_queries)
+        sample_queries, buggy_idx_list = get_queries(sample_contents)
+        sample_queries = seperate_queries(sample_queries, buggy_idx_list)
         debug_print_queries(sample_queries)
         yield sample, sample_queries
 

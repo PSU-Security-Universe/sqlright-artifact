@@ -1,7 +1,6 @@
 from typing import List, Tuple
-
+import mysql
 import constants
-import norec
 from ORACLE import Oracle_NoREC
 import reports
 import utils

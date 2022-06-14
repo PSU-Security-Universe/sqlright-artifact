@@ -27,6 +27,37 @@ def force_copy_data_backup(hexsha: str):
 #
 #    logger.debug(f"Checkout commit completed: {hexsha}")
 
+def get_mysqld_binary(cur_dir:str):
+    if os.path.isdir(os.path.join(cur_dir, "share")) and os.path.isdir(os.path.join(cur_dir, "bin")):
+        # The third scenario, has (bin, extra, scripts, share, support-files)
+        command = "./bin/mysqld"
+        return command
+
+    elif os.path.isdir(os.path.join(cur_dir, "bin/client")):
+        # The second scenario, has (client, scripts and sql)
+        command = "./bin/sql/mysqld"
+        return command
+    else:
+        # The first scenario, all binaries directly in bin dir.
+        command = "./bin/mysqld"
+        return command
+
+
+def get_mysql_binary(cur_dir:str):
+    if os.path.isdir(os.path.join(cur_dir, "share")) and os.path.isdir(os.path.join(cur_dir, "bin")):
+        # The third scenario, has (bin, extra, scripts, share, support-files)
+        command = "./bin/mysql"
+        return command
+
+    elif os.path.isdir(os.path.join(cur_dir, "bin/client")):
+        # The second scenario, has (client, scripts and sql)
+        command = "./bin/client/mysql"
+        return command
+    else:
+        # The first scenario, all binaries directly in bin dir.
+        command = "./bin/mysql"
+        return command
+
 def start_mysqld_server(hexsha: str):
 
     p = subprocess.run("pkill mysqld",
@@ -47,7 +78,7 @@ def start_mysqld_server(hexsha: str):
 
     # And then, call MySQL server process. 
     mysql_command = [
-        "./bin/mysqld",
+        get_mysqld_binary(cur_mysql_root),
         "--basedir=" + str(cur_mysql_root),
         "--datadir=" + str(cur_mysql_data_dir),
         "--port=" + str(constants.MYSQL_SERVER_PORT),
@@ -66,37 +97,48 @@ def start_mysqld_server(hexsha: str):
                         stdin=subprocess.DEVNULL
                         )
     # Do not block the Popen, let it run and return. We will later use `pkill` to kill the mysqld process.
-    #time.sleep(3)
+    time.sleep(1)
 
 def execute_queries(queries: str, hexsha: str):
     
     cur_mysql_root = os.path.join(constants.MYSQL_ROOT, hexsha)
 
-    clean_database_query = " CREATE DATABASE IF NOT EXISTS test_sqlright1; " + \
-        "USE test_sqlright1; "
+    mysql_client = get_mysql_binary(cur_mysql_root) + " -u root --socket=%s" % (constants.MYSQL_SERVER_SOCKET)
 
-    safe_queries = clean_database_query + "\n" + queries
-    logger.debug("Running query: \n%s\n" % clean_database_query)
+    clean_database_query = "DROP DATABASE IF EXISTS test_sqlright1; CREATE DATABASE IF NOT EXISTS test_sqlright1; "
 
-    mysql_client = "./bin/mysql -u root --socket=%s" % (constants.MYSQL_SERVER_SOCKET)
-    output, status, error_msg = utils.execute_command(
-        mysql_client, input_contents=safe_queries, cwd=cur_mysql_root, timeout=3  # 3 seconds timeout. 
+    utils.execute_command(
+        mysql_client, input_contents=clean_database_query, cwd=cur_mysql_root, timeout=1  # 3 seconds timeout. 
     )
-    # mysql_client = pymysql.connect(host="127.0.0.1", user="root", port=constants.MYSQL_SERVER_PORT, charset='utf8',unix_socket=str(constants.MYSQL_CONNECT_SOCKET))
 
+    safe_queries = queries.split("\n")
+
+    all_outputs = ""
+    status = 0
+    all_error_msg = ""
+    for safe_query in safe_queries:
+        safe_query = "USE test_sqlright1; " + safe_query
+
+        output, status, error_msg = utils.execute_command(
+            mysql_client, input_contents=safe_query, cwd=cur_mysql_root, timeout=3  # 3 seconds timeout. 
+        )
+        all_outputs += output + "\n"
+        all_error_msg += error_msg + "\n"
+
+    queries = "\n".join(safe_queries)
     logger.debug(f"Query:\n\n{queries}")
-    logger.debug(f"Result: \n\n{output}\n")
+    logger.debug(f"Result: \n\n{all_outputs}\n")
     logger.debug(f"Directory: {cur_mysql_root}")
     logger.debug(f"Return Code: {status}")
 
-    if not output:
+    if not all_outputs:
         return None, constants.RESULT.ALL_ERROR
 
-    if status not in (0, 1):
-        # 1 is the default return code if we terminate the MySQL.
-        return None, constants.RESULT.SEG_FAULT
+#    if status not in (0, 1):
+#        # 1 is the default return code if we terminate the MySQL.
+#        return None, constants.RESULT.SEG_FAULT
 
-    return parse_mysql_result(output)
+    return parse_mysql_result(all_outputs)
 
 
 def parse_mysql_result(mysql_output: str):
