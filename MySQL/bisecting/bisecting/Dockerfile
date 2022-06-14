@@ -9,7 +9,7 @@ RUN chmod 777 /tmp
 RUN apt -y update
 RUN apt -y upgrade
 RUN apt -y install bison
-RUN apt -y install build-essential
+RUN apt -y update && apt -y install build-essential
 RUN apt -y install clang
 RUN apt -y install cmake
 RUN apt -y install flex
@@ -37,6 +37,7 @@ RUN apt -y install unzip
 RUN pip3 install gitpython
 RUN pip3 install loguru
 RUN pip3 install rich
+RUN apt -y install libaio1
 
 RUN apt -y install llvm
 RUN apt -y install clang
@@ -64,26 +65,20 @@ USER mysql
 ENV CC=gcc-9
 ENV CXX=g++-9
 
-#WORKDIR /home/mysql/
-#RUN git clone https://github.com/mysql/mysql-server.git
-#WORKDIR /home/mysql/mysql-server
-#RUN git checkout 8.0
-
 # Copy the bisecting python script to the repo. 
 FROM sqlright_mysql_tools AS bisecting_setup
 
 USER root
-RUN mkdir -p /home/mysql/bisecting
-RUN chown -R mysql:mysql /home/mysql/bisecting
-
 COPY bisecting_scripts /home/mysql/bisecting_scripts
-COPY mysql_binary_zip.zip /home/mysql/
+COPY mysql_binary_zip /home/mysql/
 RUN chown -R mysql:mysql /home/mysql/bisecting_scripts
-RUN chown -R mysql:mysql /home/mysql/mysql_binary_zip.zip
+RUN chown -R mysql:mysql /home/mysql/mysql_binary_zip
 
 USER mysql
-WORKDIR /home/mysql/
+WORKDIR /home/mysql/mysql_binary_zip
+RUN zip -F mysql_binary.zip --out mysql_binary_zip.zip
 RUN unzip mysql_binary_zip.zip
+RUN mv mysql_binary /home/mysql/mysql_binary
 
 USER root
 WORKDIR /home/mysql

@@ -279,7 +279,7 @@ python3 run_plots.py
 
 ## 4. Contribution of code-coverage feedback:
 
-### 4.1 Using NoREC oracle:
+### 4.1 Using NoREC oracle (Figure 6c):
 
 #### 4.1.1 Run the SQLRight SQLite3 Drop All configiguration, for 24 hours:
 ```sh
@@ -306,7 +306,7 @@ python3 copy_results.py
 python3 run_plots.py
 ```
 
-### 4.2 Using TLP oracle:
+### 4.2 Using TLP oracle (Figure 6d):
 
 #### 4.2.1 Run the SQLRight SQLite3 Drop All configiguration, for 24 hours:
 ```sh
@@ -333,10 +333,56 @@ python3 copy_results.py
 python3 run_plots.py
 ```
 
-
 ## 5. Contribution of Validity components:
 
-### Run `SQLRight Postgres no-ctx-valid` configuration with `NoREC` oracle:
+### 5.1 SQLite, NoREC oracle (Figure 7c, f, i):
+
+#### 5.1.1 Run the SQLRight SQLite3 fuzzing for 24 hours. 
+
+This evaluation is the same as the one in session `3.1.1`. We can reuse the evaluation results. 
+
+#### 5.1.2 Run the SQLRight no-ctx-valid fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle NOREC
+```
+
+#### 5.1.3 Run the SQLRight no-db-par-ctx-valid fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle NOREC
+```
+
+#### 5.1.4 Run the Squirrel-oracle fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle NOREC
+```
+
+#### 5.1.5 Plot the figures:
+
+```sh
+cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Validate_Parts
+python3 copy_results.py
+python3 run_plots.py
+```
+
+### 5.2 PostgreSQL, NoREC oracle (Figure 7e, h, k):
+
+#### 5.2.1 Run the SQLRight PostgreSQL fuzzing for 24 hours. 
+
+This evaluation is the same as the one in session `3.2.1`. We can reuse the evaluation results. 
+
+#### 5.2.2 Run the SQLRight no-ctx-valid fuzzing for 24 hours. 
 
 Run
 
@@ -345,7 +391,7 @@ cd <sqlright_root>/PostgreSQL/scripts
 bash run_postgres_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
-### Run `SQLRight Postgres no-db-par-ctx-valid` configuration with `NoREC` oracle:
+#### 5.2.3 Run the SQLRight no-db-par-ctx-valid fuzzing for 24 hours. 
 
 Run
 
@@ -354,7 +400,7 @@ cd <sqlright_root>/PostgreSQL/scripts
 bash run_postgres_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
-### Run `SQLRight Postgres squirrel-oracle` configuration with `NoREC` oracle:
+#### 5.2.4 Run the Squirrel-oracle fuzzing for 24 hours. 
 
 Run
 
@@ -363,3 +409,174 @@ cd <sqlright_root>/PostgreSQL/scripts
 bash run_postgres_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
+#### 5.2.5 Plot the figures:
+
+```sh
+cd <sqlright_root>/Plot_Scripts/Postgres/NoREC/Validate_Parts
+python3 copy_results.py
+python3 run_plots.py
+```
+
+### 5.3 MySQL, NoREC oracle (Figure 7d, g, j):
+
+#### 5.3.1 Run the SQLRight MySQL fuzzing for 24 hours. 
+
+This evaluation is the same as the one in session `3.3.1`. We can reuse the evaluation results. 
+
+#### 5.3.2 Run the SQLRight no-ctx-valid fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/MySQL/scripts
+bash run_mysql_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle NOREC
+```
+
+#### 5.3.3 Run the SQLRight no-db-par-ctx-valid fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/MySQL/scripts
+bash run_mysql_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle NOREC
+```
+
+#### 5.3.4 Run the Squirrel-oracle fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/MySQL/scripts
+bash run_mysql_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle NOREC
+```
+
+#### 5.3.5 Plot the figures:
+
+```sh
+cd <sqlright_root>/Plot_Scripts/MySQL/NoREC/Validate_Parts
+python3 copy_results.py
+python3 run_plots.py
+```
+
+### 5.4 SQLite, TLP oracle (Figure 9c, f, i):
+
+#### 5.4.1 Run the SQLRight SQLite3 fuzzing for 24 hours. 
+
+This evaluation is the same as the one in session `3.4.1`. We can reuse the evaluation results. 
+
+#### 5.4.2 Run the SQLRight no-ctx-valid fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
+```
+
+#### 5.4.3 Run the SQLRight no-db-par-ctx-valid fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
+```
+
+#### 5.4.4 Run the Squirrel-oracle fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle TLP
+```
+
+#### 5.4.5 Plot the figures:
+
+```sh
+cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Validate_Parts
+python3 copy_results.py
+python3 run_plots.py
+```
+
+### 5.5 PostgreSQL, NoREC oracle (Figure 9e, h, k):
+
+#### 5.5.1 Run the SQLRight PostgreSQL fuzzing for 24 hours. 
+
+This evaluation is the same as the one in session `3.5.1`. We can reuse the evaluation results. 
+
+#### 5.5.2 Run the SQLRight no-ctx-valid fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash run_postgres_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
+```
+
+#### 5.5.3 Run the SQLRight no-db-par-ctx-valid fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash run_postgres_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
+```
+
+#### 5.5.4 Run the Squirrel-oracle fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/PostgreSQL/scripts
+bash run_postgres_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle TLP
+```
+
+#### 5.5.5 Plot the figures:
+
+```sh
+cd <sqlright_root>/Plot_Scripts/Postgres/TLP/Validate_Parts
+python3 copy_results.py
+python3 run_plots.py
+```
+
+### 5.6 MySQL, TLP oracle (Figure 9d, g, j):
+
+#### 5.6.1 Run the SQLRight MySQL fuzzing for 24 hours. 
+
+This evaluation is the same as the one in session `3.6.1`. We can reuse the evaluation results. 
+
+#### 5.6.2 Run the SQLRight no-ctx-valid fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/MySQL/scripts
+bash run_mysql_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
+```
+
+#### 5.6.3 Run the SQLRight no-db-par-ctx-valid fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/MySQL/scripts
+bash run_mysql_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
+```
+
+#### 5.6.4 Run the Squirrel-oracle fuzzing for 24 hours. 
+
+Run
+
+```sh
+cd <sqlright_root>/MySQL/scripts
+bash run_mysql_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle TLP
+```
+
+#### 5.6.5 Plot the figures:
+
+```sh
+cd <sqlright_root>/Plot_Scripts/MySQL/TLP/Validate_Parts
+python3 copy_results.py
+python3 run_plots.py
+```
