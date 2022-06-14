@@ -3024,7 +3024,7 @@ u8 execute_cmd_string(string cmd_string, vector<int> &explain_diff_id,
   /* Some useful debug output. That could show what queries are being tested. */
   // stream_output_res(all_comp_res, cerr);
 
-  if (all_comp_res.final_res == ORA_COMP_RES::Fail && bug_output_id <= 1200) {
+  if (all_comp_res.final_res == ORA_COMP_RES::Fail && bug_output_id <= 400) {
 
     ofstream outputfile;
 

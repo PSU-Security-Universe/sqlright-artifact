@@ -23,9 +23,10 @@ timeout_ms = 2000 # not used.
 output_dir_str = "/home/sqlite/fuzzing/fuzz_root/outputs"
 oracle_str = "NOREC"
 feedback_str = ""
+explain_flag = False
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:T:", ["odir=", "start-core=", "num-concurrent=", "oracle=", "feedback=", "timeout="])
+    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:T:E", ["odir=", "start-core=", "num-concurrent=", "oracle=", "feedback=", "timeout="])
 except getopt.GetoptError:
     print("Arguments parsing error")
     exit(1)
@@ -48,6 +49,9 @@ for opt, arg in opts:
     elif opt in ("-T", "--timeout"):
         timeout_ms = int(arg)
         print("Using timeout: %d " % (timeout_ms))
+    elif opt in ("-E"):
+        explain_flag = True
+        print("Using Explain flag. ")
     else:
         print("Error. Input arguments not supported. \n")
         exit(1)
@@ -67,29 +71,24 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
 
     fuzzing_command = []
 
-    if feedback_str == "":
-        fuzzing_command = [
-            "./afl-fuzz",
-            "-i", "./inputs",
-            "-o", cur_output_dir_str,
-            "-c", str(cur_inst_id),
-            "-O", str(oracle_str),
-            "-E",
-            " -- ", sqlite_bin,
-            "&"
-        ]
-    else:
-        fuzzing_command = [
-            "./afl-fuzz",
-            "-i", "./inputs",
-            "-o", cur_output_dir_str,
-            "-c", str(cur_inst_id),
-            "-O", str(oracle_str),
-            "-E",
-            "-F", str(feedback_str),
-            " -- ", sqlite_bin,
-            "&"
-        ]
+
+    fuzzing_command = [
+        "./afl-fuzz",
+        "-i", "./inputs",
+        "-o", cur_output_dir_str,
+        "-c", str(cur_inst_id),
+        "-O", str(oracle_str)
+    ]
+
+    if explain_flag:
+        fuzzing_command.append("-E")
+
+    if feedback_str != "":
+        fuzzing_command.append("-F " + str(feedback_str))
+
+    fuzzing_command.append(" -- ")
+    fuzzing_command.append(sqlite_bin)
+    fuzzing_command.append("&")
 
     fuzzing_command = " ".join(fuzzing_command)
     print("Running fuzzing command: " + fuzzing_command)
