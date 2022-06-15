@@ -183,7 +183,7 @@ def parse_mysql_result(mysql_output: str):
             if not current_lines:
                 continue
 
-            if current_lines == " " or current_line == "\n":
+            if current_lines == " " or current_lines == "\n":
                 continue
 
             result.append(current_lines)
