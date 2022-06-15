@@ -45,13 +45,6 @@ def setup_env():
     #pgs.clone_mysql_source()
 
 
-@click.command()
-@click.option(
-    "--debug-level",
-    default="DEBUG",
-    type=click.Choice(["DEBUG", "INFO"]),
-    help="specify the debug level for the log file.",
-)
 def main(debug_level):
 
     oracle_str = "NOREC"
@@ -68,6 +61,7 @@ def main(debug_level):
             print("Error. Input arguments not supported. \n")
             exit(1)
 
+    debug_level = "TLP"
     setup_logger(debug_level)
     setup_env()
 
