@@ -35,9 +35,14 @@ def main():
             print("Error. Input arguments not supported. \n")
             exit(1)
 
-    if oracle_str == "":
-        oracle_str = "NOREC"
-        print("Using oracle: %s " % (oracle_str))
+    oracle = 0
+    if oracle_str == "NOREC":
+        oracle = Oracle_NOREC
+    elif oracle_str == "TLP":
+        oracle = Oracle_TLP
+    else:
+        oracle = Oracle_NoREC
+
 
     sys.stdout.flush()
 

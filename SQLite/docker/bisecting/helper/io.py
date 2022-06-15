@@ -32,10 +32,10 @@ class IO:
             if cls.is_checked:
                 return None, "Done"
             cls.is_checked = True
-            all_files_in_dir = os.listdir(file_directory)
-            all_files_in_dir = [os.path.join(file_directory, fn) for fn in cls.all_files_in_dir]
-            all_files_in_dir.sort(key=os.path.getctime)
-            all_files_in_dir = [fn.split("/")[-1] for fn in all_files_in_dir]
+            cur_all_files_in_dir = os.listdir(file_directory)
+            cls.all_files_in_dir = [os.path.join(file_directory, fn) for fn in cur_all_files_in_dir]
+            cls.all_files_in_dir.sort(key=os.path.getatime)
+            cls.all_files_in_dir = [fn.split("/")[-1] for fn in cls.all_files_in_dir]
 
         idx = 0
         current_file_d = ""
@@ -67,8 +67,8 @@ class IO:
             if len(all_queries) != 0:
                 break
         
-        if i < (len(cls.all_files_in_dir)):
-            cls.all_files_in_dir = cls.all_files_in_dir[i:]
+        if idx < (len(cls.all_files_in_dir)):
+            cls.all_files_in_dir = cls.all_files_in_dir[idx:]
         else:
             cls.all_files_in_dir = []
             cls.is_checked = True
