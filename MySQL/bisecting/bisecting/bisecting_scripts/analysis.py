@@ -17,7 +17,7 @@ def setup_logger(debug_level):
     )
 
 
-def enter_bisecting_mode():
+def enter_bisecting_mode(oracle_str: str):
 
     all_commits = utils.json_load(constants.MYSQL_SORTED_COMMITS)
     logger.info(f"Getting {len(all_commits)} number of commits.")
@@ -26,7 +26,7 @@ def enter_bisecting_mode():
 
     for sample, sample_queries in reports.read_queries_from_files():
         for sample_query in sample_queries:
-            _ = bisecting.start_bisect(sample_query, all_commits)
+            _ = bisecting.start_bisect(sample_query, all_commits, oracle_str)
         # utils.remove_file(sample)
 
 
@@ -53,10 +53,24 @@ def setup_env():
 )
 def main(debug_level):
 
+    oracle_str = "NOREC"
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "O:", ["oracle="])
+    except getopt.GetoptError:
+        print("Arguments parsing error")
+        exit(1)
+    for opt, arg in opts:
+        if opt in ("-O", "--oracle"):
+            oracle_str = arg
+            print("Using oracle: %s " % (oracle_str))
+        else:
+            print("Error. Input arguments not supported. \n")
+            exit(1)
+
     setup_logger(debug_level)
     setup_env()
 
-    enter_bisecting_mode()
+    enter_bisecting_mode(oracle_str)
 
 
 if __name__ == "__main__":

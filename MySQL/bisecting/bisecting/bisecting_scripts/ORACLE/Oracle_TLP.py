@@ -4,7 +4,7 @@ import constants
 from loguru import logger
 
 
-class Oracle_NoREC:
+class Oracle_TLP:
 
     @staticmethod
     def comp_query_res(all_res_lll) -> Tuple[constants.RESULT, List[constants.RESULT]]:
@@ -16,12 +16,8 @@ class Oracle_NoREC:
             opt_l = cur_res_l[0]
             unopt_l = cur_res_l[1]
 
-            try:
-                opt_int_l = list(map(lambda n: int(n), opt_l))
-                unopt_int_l = list(map(lambda n: int(n), unopt_l))
-            except ValueError:
-                opt_int_l = [-1]
-                unopt_int_l = [-1]
+            opt_int_l = len(opt_l)
+            unopt_int_l = len(unopt_l)
 
             result = constants.RESULT.PASS
             if opt_int_l == [-1] or unopt_int_l == [-1]:

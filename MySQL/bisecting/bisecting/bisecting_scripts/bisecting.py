@@ -2,6 +2,7 @@ from typing import List, Tuple
 import mysql
 import constants
 from ORACLE import Oracle_NoREC
+from ORACLE import Oracle_TLP
 import reports
 import utils
 from loguru import logger
@@ -12,7 +13,7 @@ all_unique_results_dict = dict()
 all_previous_compile_failure = []
 
 
-def check_query_execute_correctness(queries_l: List[str], hexsha: str):
+def check_query_execute_correctness(queries_l: List[str], hexsha: str, oracle_str: str):
     install_directory = os.path.join(constants.MYSQL_ROOT, hexsha)
 
 #    cur_mysqld_binary_dir = os.path.join(install_directory, "bin/mysqld")
@@ -35,7 +36,17 @@ def check_query_execute_correctness(queries_l: List[str], hexsha: str):
         logger.debug("Result all Errors. \n")
         return constants.RESULT.ALL_ERROR, [], []
 
-    final_flag, all_res_flags = Oracle_NoREC.comp_query_res(all_res_str_l)
+    final_flag = constants.RESULT.PASS
+    all_res_flags = []
+    if oracle_str == "NOREC" or oracle_str == "NoREC":
+        final_flag, all_res_flags = Oracle_NoREC.comp_query_res(all_res_str_l)
+    elif oracle_str == "TLP":
+        final_flag, all_res_flags = Oracle_TLP.comp_query_res(all_res_str_l)
+    else:
+        logger.error("Oracle_str: %s not recognized. Using the default NOREC oracle instead. ")
+        final_flag, all_res_flags = Oracle_NoREC.comp_query_res(all_res_str_l)
+
+
     return final_flag, all_res_flags, all_res_str_l
 
 
@@ -61,8 +72,8 @@ def cross_compare(buggy_commit: str):
     return uniq_id, is_unique_commit
 
 
-def start_bisect(queries: List[str], all_commits):
-    current_bisecting_result = bi_secting_commits(queries, all_commits)
+def start_bisect(queries: List[str], all_commits, oracle_str: str):
+    current_bisecting_result = bi_secting_commits(queries, all_commits, oracle_str)
     if current_bisecting_result.is_bisecting_error:
         # Unique bug id is Unknown. Meaning unsorted or unknown bug.
         # current_bisecting_result.uniq_bug_id_int = "Unknown"
@@ -80,7 +91,7 @@ def start_bisect(queries: List[str], all_commits):
 
     return is_unique_commit
 
-def bi_secting_commits(queries: List[str], all_commits_str):
+def bi_secting_commits(queries: List[str], all_commits_str, oracle_str:str):
     # The oldest buggy commit, which is the commit that introduce the bug.
     newer_commit_str = all_commits_str[0]  # The latest buggy commit.
     older_commit_str = all_commits_str[-1]  # The oldest correct commit.
@@ -118,7 +129,7 @@ def bi_secting_commits(queries: List[str], all_commits_str):
                 rn_correctness,
                 all_res_flags,
                 all_res_str_l,
-            ) = check_query_execute_correctness(queries, commit_ID)
+            ) = check_query_execute_correctness(queries, commit_ID, oracle_str)
             if rn_correctness == constants.RESULT.PASS:  # The correct version.
                 older_commit_index = tmp_commit_index
                 is_successfully_executed = True

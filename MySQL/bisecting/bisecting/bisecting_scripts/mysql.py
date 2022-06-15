@@ -179,26 +179,14 @@ def parse_mysql_result(mysql_output: str):
             current_lines_int = [-1]
 
             current_lines = output_lines[begin_idx + 1 : end_idx]
-#            current_lines = map(lambda l: l.strip(), current_lines)
-#            current_lines = list(filter(lambda l: ' = "' in l, current_lines))
 
-            if current_lines:
-#                current_lines = map(lambda l: l[l.find("=", 1) + 1 :], current_lines)
-#                current_lines = map(lambda l: l[: l.find("(")], current_lines)
-#                current_lines = map(lambda l: l.strip(), current_lines)
-#                current_lines = map(lambda l: l.strip('"'), current_lines)
+            if not current_lines:
+                continue
 
-                try:
-                    if opt:
-                        current_lines_int = list(map(lambda n: int(n), current_lines))
-                    else:
-                        current_lines_int = list(
-                            map(lambda n: int(float(n) + 0.0001), current_lines)
-                        )
-                except ValueError:
-                    pass
+            if current_lines == " " or current_line == "\n":
+                continue
 
-            result.append(current_lines_int)
+            result.append(current_lines)
 
         return result
 
