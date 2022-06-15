@@ -93,5 +93,8 @@ RUN cp ./91a17cedb1ee880fe7915fb14cfd74c04e8d6588/bin/libprotobuf-lite.so.3.6.1 
 COPY bisecting_scripts /home/mysql/bisecting_scripts
 RUN chown -R mysql:mysql /home/mysql/bisecting_scripts
 
+COPY scripts /home/mysql/scripts
+RUN chown -R mysql:mysql /home/mysql/scripts
+
 USER root
 WORKDIR /home/mysql

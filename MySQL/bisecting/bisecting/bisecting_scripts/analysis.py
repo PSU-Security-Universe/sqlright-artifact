@@ -45,7 +45,7 @@ def setup_env():
     #pgs.clone_mysql_source()
 
 
-def main(debug_level):
+def main():
 
     oracle_str = "NOREC"
     try:
@@ -61,7 +61,7 @@ def main(debug_level):
             print("Error. Input arguments not supported. \n")
             exit(1)
 
-    debug_level = "TLP"
+    debug_level = "DEBUG"
     setup_logger(debug_level)
     setup_env()
 
