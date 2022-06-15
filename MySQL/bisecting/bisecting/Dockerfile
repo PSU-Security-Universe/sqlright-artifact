@@ -72,16 +72,18 @@ FROM sqlright_mysql_tools AS bisecting_setup
 
 # Copy the MySQL binaries to the repo. 
 USER root
-COPY mysql_binary.zip /home/mysql/mysql_binary.zip
-RUN chown -R mysql:mysql /home/mysql/mysql_binary.zip
+#COPY mysql_binary.zip /home/mysql/mysql_binary.zip
+COPY mysql_binary_zip /home/mysql/mysql_binary_zip
+RUN chown -R mysql:mysql /home/mysql/mysql_binary_zip
 
 USER mysql
-#WORKDIR /home/mysql/mysql_binary_zip
+WORKDIR /home/mysql/mysql_binary_zip
 #RUN zip -FF mysql_binary.zip --out mysql_binary_zip.zip -fz
-#RUN unzip mysql_binary_zip.zip > /dev/null
-#RUN mv mysql_binary /home/mysql/mysql_binary
-WORKDIR /home/mysql/
-RUN unzip mysql_binary.zip
+RUN cat mysql_binary.zip* > mysql_binary_zip.zip
+RUN unzip mysql_binary_zip.zip
+RUN mv mysql_binary /home/mysql/mysql_binary
+#WORKDIR /home/mysql/
+#RUN unzip mysql_binary.zip
 
 USER root
 WORKDIR /home/mysql/mysql_binary
