@@ -5981,7 +5981,8 @@ u8 execute_cmd_string(vector<string>& cmd_string_vec, vector<int> &explain_diff_
   /* Debug end.  */
   /***********************/
 
-  if (all_comp_res.final_res == ORA_COMP_RES::Fail)
+  // If the result mismatch, dump the bug report. However, if the bug report number exceeds 400, meaning that there are FPs. Mute the subsequent bug reports. 
+  if (all_comp_res.final_res == ORA_COMP_RES::Fail && bug_output_id <= 400)
   {
     ofstream outputfile;
     bug_output_id++;
