@@ -1,9 +1,9 @@
 import os
-from Bug_Analysis.helper.version_control import VerCon
-from Bug_Analysis.helper.data_struct import BisectingResults, RESULT, log_out_line
-from Bug_Analysis.helper.executor import Executor
-from Bug_Analysis.helper.io import IO
-from Bug_Analysis.bi_config import UNIQUE_BUG_OUTPUT_DIR, CUR_WORKDIR
+from helper.version_control import VerCon
+from helper.data_struct import BisectingResults, RESULT, log_out_line
+from helper.executor import Executor
+from helper.io import IO
+from bi_config import UNIQUE_BUG_OUTPUT_DIR, CUR_WORKDIR
 
 
 class Bisect:

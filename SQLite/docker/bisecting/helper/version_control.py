@@ -5,8 +5,8 @@ import os
 import shutil
 import subprocess
 
-from Bug_Analysis.bi_config import *
-from Bug_Analysis.helper.data_struct import log_out_line
+from bi_config import *
+from helper.data_struct import log_out_line
 
 
 class VerCon:
@@ -61,7 +61,7 @@ class VerCon:
             if result[0] != 0:
                 log_out_line("Compilation failed. Reason: %s. \n" % (result[1]))
              
-            result = subprocess.getstatusoutput("../../configure  --enable-fts5")
+            result = subprocess.getstatusoutput("../../configure  --enable-fts5 --enable-debug")
             if result[0] != 0:
                 log_out_line("Compilation failed. Reason: %s. \n" % (result[1]))
                 # If --enable-fts5 is not available, then we try the normal configure instead. 
@@ -70,11 +70,24 @@ class VerCon:
                     log_out_line("Compilation failed. Reason: %s. \n" % (result[1]))
                     return 1
 
-            result = subprocess.getstatusoutput("make -j" + str(COMPILE_THREAD_COUNT))
+            result = subprocess.getstatusoutput("make -j" + str(COMPILE_THREAD_COUNT) + " && strip sqlite3")
             if result[0] != 0:
                 log_out_line("Compilation failed. Reason: %s. \n" % (result[1]))
                 return 1
         log_out_line("Compilation completed. ")
+        
+        # Remove all other intermediate files, keep only the sqlite3 binary.
+        for cur_sub_file in os.listdir(os.getcwd()):
+            if cur_sub_file == "sqlite3":
+                continue
+            cur_file = os.path.join(os.getcwd(), cur_sub_file)
+            if os.path.isdir(cur_file):
+                shutil.rmtree(cur_file)
+            else:
+                os.remove(cur_file)
+
+        log_out_line("All intermediate files removed. Only stripped SQLite3 binary are kept. ")
+
         return 0
 
     @classmethod

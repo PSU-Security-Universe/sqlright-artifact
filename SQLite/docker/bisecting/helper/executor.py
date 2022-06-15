@@ -2,8 +2,8 @@ import os
 import subprocess
 import re
 
-from Bug_Analysis.bi_config import *
-from Bug_Analysis.helper.data_struct import log_out_line, RESULT
+from bi_config import *
+from helper.data_struct import log_out_line, RESULT
 
 
 class Executor:

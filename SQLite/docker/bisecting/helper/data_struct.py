@@ -1,7 +1,7 @@
 from enum import Enum
 import re
 
-from Bug_Analysis.bi_config import LOG_OUTPUT_FILE
+from bi_config import LOG_OUTPUT_FILE
 
 
 class RESULT(Enum):

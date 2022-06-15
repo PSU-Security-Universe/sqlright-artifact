@@ -1,7 +1,7 @@
 import re
 
 
-from Bug_Analysis.helper.data_struct import RESULT, is_string_only_whitespace
+from helper.data_struct import RESULT, is_string_only_whitespace
 
 
 class Oracle_NOREC:

@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import atexit
 
-from Bug_Analysis.bi_config import *
+from bi_config import *
 
 
 class Fuzzer:

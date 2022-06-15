@@ -4,13 +4,13 @@ import re
 import shutil
 import sys
 
-from Bug_Analysis.helper.data_struct import (
+from helper.data_struct import (
     log_out_line,
     BisectingResults,
     RESULT,
     is_string_only_whitespace,
 )
-from Bug_Analysis.bi_config import *
+from bi_config import *
 
 
 class IO:
@@ -359,7 +359,7 @@ class IO:
 
     @classmethod
     def status_print(cls):
-        # from Bug_Analysis.helper.bisecting import Bisect
+        # from helper.bisecting import Bisect
         print(
             "Currently, we have %d being processed. \n"
             % (cls.total_processed_bug_count_int)

@@ -2,7 +2,7 @@ import re
 from sys import maxsize
 from enum import Enum
 
-from Bug_Analysis.helper.data_struct import RESULT, is_string_only_whitespace
+from helper.data_struct import RESULT, is_string_only_whitespace
 
 
 class VALID_TYPE_TLP(Enum):

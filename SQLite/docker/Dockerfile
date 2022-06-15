@@ -43,6 +43,8 @@ RUN apt -y install clang
 RUN apt install -y g++-9
 RUN apt install -y gcc-9
 
+RUN pip3 install gitpython
+
 RUN useradd -ms /bin/bash sqlite
 USER sqlite
 
@@ -184,6 +186,11 @@ RUN mkdir -p Bug_Analysis
 USER root
 COPY bisecting /home/sqlite/bisecting
 RUN chown -R sqlite:sqlite /home/sqlite/bisecting
+
+# Setup the SQLite bisecting cached binaries. 
+USER root
+COPY sqlite_bisecting_binary /home/sqlite/sqlite_bisecting_binary
+RUN chown -R sqlite:sqlite /home/sqlite/sqlite_bisecting_binary
 
 # At last, setup the Docker helper scripts
 USER root
