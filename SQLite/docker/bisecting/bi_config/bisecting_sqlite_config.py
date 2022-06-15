@@ -2,7 +2,7 @@ import os
 
 CUR_WORKDIR = "/home/sqlite/bisecting"
 
-SQLITE_DIR = "/home/sqlite/sqlite_bisecting/"
+SQLITE_DIR = "/home/sqlite/sqlite_bisecting_binary/"
 # Change to your own sqlite3 repo root dir.
 SQLITE_BLD_DIR = os.path.join(SQLITE_DIR, "bld")
 SQLITE_BRANCH = "master"

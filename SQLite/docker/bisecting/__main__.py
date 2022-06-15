@@ -19,7 +19,7 @@ def main():
 
     try:
 
-        opts, args = getopt.getopt(sys.argv[1:], "O:F:", ["oracle=, feedback="])
+        opts, args = getopt.getopt(sys.argv[1:], "O:F:", ["oracle=", "feedback="])
 
     except getopt.GetoptError:
         print("Arguments parsing error")
