@@ -3,7 +3,7 @@ from Bug_Analysis.helper.version_control import VerCon
 from Bug_Analysis.helper.data_struct import BisectingResults, RESULT, log_out_line
 from Bug_Analysis.helper.executor import Executor
 from Bug_Analysis.helper.io import IO
-from Bug_Analysis.bi_config import UNIQUE_BUG_OUTPUT_DIR, LOG_OUTPUT_DIR
+from Bug_Analysis.bi_config import UNIQUE_BUG_OUTPUT_DIR, CUR_WORKDIR
 
 
 class Bisect:
@@ -43,7 +43,7 @@ class Bisect:
 
     @classmethod
     def setup_previous_compile_fail(cls):
-        fail_compiled_commits_file = os.path.join(LOG_OUTPUT_DIR, "fail_compiled_commits.txt")
+        fail_compiled_commits_file = os.path.join(CUR_WORKDIR, "fail_compiled_commits.txt")
         if os.path.exists(fail_compiled_commits_file):
             with open(fail_compiled_commits_file, "r") as f:
                 cls.all_previous_compile_failure = [
@@ -134,7 +134,7 @@ class Bisect:
 
 
                     fail_compiled_commits_file = os.path.join(
-                        LOG_OUTPUT_DIR, "fail_compiled_commits.txt"
+                        CUR_WORKDIR, "fail_compiled_commits.txt"
                     )
 
                     with open(fail_compiled_commits_file, "a") as f:
@@ -255,8 +255,9 @@ class Bisect:
                         break
 
                     fail_compiled_commits_file = os.path.join(
-                        LOG_OUTPUT_DIR, "fail_compiled_commits.txt"
+                        CUR_WORKDIR, "fail_compiled_commits.txt"
                     )
+
                     with open(fail_compiled_commits_file, "a") as f:
                         f.write(commit_ID + "\n")
 
