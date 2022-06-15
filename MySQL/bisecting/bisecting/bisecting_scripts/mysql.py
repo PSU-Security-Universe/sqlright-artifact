@@ -103,7 +103,7 @@ def execute_queries(queries: str, hexsha: str):
     
     cur_mysql_root = os.path.join(constants.MYSQL_ROOT, hexsha)
 
-    mysql_client = get_mysql_binary(cur_mysql_root) + " -u root --socket=%s" % (constants.MYSQL_SERVER_SOCKET)
+    mysql_client = get_mysql_binary(cur_mysql_root) + " -u root -N --socket=%s" % (constants.MYSQL_SERVER_SOCKET)
 
     clean_database_query = "DROP DATABASE IF EXISTS test_sqlright1; CREATE DATABASE IF NOT EXISTS test_sqlright1; "
 
@@ -122,7 +122,7 @@ def execute_queries(queries: str, hexsha: str):
         output, status, error_msg = utils.execute_command(
             mysql_client, input_contents=safe_query, cwd=cur_mysql_root, timeout=3  # 3 seconds timeout. 
         )
-        all_outputs += output + "\n"
+        all_outputs += output
         all_error_msg += error_msg + "\n"
 
     queries = "\n".join(safe_queries)
@@ -179,14 +179,14 @@ def parse_mysql_result(mysql_output: str):
             current_lines_int = [-1]
 
             current_lines = output_lines[begin_idx + 1 : end_idx]
-            current_lines = map(lambda l: l.strip(), current_lines)
-            current_lines = list(filter(lambda l: ' = "' in l, current_lines))
+#            current_lines = map(lambda l: l.strip(), current_lines)
+#            current_lines = list(filter(lambda l: ' = "' in l, current_lines))
 
             if current_lines:
-                current_lines = map(lambda l: l[l.find("=", 1) + 1 :], current_lines)
-                current_lines = map(lambda l: l[: l.find("(")], current_lines)
-                current_lines = map(lambda l: l.strip(), current_lines)
-                current_lines = map(lambda l: l.strip('"'), current_lines)
+#                current_lines = map(lambda l: l[l.find("=", 1) + 1 :], current_lines)
+#                current_lines = map(lambda l: l[: l.find("(")], current_lines)
+#                current_lines = map(lambda l: l.strip(), current_lines)
+#                current_lines = map(lambda l: l.strip('"'), current_lines)
 
                 try:
                     if opt:

@@ -69,6 +69,7 @@ def start_bisect(queries: List[str], all_commits):
         # Unique bug id is Unknown. Meaning unsorted or unknown bug.
         # current_bisecting_result.uniq_bug_id_int = "Unknown"
         # reports.dump_unique_bugs(current_bisecting_result)
+        logger.error("Bisecting Error!")
         return True
 
     # The unique bug id will be appended to current_bisecting_result when running cross_compare
