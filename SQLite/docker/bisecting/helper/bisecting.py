@@ -129,7 +129,6 @@ class Bisect:
 
                     if current_commit_str in cls.all_previous_compile_failure:
                         break
-
                     cls.all_previous_compile_failure.append(current_commit_str)
 
 
@@ -212,7 +211,6 @@ class Bisect:
                 commit_ID = all_commits_str[tmp_commit_index]
                 if commit_ID in cls.all_previous_compile_failure:
                     rn_correctness = RESULT.FAIL_TO_COMPILE
-                    # log_out_line("For commit %s. Bisecting FAIL_TO_COMPILE. \n" % (commit_ID))
 
                 else:
                     (
@@ -248,10 +246,9 @@ class Bisect:
 
                     log_out_line("For commit %s. Bisecting FAIL_TO_COMPILE. \n" % (commit_ID))
 
-                    if tmp_commit_index in cls.all_previous_compile_failure:
+                    if commit_ID in cls.all_previous_compile_failure:
                         break
-                    
-                    cls.all_previous_compile_failure.append(tmp_commit_index)
+                    cls.all_previous_compile_failure.append(commit_ID)
 
                     fail_compiled_commits_file = os.path.join(
                         CUR_WORKDIR, "fail_compiled_commits.txt"
