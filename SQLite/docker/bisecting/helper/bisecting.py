@@ -247,12 +247,11 @@ class Bisect:
                     is_error_returned_from_exec = True
 
                     log_out_line("For commit %s. Bisecting FAIL_TO_COMPILE. \n" % (commit_ID))
-                    
-                    cls.all_previous_compile_failure.append(tmp_commit_index)
-
 
                     if tmp_commit_index in cls.all_previous_compile_failure:
                         break
+                    
+                    cls.all_previous_compile_failure.append(tmp_commit_index)
 
                     fail_compiled_commits_file = os.path.join(
                         CUR_WORKDIR, "fail_compiled_commits.txt"

@@ -34,7 +34,7 @@ class IO:
             cls.is_checked = True
             cur_all_files_in_dir = os.listdir(file_directory)
             cls.all_files_in_dir = [os.path.join(file_directory, fn) for fn in cur_all_files_in_dir]
-            cls.all_files_in_dir.sort(key=os.path.getatime)
+            cls.all_files_in_dir.sort(key=os.path.getmtime)
             cls.all_files_in_dir = [fn.split("/")[-1] for fn in cls.all_files_in_dir]
 
         idx = 0
@@ -452,8 +452,9 @@ class IO:
 
     @classmethod
     def gen_unique_bug_output_dir(cls):
-        if not os.path.isdir(UNIQUE_BUG_OUTPUT_DIR):
-            os.mkdir(UNIQUE_BUG_OUTPUT_DIR)
+        if os.path.isdir(UNIQUE_BUG_OUTPUT_DIR):
+            shutil.rmtree(UNIQUE_BUG_OUTPUT_DIR)
+        os.mkdir(UNIQUE_BUG_OUTPUT_DIR)
 
     @classmethod
     def retrive_results_from_str(cls, begin_sign: str, end_sign: str, result_str: str):
