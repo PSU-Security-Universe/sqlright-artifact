@@ -25,15 +25,39 @@ def enter_bisecting_mode(oracle_str: str):
 
     logger.info("Beginning processing files in the target folder.")
 
-    for sample, sample_queries in reports.read_queries_from_files():
+    fuzzing_start_time = 0
+
+    for sample_file, sample_queries in reports.read_queries_from_files():
+        is_unique_commit = True
         for sample_query in sample_queries:
-            _ = bisecting.start_bisect(sample_query, all_commits, oracle_str)
-        # utils.remove_file(sample)
+            cur_is_unique_commit = bisecting.start_bisect(sample_query, all_commits, oracle_str)
+            
+            if not cur_is_unique_commit:
+                is_unique_commit = False
+
+        # Log the sample bug generation time.
+        if is_unique_commit == True:
+            cur_bug_time = os.path.getmtime(sample_file)
+            duration = 0
+            # Log the bug output time. 
+            if fuzzing_start_time == 0:
+                fuzzing_start_time = cur_bug_time
+                duration = 0
+            else:
+                duration = cur_bug_time - fuzzing_start_time
+
+            with open(os.path.join(constants.UNIQUE_BUG_OUTPUT_DIR, "time.txt"), "a") as f:
+                f.write(
+                    "{} {}\n".format(
+                        os.path.basename(sample_file), duration
+                    )
+                )
 
 
 def setup_env():
     # remove and re-create the unique bug output directory.
-    utils.remove_directory(constants.UNIQUE_BUG_OUTPUT_DIR)
+    if os.path.isdir(constants.UNIQUE_BUG_OUTPUT_DIR):
+        utils.remove_directory(constants.UNIQUE_BUG_OUTPUT_DIR)
     os.mkdir(constants.UNIQUE_BUG_OUTPUT_DIR)
 
     ## Use the backup of PostgreSQL source code.

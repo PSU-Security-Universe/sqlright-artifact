@@ -75,11 +75,8 @@ def cross_compare(buggy_commit: str):
 def start_bisect(queries: List[str], all_commits, oracle_str: str):
     current_bisecting_result = bi_secting_commits(queries, all_commits, oracle_str)
     if current_bisecting_result.is_bisecting_error:
-        # Unique bug id is Unknown. Meaning unsorted or unknown bug.
-        # current_bisecting_result.uniq_bug_id_int = "Unknown"
-        # reports.dump_unique_bugs(current_bisecting_result)
         logger.error("Bisecting Error!")
-        return True
+        return False
 
     # The unique bug id will be appended to current_bisecting_result when running cross_compare
     buggy_commit = current_bisecting_result.first_buggy_commit_id
@@ -87,7 +84,7 @@ def start_bisect(queries: List[str], all_commits, oracle_str: str):
     current_bisecting_result.unique_bug_id_int = uniq_id
 
     if is_unique_commit:
-        reports.dump_unique_bugs(current_bisecting_result)
+        is_unique_commit = reports.dump_unique_bugs(current_bisecting_result)
 
     return is_unique_commit
 

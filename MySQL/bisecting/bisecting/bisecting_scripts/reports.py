@@ -146,6 +146,43 @@ def dumps_inconsistent_queries(query: str, same_result_query_index: List[int]):
 
     return header + tail
 
+def is_identified_bug(all_query:str):
+
+    all_query_l = all_query.splitlines()
+
+    select_query = ""
+    for cur_query in all_query_l:
+        if 'SELECT "---------' in cur_query:
+            select_query = cur_query
+            break
+
+    logger.debug("Debug: In function is_identified_bug, getting all_query: %s" % (all_query))
+    logger.debug("Debug: In function is_identified_bug, getting buggy_select_stmt: %s" % (select_query))
+
+    # MySQL Bug pattern 1: "ALL/ANY":
+    if "all" in select_query.casefold() or "any" in select_query.casefold():
+        return True
+
+    # MySQL Bug pattern 2: Unique KEY and <=> NULL
+    if "unique key" in all_query.casefold() and "<=>" in select_query:
+        return True
+
+    # MySQL Bug pattern 3: "GTID_SUBSET"
+    if "gtid_subset" in select_query.casefold():
+        return True
+
+    # MySQL bug pattern 4: GROUP BY HUGE NUMBER
+    ## Skip
+
+    # MySQL bug pattern 5: ExtractValue()
+    if "extractvalue" in select_query.casefold():
+        return True
+
+    # MySQL bug pattern 6: Like and Escape
+    if "like" in select_query.casefold() and "escape" in select_query.casefold():
+        return True
+
+    return False
 
 def dump_unique_bugs(current_bisecting_result: constants.BisectingResults):
     def _pretty_process(bisecting_result: constants.BisectingResults):
@@ -183,6 +220,12 @@ def dump_unique_bugs(current_bisecting_result: constants.BisectingResults):
                 bisecting_result.last_buggy_res_str_l[j].pop(i)
 
     _pretty_process(current_bisecting_result)
+
+    if len(current_bisecting_result.query) == 0:
+        return False
+
+    if not is_identified_bug(current_bisecting_result.query[0]):
+        return False
 
     report_contents = []
     report_contents.append("-------------------------------\n")
@@ -237,3 +280,5 @@ def dump_unique_bugs(current_bisecting_result: constants.BisectingResults):
     current_unique_bug_output = os.path.join(constants.UNIQUE_BUG_OUTPUT_DIR, f"bug_{bug_id}")
     with open(current_unique_bug_output, "a+") as f:
         f.write("\n".join(report_contents))
+
+    return True
