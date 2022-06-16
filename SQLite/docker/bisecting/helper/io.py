@@ -235,7 +235,7 @@ class IO:
             if idx in same_idx:
                 continue
             effect_idx += 1
-            new_tail += 'SELECT "--------- ' + str(effect_idx) + "  "
+            new_tail += 'SELECT --------- ' + str(effect_idx) + "  "
             for cur_veri_stmt in veri_stmts[idx]:
                 new_tail += cur_veri_stmt + "    "
             new_tail += "\n"
@@ -279,9 +279,83 @@ class IO:
                 bisecting_result.last_buggy_res_str_l[j].pop(idx)
 
     @classmethod
+    def _is_identified_bugs(cls, result: BisectingResults):
+        if result.is_bisecting_error:
+            # bisect error
+            return False
+        if (
+            result.last_buggy_res_str_l == []
+            or result.last_buggy_res_str_l == None
+        ):
+            # Does not find the buggy output. 
+            return False
+
+        if (result.first_buggy_commit_id != "") and (result.first_buggy_commit_id in KNOWN_BUGGY_COMMIT):
+            return True
+
+        for cur_query in result.query:
+            if "rtree" in cur_query.casefold():
+                return False
+            for cur_line in cur_query.splitlines():
+                if "create table" in cur_line.casefold():
+                    # Seventh and Eighth bug pattern:
+                    if "primary key" in cur_line.casefold() and "without rowid" in cur_line.casefold():
+                        return True
+
+                if "alter table" in cur_line.casefold() and "add column" in cur_line.casefold() and "not null" in cur_line.casefold():
+                    # Thirteenth bug pattern:
+                    return True
+
+                if "SELECT ---------" in cur_line:
+                    # Found the buggy SELECT statement
+                    # "cur_line" is the SELECT statement, "cur_query" is the whole query sequence. 
+
+                    # First bug pattern.
+                    if "distinct" in cur_line.casefold() and "unique index" in cur_query.casefold():
+                        return True
+
+                    # Second bug pattern. 
+                    if "join" in cur_line.casefold() and ("likely"  in cur_line.casefold() or "unlikely" in cur_line.casefold()):
+                        return True
+
+                    # Third bug pattern: in (..) and
+                    if "in (" in cur_line.casefold() and "and" in cur_line.casefold():
+                        return True
+                    
+                    # Fourth bug pattern: where exists (...)
+                    if "where exists (" in cur_line.casefold():
+                        return True
+
+                    # Fifth and Sixth bug pattern:
+                    if "nth_valud" in cur_line.casefold() and "over" in cur_line.casefold():
+                        return True
+
+                    # Tenth bug pattern:
+                    if "like" in cur_line.casefold() and "and" in cur_line.casefold():
+                        return True
+
+                    # Eleventh bug pattern:
+                    if "unique index" in cur_query.casefold() and "is not null" in cur_line.casefold():
+                        return True
+
+        # All bug pattern mismatched. Skip the bug. 
+        return False
+
+
+                    
+
+
+
+    @classmethod
     def write_uniq_bugs_to_files(
         cls, current_bisecting_result: BisectingResults, oracle, dup_count:int
     ):
+        cls._pretty_process(current_bisecting_result, oracle)
+
+        if not cls._is_identified_bugs(current_bisecting_result):
+            # If the bug does not match the filter, do not output it to the unique bug folder. 
+            print("All bug pattern mismatched. Skip the bug. ")
+            return None
         if not os.path.isdir(UNIQUE_BUG_OUTPUT_DIR):
             os.mkdir(UNIQUE_BUG_OUTPUT_DIR)
         current_unique_bug_output = os.path.join(
@@ -294,7 +368,6 @@ class IO:
             append_or_write = "w"
         bug_output_file = open(current_unique_bug_output, append_or_write)
 
-        cls._pretty_process(current_bisecting_result, oracle)
 
         bug_output_file.write('-------------------------------\n\n')
         if current_bisecting_result.uniq_bug_id_int != "Unknown":

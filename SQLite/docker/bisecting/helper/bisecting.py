@@ -345,6 +345,11 @@ class Bisect:
             current_unique_bug_output = IO.write_uniq_bugs_to_files(
                 current_bisecting_result, oracle, dup_count
             )
+            
+            if current_unique_bug_output == None:
+                # return is_dup_commit = True
+                return True
+
             bug_map_path = os.path.join(UNIQUE_BUG_OUTPUT_DIR, "map.txt")
             with open(bug_map_path, "a") as f:
                 f.write(
