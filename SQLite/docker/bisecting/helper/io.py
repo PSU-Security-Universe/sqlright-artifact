@@ -84,12 +84,16 @@ class IO:
     @classmethod
     def _restructured_and_clean_all_queries(cls, all_queries):
         output_all_queries = []
+        buggy_flag = []
+        buggy_idx = []
 
         for queries in all_queries:
             current_queries_in = queries.split("\n")
             current_queries_out = ""
             is_adding = False
             for query in current_queries_in:
+                if "RESULT FLAGS" in query:
+                    buggy_flag.append(query)
                 if "Result string" in query:
                     is_adding = False
                     output_all_queries.append(current_queries_out)
@@ -109,6 +113,11 @@ class IO:
                 if is_adding:
                     current_queries_out += query + " \n"
 
+        # Find out which select is buggy:
+        for idx, cur_flag in enumerate(buggy_flag):
+            if "0" in cur_flag:
+                buggy_idx.append(idx)
+
         """ Next, separate the SELECT statements into different query sequences.
             If one buggy query contains multiple SELECT oracle mismatch,
             these mismatches could due to different reasons, 
@@ -126,8 +135,11 @@ class IO:
                     output_all_queries_tmp.append(new_list_tmp)
                 else:
                     output_all_queries_tmp[i-1].append(output_queries_out)
-            
-        output_all_queries = output_all_queries_tmp
+        
+        output_all_queries = []
+        for idx in buggy_idx:
+            if idx < len(output_all_queries_tmp):
+                output_all_queries.append(output_all_queries_tmp[idx])
 
         # print("Debug: printing all the read queries: \n")
         # for cur_output_query in output_all_queries:
