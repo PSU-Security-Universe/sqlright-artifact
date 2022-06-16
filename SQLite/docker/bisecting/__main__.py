@@ -60,13 +60,13 @@ def main():
     )
 
     log_out_line(
-        "Beginning processing files in the target folder. (Infinite Loop) \n\n"
+        "Begins processing bug reports in the target folder. "
     )
     while True:
         # Read one file at a time.
         all_new_queries, current_file_d = IO.read_queries_from_files(
             file_directory=BUG_SAMPLE_DIR, 
-            is_removed_read=True
+            is_removed_read=False
         )
         if all_new_queries == None or current_file_d == "Done":
             print("Done")

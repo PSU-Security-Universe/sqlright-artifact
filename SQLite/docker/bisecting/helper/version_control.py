@@ -28,7 +28,8 @@ class VerCon:
 
         if END_COMMIT_ID != "":
             end_index = cls.all_commits_hexsha.index(END_COMMIT_ID)
-            cls.all_commits_hexsha = cls.all_commits_hexsha[:end_index]
+            if end_index < len(cls.all_commits_hexsha):
+                cls.all_commits_hexsha = cls.all_commits_hexsha[:end_index+1]
         if BEGIN_COMMIT_ID != "":
             begin_index = cls.all_commits_hexsha.index(BEGIN_COMMIT_ID)
             cls.all_commits_hexsha = cls.all_commits_hexsha[begin_index:]
@@ -46,15 +47,16 @@ class VerCon:
         with open(os.devnull, "wb") as devnull:
             subprocess.check_call(
                 ["git", "checkout", hexsha, "--force"],
-                stdout=devnull,
+                stdout=subprocess.DEVNULL,
                 stderr=subprocess.STDOUT,
             )
-        log_out_line("Checkout commit completed. \n")
+            log_out_line("Checkout commit: %s completed. " % (hexsha))
 
     @staticmethod
     def _compile_sqlite_binary(CACHED_INSTALL_DEST_DIR: str) -> bool:
-        if not os.path.isdir(CACHED_INSTALL_DEST_DIR):
-            os.mkdir(CACHED_INSTALL_DEST_DIR)
+        if os.path.isdir(CACHED_INSTALL_DEST_DIR):
+            shutil.rmtree(CACHED_INSTALL_DEST_DIR)
+        os.mkdir(CACHED_INSTALL_DEST_DIR)
         os.chdir(CACHED_INSTALL_DEST_DIR)
         with open(os.devnull, "wb") as devnull:
             result = subprocess.getstatusoutput("chmod +x ../../configure")
@@ -117,8 +119,12 @@ class VerCon:
                 "\n\n\nWarning: For commit: %s, installed dir exists, but sqlite3 is not compiled probably. \n\n\n"
                 % (hexsha)
             )
-            return ""
-
+            cls._checkout_commit(hexsha=hexsha)
+            result = cls._compile_sqlite_binary(
+                CACHED_INSTALL_DEST_DIR=INSTALL_DEST_DIR
+            )
+            if result != 0:
+                return ""  # Compile failed.
         if os.path.isfile(
             os.path.join(INSTALL_DEST_DIR, "sqlite3")
         ):  # Compile successfully.
