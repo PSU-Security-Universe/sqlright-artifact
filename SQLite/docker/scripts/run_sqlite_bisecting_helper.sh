@@ -4,7 +4,7 @@
 # entrypoint: bash
 
 chown -R sqlite:sqlite /home/sqlite/bisecting
-chown -R sqlite:sqlite /home/sqlite/sqlite_bisecting
+chown -R sqlite:sqlite /home/sqlite/sqlite_bisecting_binary
 
 SCRIPT_EXEC=$(cat << EOF
 
