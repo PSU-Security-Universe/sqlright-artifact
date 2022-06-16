@@ -86,22 +86,31 @@ def main():
             statement pairs, here we will have 100 iterations. 
         """
         iter_idx = 0
+        is_dup_commit = False
         for cur_new_queries in all_new_queries:
-            is_dup_commit = Bisect.run_bisecting(
+            # Early drop the query if the query contains `rtree`.
+            if len(cur_new_queries) > 0 and "rtree" in cur_new_query[0].casefold():
+                is_dup_commit = True
+                break
+            cur_is_dup_commit = Bisect.run_bisecting(
                 queries_l=cur_new_queries,
                 oracle=oracle,
                 vercon=vercon,
                 current_file=current_file_d,
                 iter_idx = iter_idx
             )
+            if cur_is_dup_commit:
+                is_dup_commit = True
             iter_idx += 1
         end_time = time.time()
-        with open(os.path.join(UNIQUE_BUG_OUTPUT_DIR, "time.txt"), "a") as f:
-            f.write(
-                "{} {}\n".format(
-                    os.path.basename(current_file_d), end_time - start_time
+
+        if is_dup_commit:
+            with open(os.path.join(UNIQUE_BUG_OUTPUT_DIR, "time.txt"), "a") as f:
+                f.write(
+                    "{} {}\n".format(
+                        os.path.basename(current_file_d), end_time - start_time
+                    )
                 )
-            )
 
         IO.status_print()
 
