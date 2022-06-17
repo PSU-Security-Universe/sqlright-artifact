@@ -18,11 +18,12 @@ from plot_funcs import *
 plot_sql_correct_rate("../SQLRight_NoREC", markevery = 10, line_style = 4)
 plot_sql_correct_rate("./SQLRight_with_squ_valid", markevery = 10, line_style = 2)
 plot_sql_correct_rate("./SQLRight_with_squ_parser", markevery = 10, line_style = 3)
-plot_sql_correct_rate("../SQLRight_NoREC", markevery = 10, line_style = 0)
 plot_sql_correct_rate("../Comp_diff_tools_NoREC/Squirrel_with_oracle", markevery = 10, line_style = 1)
  
 plt.xlim(0, 24) 
 plt.ylim(-2, 30)
+
+plt.legend([r'SQLRight', r'SQLRight$_{-ctx}$$_{-}$$_{valid}$', r'SQLRight$_{-db}$$_{-}$$_{par}$$_{&}$$_{ctx}$$_{-}$$_{valid}$', r'Squirrel$_{+oracle}$'])
 
 x_major_locator=MultipleLocator(4)
 ax=plt.gca()

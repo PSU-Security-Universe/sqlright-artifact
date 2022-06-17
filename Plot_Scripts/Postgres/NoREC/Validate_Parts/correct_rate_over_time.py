@@ -14,23 +14,21 @@ from plot_funcs import *
 
 plot_sql_corr_over_time("../SQLRight_NoREC/", markevery = 10, line_style = 4)
 plot_sql_corr_over_time("./SQLRight_with_squ_valid/", markevery = 10, line_style = 2)
-# plot_sql_corr_over_time("./SQLRight_with_squ_parser/plot_data_0", markevery = 10, line_style = 3)
-plot_sql_corr_over_time("../SQLRight_NoREC/", markevery = 10, line_style = 0)
-# plot_sql_corr_over_time("../Comp_diff_tools_NoREC/Squirrel_with_oracle/plot_data_0", markevery = 10, line_style = 1)
-
+# Using squirrel parser
 x = list(np.arange(0, 72.2, 0.2))
 y = [1] * len(x)
-
-# Squirrel
 plot_with_style(x, y, style_id = 1, markevery=10)
 # squirrel parser
 plot_with_style(x, y, style_id = 3, markevery=10)
+
 
 # plt.xlabel('Time (hour)', fontsize = 20)
 plt.ylabel('valid statements per hour', fontsize = 20)
 
 plt.xlim(0, 24)
 # plt.ylim(-1, 30)
+
+plt.legend([r'SQLRight', r'SQLRight$_{-ctx}$$_{-}$$_{valid}$', r'SQLRight$_{-db}$$_{-}$$_{par}$$_{&}$$_{ctx}$$_{-}$$_{valid}$', r'Squirrel$_{+oracle}$'])
 
 x_major_locator=MultipleLocator(4)
 ax=plt.gca()
