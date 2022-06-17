@@ -103,6 +103,9 @@ def remove_directory(directory: Path):
 
 def remove_directory(directory: str):
     if os.path.isdir(directory):
+        shutil.rmtree(directory, onerror=remove_directory_error_helper)
+
+    if os.path.isdir(directory):
         shutil.rmtree(directory)
     return
 
