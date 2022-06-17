@@ -73,7 +73,7 @@ def main():
 
     oracle_str = "NOREC"
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "O:", ["oracle="])
+        opts, args = getopt.getopt(sys.argv[1:], "O:F:", ["oracle=", "Feedback="])
     except getopt.GetoptError:
         print("Arguments parsing error")
         exit(1)
@@ -81,6 +81,9 @@ def main():
         if opt in ("-O", "--oracle"):
             oracle_str = arg
             print("Using oracle: %s " % (oracle_str))
+        elif opt in ("-F", "--Feedback"):
+            # Ignore this flag in the bisecting. 
+            pass
         else:
             print("Error. Input arguments not supported. \n")
             exit(1)
