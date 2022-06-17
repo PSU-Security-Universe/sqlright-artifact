@@ -580,3 +580,16 @@ cd <sqlright_root>/Plot_Scripts/MySQL/TLP/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
 ```
+
+## 6. Mutation Depth.
+
+Get the mutation depth information shown in the Table 3 in the paper. 
+
+This evaluation are based on the data generated from Session 4: `Contribution of code-coverage feedback`. Please finish the Session 4 experiment first before running the following command.
+
+```sh
+cd <sqlright_root>/Plot_scripts
+python3 count_queue_depth.py
+```
+
+The Queue Depth information would be returned. Although the mutation depth number returned could be slightly different between each run, and it could be slightly different from the number shown in the paper. But in general, the `Max Depth` from SQLRight NoREC and TLP should be larger than other baselines, and SQLRight NoREC and TLP should have more queue seeds located in a deeper depth, compared to other baselines. 
