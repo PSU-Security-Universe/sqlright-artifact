@@ -22,6 +22,8 @@ plot_sql_correct_rate("./save_all", markevery = 10, line_style = 3)
 
 plt.xlim(0, 24)
 
+plt.legend([r'SQLRight', r'SQLRight$_{drop}$', r'SQLRight$_{rand}$', r'SQLRight$_{save}$'])
+
 x_major_locator=MultipleLocator(4)
 ax=plt.gca()
 ax.xaxis.set_major_locator(x_major_locator)

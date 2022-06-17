@@ -19,6 +19,8 @@ plot_sqlancer_correct_rate("./SQLancer_TLP/logs_0", markevery = 30, line_style =
 
 plt.xlim(0, 72)
 
+plt.legend([r'SQLRight', r'Squirrel$_{+oracle}$', r'SQLancer'])
+
 x_major_locator=MultipleLocator(12)
 ax=plt.gca()
 ax.xaxis.set_major_locator(x_major_locator)

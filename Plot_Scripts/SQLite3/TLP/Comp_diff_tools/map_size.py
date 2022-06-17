@@ -24,6 +24,8 @@ plt.ylabel('Coverage (k)', fontsize = 20)
 plt.xlim(0, 72)
 plt.ylim(20, 44) 
 
+plt.legend([r'SQLRight', r'Squirrel$_{+oracle}$', r'SQLancer'])
+
 x_major_locator=MultipleLocator(12)
 ax=plt.gca()
 ax.xaxis.set_major_locator(x_major_locator)

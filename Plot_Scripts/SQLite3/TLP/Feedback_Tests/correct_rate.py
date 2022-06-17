@@ -18,9 +18,9 @@ plot_sql_correct_rate("./drop_all/", markevery = 10, line_style = 1)
 plot_sql_correct_rate("./random_save/", markevery = 10, line_style = 2)
 plot_sql_correct_rate("./save_all/", markevery = 10, line_style = 3)
 
-
-
 plt.xlim(0, 24)
+
+plt.legend([r'SQLRight', r'SQLRight$_{drop}$', r'SQLRight$_{rand}$', r'SQLRight$_{save}$'])
 
 x_major_locator=MultipleLocator(4)
 ax=plt.gca()

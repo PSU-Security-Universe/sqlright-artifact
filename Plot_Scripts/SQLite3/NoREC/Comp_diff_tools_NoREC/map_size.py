@@ -24,6 +24,8 @@ plt.ylabel('Coverage (k)', fontsize = 20)
 plt.xlim(0, 72)
 plt.ylim(20, 44) 
 
+plt.legend([r'SQLRight', r'Squirrel$_{+oracle}$', r'SQLancer'])
+
 x_major_locator=MultipleLocator(12)
 ax=plt.gca()
 ax.xaxis.set_major_locator(x_major_locator)
@@ -40,15 +42,3 @@ if not os.path.isdir("./plots"):
 plt.savefig('./plots/map-size.pdf', dpi = 200)
 plt.savefig('./plots/map_size.png', dpi = 200)
 
-
-plt.gca().grid(False)
-
-def export_legend(legend, filename="./plots/legend.pdf"):
-    fig  = legend.figure
-    fig.canvas.draw()
-    bbox = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
-    bbox = Bbox.from_bounds(bbox.x0-0.01, bbox.y0, bbox.width+0.085, bbox.height)
-    fig.savefig(filename, dpi=200, bbox_inches=bbox)
-
-legend = plt.legend([r'SQLRight', r'Squirrel$_{+oracle}$         ', r'SQLancer'], fontsize=14, handlelength=4)
-export_legend(legend)

@@ -23,6 +23,8 @@ plt.ylabel('Valid Queries per Hour', fontsize = 20)
 plt.xlim(0, 72)
 # plt.ylim(90, 130)
 
+plt.legend([r'SQLRight', r'Squirrel$_{+oracle}$', r'SQLancer'])
+
 x_major_locator=MultipleLocator(12)
 ax=plt.gca()
 ax.xaxis.set_major_locator(x_major_locator)

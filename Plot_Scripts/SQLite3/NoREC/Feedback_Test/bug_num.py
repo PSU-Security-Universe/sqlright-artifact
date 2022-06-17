@@ -24,6 +24,8 @@ plt.ylabel('Coverage (k)', fontsize = 20)
 
 plt.xlim(0, 24)
 
+plt.legend([r'SQLRight', r'SQLRight$_{drop}$', r'SQLRight$_{rand}$', r'SQLRight$_{save}$'])
+
 x_major_locator=MultipleLocator(4)
 ax=plt.gca()
 ax.xaxis.set_major_locator(x_major_locator)
