@@ -13,18 +13,22 @@ sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
 plot_sql_corr_over_time("../SQLRight_MySQL_TLP/", markevery = 30, line_style = 0)
-# plot_sql_corr_over_time("./squirrel/", markevery = 30, line_style = 1)
-plot_sqlancer_corr_over_time_2("./SQLancer/plot_data_0", markevery = 30, line_style = 2)
 
+# Squirel Oracle
 x = list(np.arange(0, 72.2, 0.2))
 y = [1] * len(x)
 plot_with_style(x, y, style_id = 1, markevery=30)
+
+plot_sqlancer_corr_over_time_2("./SQLancer/plot_data_0", markevery = 30, line_style = 2)
+
 
 # plt.xlabel('Time (hour)', fontsize = 20)
 plt.ylabel('Valid Queries per Hour', fontsize = 20)
 
 plt.xlim(0, 72)
 # plt.ylim(90, 130)
+
+plt.legend([r'SQLRight', r'Squirrel$_{+oracle}$', r'SQLancer'])
 
 x_major_locator=MultipleLocator(12)
 ax=plt.gca()
