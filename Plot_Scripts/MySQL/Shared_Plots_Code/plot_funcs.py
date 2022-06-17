@@ -81,6 +81,59 @@ def plot_with_style(x, y, style_id = 0, markevery=100):
         plt.plot(x, y, linestyle = (0, (3, 1, 1, 1, 1, 1)), marker = 'o', markevery=markevery, linewidth=4.0, markersize=14)
     return
 
+def plot_sql_bugs(file_dir, markevery, line_style):
+
+    if not os.path.isdir(file_dir):
+        print("Warning: Bug folder %s not exists. It could due to no active True Positive bugs being found. Or the bisecting algorithm is not called. " % (file_dir))
+        exit(1)
+
+    file_dir = os.path.join(file_dir, "time.txt")
+
+    # If the time.txt file not exists. Treat it as no bugs. 
+    if not os.path.isfile(file_dir):
+        print("time.txt file: %s not exists. " % (file_dir))
+        time_l = list(np.arange(0, 72.2, 0.2))
+        bug_num_l = [0] * len(time_l)
+        plot_with_style(time_l, bug_num_l, style_id=line_style, markevery=markevery)
+        return
+    
+    file_fd = open(file_dir, 'r')
+    all_file_lines = file_fd.readlines()
+
+    all_bug_time = []
+    for cur_line in all_file_lines:
+        cur_line = cur_line.split(" ")[1]
+        cur_line = float(cur_line)
+        all_bug_time.append(cur_line)
+    all_bug_time.sort()
+    all_bug_time = [x / 3600.0 for x in all_bug_time]
+
+    time_l = []
+    bug_num_l = []
+    bug_num = 0
+    for i in np.arange(0, 72.2, 0.2):
+        if len(all_bug_time) == 0:
+            time_l.append(i)
+            bug_num_l.append(bug_num)
+            continue
+        if i >= all_bug_time[0]:
+            time_l.append(i)
+            bug_num_l.append(bug_num)
+            bug_num += 1
+            time_l.append(i)
+            bug_num_l.append(bug_num)
+
+            if len(all_bug_time) > 1:
+                all_bug_time = all_bug_time[1:]
+            else:
+                all_bug_time = []
+        else:
+            time_l.append(i)
+            bug_num_l.append(bug_num)
+        continue
+
+    plot_with_style(time_l, bug_num_l, style_id=line_style, markevery=markevery)
+
 
 def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
     # For SQLRight. Our main tool.
