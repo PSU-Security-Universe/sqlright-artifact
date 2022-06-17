@@ -35,9 +35,10 @@ oracle_str = "NOREC"
 feedback_str = ""
 parallel_num = 5
 starting_core_id = 0
+is_non_deter = False
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:", ["odir=", "start-core=", "num-concurrent=", "oracle="])
+    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:", ["odir=", "start-core=", "num-concurrent=", "oracle=", "non-deter"])
 except getopt.GetoptError:
     print("Arguments parsing error")
     exit(1)
@@ -54,6 +55,9 @@ for opt, arg in opts:
     elif opt in ("-O", "--oracle"):
         oracle_str = arg
         print("Using oracle: %s " % (oracle_str))
+    elif opt in ("--non-deter"):
+        is_non_deter = True
+        print("Using Non-Deterministic Behavior. ")
     else:
         print("Error. Input arguments not supported. \n")
         exit(1)
@@ -114,9 +118,15 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
         "-i", "./inputs",
         "-o", cur_output_dir_str,
         "-c", str(cur_inst_id),
-        "-O", oracle_str,
-        "aaa" , "&"
+        "-O", oracle_str
         ]
+
+    if is_non_deter == True:
+        fuzzing_command.append("-w")
+
+    fuzzing_command.append("aaa")
+    fuzzing_command.append("&")
+
     fuzzing_command = " ".join(fuzzing_command)
     print("Running fuzzing command: " + fuzzing_command)
     p = subprocess.Popen(

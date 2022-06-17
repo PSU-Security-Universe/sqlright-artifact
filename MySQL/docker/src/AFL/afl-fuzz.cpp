@@ -205,6 +205,7 @@ EXP_ST u8 disable_coverage_feedback = 0;
                                * 1: Drop all queries. 
                                * 2: Randomly save queries. 
                                * 3: Save all queries. */
+static bool is_using_non_deter = 0; /* Is using non-deterministic queries. Default No. */
 
 
 extern int ff_debug;
@@ -5839,6 +5840,10 @@ u8 execute_cmd_string(vector<string>& cmd_string_vec, vector<int> &explain_diff_
   string res_str = "";
 
   for (const string& cmd_string : cmd_string_vec) {
+    if (is_using_non_deter) {
+        /* If it is using the non-deter queries, do not check for the non-deter keywords.  */
+        break;
+    }
     if ((cmd_string.find("RANDOM") != std::string::npos) ||
         (cmd_string.find("random") != std::string::npos)
       ){
@@ -8259,7 +8264,7 @@ int main(int argc, char *argv[])
   gettimeofday(&tv, &tz);
   srandom(tv.tv_sec ^ tv.tv_usec ^ getpid());
 
-  while ((opt = getopt(argc, argv, "+i:o:f:m:t:T:dnCB:S:M:x:Q:s:c:lDc:O:P:K:F:")) > 0)
+  while ((opt = getopt(argc, argv, "+i:o:f:m:t:T:dnCB:S:M:x:Q:s:c:lDc:O:P:K:F:w")) > 0)
 
     switch (opt)
     {
@@ -8305,6 +8310,11 @@ int main(int argc, char *argv[])
       if (out_dir)
         FATAL("Multiple -o options not supported");
       out_dir = optarg;
+      break;
+
+    case 'w':  /* Using non-deterministic query or not. Default No.  */
+      is_using_non_deter = true;
+      cerr << "Attention: Using non-deterministic queries in the fuzzing. Will generate False Positives. \n";
       break;
 
     case 'M':

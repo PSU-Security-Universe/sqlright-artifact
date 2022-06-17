@@ -184,7 +184,7 @@ def is_identified_bug(all_query:str):
 
     return False
 
-def dump_unique_bugs(current_bisecting_result: constants.BisectingResults):
+def dump_unique_bugs(current_bisecting_result: constants.BisectingResults, is_non_deter: bool):
     def _pretty_process(bisecting_result: constants.BisectingResults):
 
         if not bisecting_result.last_buggy_res_str_l:
@@ -224,7 +224,7 @@ def dump_unique_bugs(current_bisecting_result: constants.BisectingResults):
     if len(current_bisecting_result.query) == 0:
         return False
 
-    if not is_identified_bug(current_bisecting_result.query[0]):
+    if not is_identified_bug(current_bisecting_result.query[0]) and not is_non_deter:
         return False
 
     report_contents = []

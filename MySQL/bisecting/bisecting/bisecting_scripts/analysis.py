@@ -18,7 +18,7 @@ def setup_logger(debug_level):
     )
 
 
-def enter_bisecting_mode(oracle_str: str):
+def enter_bisecting_mode(oracle_str: str, is_non_deter: bool):
 
     all_commits = utils.json_load(constants.MYSQL_SORTED_COMMITS)
     logger.info(f"Getting {len(all_commits)} number of commits.")
@@ -30,7 +30,7 @@ def enter_bisecting_mode(oracle_str: str):
     for sample_file, sample_queries in reports.read_queries_from_files():
         is_unique_commit = True
         for sample_query in sample_queries:
-            cur_is_unique_commit = bisecting.start_bisect(sample_query, all_commits, oracle_str)
+            cur_is_unique_commit = bisecting.start_bisect(sample_query, all_commits, oracle_str, is_non_deter)
             
             if not cur_is_unique_commit:
                 is_unique_commit = False
@@ -72,8 +72,9 @@ def setup_env():
 def main():
 
     oracle_str = "NOREC"
+    is_non_deter = False
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "O:F:", ["oracle=", "Feedback="])
+        opts, args = getopt.getopt(sys.argv[1:], "O:F:", ["oracle=", "Feedback=", "non-deter"])
     except getopt.GetoptError:
         print("Arguments parsing error")
         exit(1)
@@ -84,6 +85,9 @@ def main():
         elif opt in ("-F", "--Feedback"):
             # Ignore this flag in the bisecting. 
             pass
+        elif opt in ("--non-deter"):
+            is_non_deter = True
+            print("Using non-deterministic queries. ")
         else:
             print("Error. Input arguments not supported. \n")
             exit(1)
@@ -92,7 +96,7 @@ def main():
     setup_logger(debug_level)
     setup_env()
 
-    enter_bisecting_mode(oracle_str)
+    enter_bisecting_mode(oracle_str, is_non_deter)
 
 
 if __name__ == "__main__":

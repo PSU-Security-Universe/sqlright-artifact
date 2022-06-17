@@ -74,7 +74,7 @@ def cross_compare(buggy_commit: str):
     return uniq_id, is_unique_commit
 
 
-def start_bisect(queries: List[str], all_commits, oracle_str: str):
+def start_bisect(queries: List[str], all_commits, oracle_str: str, is_non_deter: bool):
     current_bisecting_result = bi_secting_commits(queries, all_commits, oracle_str)
     if current_bisecting_result.is_bisecting_error:
         logger.error("Bisecting Error!")
@@ -86,7 +86,7 @@ def start_bisect(queries: List[str], all_commits, oracle_str: str):
     current_bisecting_result.unique_bug_id_int = uniq_id
 
     if is_unique_commit:
-        is_unique_commit = reports.dump_unique_bugs(current_bisecting_result)
+        is_unique_commit = reports.dump_unique_bugs(current_bisecting_result, is_non_deter)
 
     return is_unique_commit
 
