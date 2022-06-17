@@ -6,6 +6,7 @@ import shutil
 import subprocess
 from pathlib import Path
 from typing import List
+import time
 
 import constants
 from loguru import logger
@@ -84,8 +85,18 @@ def remove_file(file: str):
         os.remove(file)
     return
 
+def remove_directory_error_helper():
+    # Force stop all mysqld process. And then wait for a few seconds.
+    command = "pkill -9 mysqld"
+    subprocess.run(command)
+    time.sleep(2)
+
+
 def remove_directory(directory: Path):
     directory = Path(directory)
+    if directory.exists():
+        shutil.rmtree(directory, onerror=remove_directory_error_helper)
+
     if directory.exists():
         shutil.rmtree(directory)
     return
