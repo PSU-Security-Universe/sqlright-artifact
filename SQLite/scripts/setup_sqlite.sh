@@ -9,7 +9,7 @@ fi
 if [ ! -d ./sqlite_bisecting_binary ]; then
     cd sqlite_bisecting_binary_zip
     cat sqlite_bisecting_binary.zip* > ./sqlite_bisecting_binary_zip.zip
-    echo "Unzipping files. Wait for a second. "
+    echo "Unzipping files. Please wait. "
     unzip sqlite_bisecting_binary_zip.zip &> /dev/null
     mv sqlite_bisecting_binary ../sqlite_bisecting_binary
     cd ../
