@@ -83,14 +83,14 @@ def plot_with_style(x, y, style_id = 0, markevery=100):
 def plot_sql_bugs(file_dir, markevery, line_style):
 
     if not os.path.isdir(file_dir):
-        print("Warning: Bug folder %s not exists. It could due to no active True Positive bugs being found. Or the bisecting algorithm is not called. " % (file_dir))
+        print("Warning: Bug folder %s not exists. " % (file_dir))
         exit(1)
 
     file_dir = os.path.join(file_dir, "time.txt")
 
     # If the time.txt file not exists. Treat it as no bugs. 
     if not os.path.isfile(file_dir):
-        print("time.txt file: %s not exists. " % (file_dir))
+        print("time.txt file: %s not exists.  It could due to no active True Positive bugs being found after bisecting and filtering. Or the bisecting algorithm is not called. " % (file_dir))
         time_l = list(np.arange(0, 72.2, 0.2))
         bug_num_l = [0] * len(time_l)
         plot_with_style(time_l, bug_num_l, style_id=line_style, markevery=markevery)
