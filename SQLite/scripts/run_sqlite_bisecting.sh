@@ -29,6 +29,13 @@ if [ "$1" == "SQLRight" ]; then
         fi
     done
 
+    for var in "$@"
+    do
+        if [ "$var" == "--non-deter" ]; then
+            resoutdir="$resoutdir""_non_deter"
+        fi
+    done
+
     bugoutdir="$resoutdir""_bugs"
     
     cd Results
@@ -170,5 +177,5 @@ elif [ "$1" == "sqlancer" ]; then
     echo "Output finished. Expected no bugs being detected by SQLancer. "
 
 else
-    echo "Usage: bash run_sqlite_bisecting.sh <config> -O <oracle> [-F <feedback>] "
+    echo "Usage: bash run_sqlite_bisecting.sh <config> -O <oracle> [-F <feedback>] [--non-deter] "
 fi

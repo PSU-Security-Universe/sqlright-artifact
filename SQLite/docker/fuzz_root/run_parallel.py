@@ -24,9 +24,10 @@ output_dir_str = "/home/sqlite/fuzzing/fuzz_root/outputs"
 oracle_str = "NOREC"
 feedback_str = ""
 explain_flag = False
+is_non_deter = False
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:T:E", ["odir=", "start-core=", "num-concurrent=", "oracle=", "feedback=", "timeout="])
+    opts, args = getopt.getopt(sys.argv[1:], "o:c:n:O:F:T:E", ["odir=", "start-core=", "num-concurrent=", "oracle=", "feedback=", "timeout=", "non-deter"])
 except getopt.GetoptError:
     print("Arguments parsing error")
     exit(1)
@@ -52,6 +53,9 @@ for opt, arg in opts:
     elif opt in ("-E"):
         explain_flag = True
         print("Using Explain flag. ")
+    elif opt in ("--non-deter"):
+        is_non_deter = True
+        print("Using Non-Deterministic Behavior. ")
     else:
         print("Error. Input arguments not supported. \n")
         exit(1)
@@ -85,6 +89,10 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
 
     if feedback_str != "":
         fuzzing_command.append("-F " + str(feedback_str))
+
+    if is_non_deter == True:
+        # The non-deter flag for the afl-fuzz is '-w'.
+        fuzzing_command.append("-w")
 
     fuzzing_command.append(" -- ")
     fuzzing_command.append(sqlite_bin)

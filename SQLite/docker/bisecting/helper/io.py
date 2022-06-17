@@ -314,14 +314,14 @@ class IO:
                 if "create table" in cur_line.casefold():
                     if "primary key" in cur_line.casefold() and "without rowid" in cur_line.casefold():
                         # Seventh and Eighth bug pattern:
-                        if not is_bug_7_checked:
-                            is_bug_7_checked = True
+                        if not cls.is_bug_7_checked:
+                            cls.is_bug_7_checked = True
                             return True
 
                 if "alter table" in cur_line.casefold() and "add column" in cur_line.casefold() and "not null" in cur_line.casefold():
                     # Thirteenth bug pattern:
-                    if not is_bug_13_checked:
-                        is_bug_13_checked = True
+                    if not cls.is_bug_13_checked:
+                        cls.is_bug_13_checked = True
                         return True
 
                 if "SELECT ---------" in cur_line:
@@ -330,44 +330,44 @@ class IO:
 
                     # First bug pattern.
                     if "distinct" in cur_line.casefold() and "unique index" in cur_query.casefold():
-                        if not is_bug_1_checked:
-                            is_bug_1_checked = True
+                        if not cls.is_bug_1_checked:
+                            cls.is_bug_1_checked = True
                             return True
 
                     # Second bug pattern. 
                     if "join" in cur_line.casefold() and ("likely"  in cur_line.casefold() or "unlikely" in cur_line.casefold()):
-                        if not is_bug_2_checked:
-                            is_bug_2_checked = True
+                        if not cls.is_bug_2_checked:
+                            cls.is_bug_2_checked = True
                             return True
 
                     # Third bug pattern: in (..) and
                     if "in (" in cur_line.casefold() and "and" in cur_line.casefold():
-                        if not is_bug_3_checked:
-                            is_bug_3_checked = True
+                        if not cls.is_bug_3_checked:
+                            cls.is_bug_3_checked = True
                             return True
                     
                     # Fourth bug pattern: where exists (...)
                     if "where exists (" in cur_line.casefold():
-                        if not is_bug_4_checked:
-                            is_bug_4_checked = True
+                        if not cls.is_bug_4_checked:
+                            cls.is_bug_4_checked = True
                             return True
 
                     # Fifth and Sixth bug pattern:
                     if "nth_valud" in cur_line.casefold() and "over" in cur_line.casefold():
-                        if not is_bug_5_checked:
-                            is_bug_5_checked = True
+                        if not cls.is_bug_5_checked:
+                            cls.is_bug_5_checked = True
                             return True
 
                     # Tenth bug pattern:
                     if "like" in cur_line.casefold() and "and" in cur_line.casefold():
-                        if not is_bug_10_checked:
-                            is_bug_10_checked = True
+                        if not cls.is_bug_10_checked:
+                            cls.is_bug_10_checked = True
                             return True
 
                     # Eleventh bug pattern:
                     if "unique index" in cur_query.casefold() and "is not null" in cur_line.casefold():
-                        if not is_bug_11_checked:
-                            is_bug_11_checked = True
+                        if not cls.is_bug_11_checked:
+                            cls.is_bug_11_checked = True
                             return True
 
         # All bug pattern mismatched. Skip the bug. 
@@ -380,11 +380,11 @@ class IO:
 
     @classmethod
     def write_uniq_bugs_to_files(
-        cls, current_bisecting_result: BisectingResults, oracle, dup_count:int
+            cls, current_bisecting_result: BisectingResults, oracle, dup_count:int, is_non_deter:bool
     ):
         cls._pretty_process(current_bisecting_result, oracle)
 
-        if not cls._is_identified_bugs(current_bisecting_result):
+        if not cls._is_identified_bugs(current_bisecting_result) and not is_non_deter:
             # If the bug does not match the filter, do not output it to the unique bug folder. 
             print("All bug pattern mismatched. Skip the bug. ")
             return None

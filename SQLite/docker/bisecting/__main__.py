@@ -16,9 +16,11 @@ def main():
 
     oracle_str = ""
 
+    is_non_deter = False
+
     try:
 
-        opts, args = getopt.getopt(sys.argv[1:], "O:F:", ["oracle=", "feedback="])
+        opts, args = getopt.getopt(sys.argv[1:], "O:F:", ["oracle=", "feedback=", "non-deter"])
 
     except getopt.GetoptError:
         print("Arguments parsing error")
@@ -30,6 +32,9 @@ def main():
         elif opt in ("-F", "--feedback"):
             # Ignored. 
             pass
+        elif opt in ("--non-deter"):
+            is_non_deter = True
+            print("Using non-deterministic queries. ")
         else:
             print("Error. Input arguments not supported. \n")
             exit(1)
@@ -86,8 +91,8 @@ def main():
         iter_idx = 0
         is_dup_commit = False
         for cur_new_queries in all_new_queries:
-            # Early drop the query if the query contains `rtree`.
-            if len(cur_new_queries) > 0 and "rtree" in cur_new_queries[0].casefold():
+            # Early drop the query if the query contains `rtree`, if is_non_deter is not set.
+            if len(cur_new_queries) > 0 and "rtree" in cur_new_queries[0].casefold() and not is_non_deter:
                 is_dup_commit = True
                 break
             cur_is_dup_commit = Bisect.run_bisecting(
@@ -95,7 +100,8 @@ def main():
                 oracle=oracle,
                 vercon=vercon,
                 current_file=current_file_d,
-                iter_idx = iter_idx
+                iter_idx = iter_idx,
+                is_non_deter = is_non_deter
             )
             if cur_is_dup_commit:
                 is_dup_commit = True

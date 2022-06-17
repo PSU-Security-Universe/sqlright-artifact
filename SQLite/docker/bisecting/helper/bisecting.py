@@ -324,7 +324,7 @@ class Bisect:
             return current_bisecting_result, True, current_bug_id_pair[1]  # Duplicated results. Return duplicated count
 
     @classmethod
-    def run_bisecting(cls, queries_l, oracle, vercon, current_file, iter_idx:int):
+    def run_bisecting(cls, queries_l, oracle, vercon, current_file, iter_idx:int, is_non_deter: bool):
         log_out_line(
             "\n\n\nBegin bisecting query with SELECT idx %d: \n\n%s \n\n\n"
             % (iter_idx, queries_l[0])
@@ -339,7 +339,7 @@ class Bisect:
             )  # The unique bug id will be appended to current_bisecting_result when running cross_compare
 
             current_unique_bug_output = IO.write_uniq_bugs_to_files(
-                current_bisecting_result, oracle, dup_count
+                current_bisecting_result, oracle, dup_count, is_non_deter
             )
             
             if current_unique_bug_output == None:

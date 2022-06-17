@@ -29,6 +29,13 @@ if [ $# > 4 ] && [ "$1" == "SQLRight" ]; then
         fi
     done
 
+    for var in "$@"
+    do
+        if [ "$var" == "--non-deter" ]; then
+            resoutdir="$resoutdir""_non_deter"
+        fi
+    done
+
     bugoutdir="$resoutdir""_bugs"
     
     cd Results
@@ -248,5 +255,6 @@ elif [ "$1" == "sqlancer" ]; then
     done
     
 else
-    echo "Usage: bash run_sqlite_fuzzing.sh <config> --start-core <num> --num-concurrent <num> -O <oracle> [-F <feedback>] "
+    echo "Wrong arguments: $@"
+    echo "Usage: bash run_sqlite_fuzzing.sh <config> --start-core <num> --num-concurrent <num> -O <oracle> [-F <feedback>] [-non-deter]  "
 fi
