@@ -18,6 +18,20 @@ class IO:
     all_files_in_dir = []
     is_checked = False
 
+    is_bug_1_checked = False
+    is_bug_2_checked = False
+    is_bug_3_checked = False
+    is_bug_4_checked = False
+    is_bug_5_checked = False
+    is_bug_6_checked = False
+    is_bug_7_checked = False
+    is_bug_8_checked = False
+    is_bug_9_checked = False
+    is_bug_10_checked = False
+    is_bug_11_checked = False
+    is_bug_12_checked = False
+    is_bug_13_checked = False
+
     @classmethod
     def remove_file_from_abs_path(cls, fd: str):
         os.remove(os.path.join(fd))
@@ -298,13 +312,17 @@ class IO:
                 return False
             for cur_line in cur_query.splitlines():
                 if "create table" in cur_line.casefold():
-                    # Seventh and Eighth bug pattern:
                     if "primary key" in cur_line.casefold() and "without rowid" in cur_line.casefold():
-                        return True
+                        # Seventh and Eighth bug pattern:
+                        if not is_bug_7_checked:
+                            is_bug_7_checked = True
+                            return True
 
                 if "alter table" in cur_line.casefold() and "add column" in cur_line.casefold() and "not null" in cur_line.casefold():
                     # Thirteenth bug pattern:
-                    return True
+                    if not is_bug_13_checked:
+                        is_bug_13_checked = True
+                        return True
 
                 if "SELECT ---------" in cur_line:
                     # Found the buggy SELECT statement
@@ -312,31 +330,45 @@ class IO:
 
                     # First bug pattern.
                     if "distinct" in cur_line.casefold() and "unique index" in cur_query.casefold():
-                        return True
+                        if not is_bug_1_checked:
+                            is_bug_1_checked = True
+                            return True
 
                     # Second bug pattern. 
                     if "join" in cur_line.casefold() and ("likely"  in cur_line.casefold() or "unlikely" in cur_line.casefold()):
-                        return True
+                        if not is_bug_2_checked:
+                            is_bug_2_checked = True
+                            return True
 
                     # Third bug pattern: in (..) and
                     if "in (" in cur_line.casefold() and "and" in cur_line.casefold():
-                        return True
+                        if not is_bug_3_checked:
+                            is_bug_3_checked = True
+                            return True
                     
                     # Fourth bug pattern: where exists (...)
                     if "where exists (" in cur_line.casefold():
-                        return True
+                        if not is_bug_4_checked:
+                            is_bug_4_checked = True
+                            return True
 
                     # Fifth and Sixth bug pattern:
                     if "nth_valud" in cur_line.casefold() and "over" in cur_line.casefold():
-                        return True
+                        if not is_bug_5_checked:
+                            is_bug_5_checked = True
+                            return True
 
                     # Tenth bug pattern:
                     if "like" in cur_line.casefold() and "and" in cur_line.casefold():
-                        return True
+                        if not is_bug_10_checked:
+                            is_bug_10_checked = True
+                            return True
 
                     # Eleventh bug pattern:
                     if "unique index" in cur_query.casefold() and "is not null" in cur_line.casefold():
-                        return True
+                        if not is_bug_11_checked:
+                            is_bug_11_checked = True
+                            return True
 
         # All bug pattern mismatched. Skip the bug. 
         return False

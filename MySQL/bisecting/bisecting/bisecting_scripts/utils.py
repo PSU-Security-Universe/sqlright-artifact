@@ -87,9 +87,9 @@ def remove_file(file: str):
 
 def remove_directory_error_helper(func, path, exc_info):
     # Force stop all mysqld process. And then wait for a few seconds.
-    command = "pkill -9 mysqld"
+    command = "pkill mysqld"
     subprocess.run(command, shell=True)
-    time.sleep(2)
+    time.sleep(7)
 
 
 def remove_directory(directory: Path):

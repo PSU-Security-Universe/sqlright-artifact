@@ -97,7 +97,7 @@ def start_mysqld_server(hexsha: str):
                         stdin=subprocess.DEVNULL
                         )
     # Do not block the Popen, let it run and return. We will later use `pkill` to kill the mysqld process.
-    time.sleep(1)
+    time.sleep(2)
 
 def execute_queries(queries: str, hexsha: str):
     
