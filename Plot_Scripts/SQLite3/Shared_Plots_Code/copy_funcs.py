@@ -21,6 +21,21 @@ def copy_sqlright_contents_in_dir(src:str, dest:str):
         # actual copy
         shutil.copy(plot_file, os.path.join(dest, "plot_data_%d" % (i)))
         i += 1
+
+    if src[-1] == "/":
+        src = src[:-1]
+    bug_time_src = src + "_bugs"
+
+    bug_time_src = os.path.join(bug_time_src, "bug_samples/unique_bug_output")
+    if not os.path.isdir(bug_time_src):
+        print("Error: time.txt file from: %s not exists. Please run the bisecting algorithm first before calling the copy_results.py. ")
+        exit(1)
+    bug_time_src = os.path.join(bug_time_src, "time.txt")
+    if not os.path.isfile(bug_time_src):
+        print("Warning: time.txt file from: %s not exists. Did you finish the bisecting algorithm? ")
+    else:
+        shutil.copy(bug_time_src, os.path.join(dest, "time.txt"))
+
     print("Copy from %s to %s finished. \n" % (src, dest))
 
 def copy_sqlancer_contents_in_dir(src:str, config_name: str, dest:str):

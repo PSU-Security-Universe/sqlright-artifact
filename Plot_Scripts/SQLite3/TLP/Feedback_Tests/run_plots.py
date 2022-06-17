@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-all_py = ["map_size.py", "correct_rate.py", "correct_rate_over_time.py"]
+all_py = ["map_size.py", "correct_rate.py", "correct_rate_over_time.py", "bug_num.py"]
 
 for cur_py in all_py:
     print("Running on dir: '%s' with file : '%s'" % (os.getcwd(), cur_py))
