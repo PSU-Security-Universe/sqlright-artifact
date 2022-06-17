@@ -39,9 +39,11 @@ def check_query_execute_correctness(queries_l: List[str], hexsha: str, oracle_st
     final_flag = constants.RESULT.PASS
     all_res_flags = []
     if oracle_str == "NOREC" or oracle_str == "NoREC":
+        logger.debug("Using Oracle NoREC")
         final_flag, all_res_flags = Oracle_NoREC.comp_query_res(all_res_str_l)
     elif oracle_str == "TLP":
-        final_flag, all_res_flags = Oracle_TLP.comp_query_res(all_res_str_l)
+        logger.debug("Using Oracle TLP")
+        final_flag, all_res_flags = Oracle_TLP.comp_query_res(all_res_str_l, queries_l[0])
     else:
         logger.error("Oracle_str: %s not recognized. Using the default NOREC oracle instead. ")
         final_flag, all_res_flags = Oracle_NoREC.comp_query_res(all_res_str_l)
