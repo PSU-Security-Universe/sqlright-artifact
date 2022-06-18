@@ -594,61 +594,191 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/MySQL/TLP/
 - For MySQL query validity: `SQLRight` has a higher validity than `Squirrel-oracle`. 
 - For MySQL valid stmts / hr: `SQLRight` has more valid_stmts / hr than `Squirrel-oracle`.
 
-## 4. Contribution of code-coverage feedback:
+## 4. Contribution of Code-Coverage Feedback
 
-### 4.1 Using NoREC oracle (Figure 6c):
+### 4.1 NoREC oracle
 
-#### 4.1.1 Run the SQLRight SQLite3 Drop All configiguration, for 24 hours:
+#### 4.1.1 SQLRight
+
+Make sure you have finished `Session 3.1.1` in this Artifact Evaluation. 
+
+#### 4.1.2 SQLRight Drop All
+
+<sub>`121` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
+
 ```sh
 cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback drop_all 
 ```
 
-#### 4.1.2 Run the SQLRight SQLite3 Random Save configiguration, for 24 hours:
+After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
+
 ```sh
 cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_bisecting.sh SQLRight --oracle NOREC --feedback drop_all 
+```
+
+The bug bisecting process is expected to finish in `1` hours. 
+
+#### 4.1.3 SQLRight Random Save
+
+<sub>`121` CPU hours</sub>
+
+**WARNING**: Due to the aggresive query seed handling strategies, the SQLright Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `15GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `75GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback random_save
 ```
 
-#### 4.1.3 Run the SQLRight SQLite3 Save All configiguration, for 24 hours:
+After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
+
 ```sh
 cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_bisecting.sh SQLRight --oracle NOREC --feedback random_save
+```
+
+The bug bisecting process is expected to finish in `1` hours. 
+
+#### 4.1.4 Run the SQLRight SQLite3 Save All configiguration, for 24 hours:
+
+<sub>`121` CPU hours</sub>
+
+**WARNING**: Due to the aggresive query seed handling strategies, the SQLright Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC --feedback save_all
 ```
 
-#### 4.1.4 Plot the figures:
+After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_bisecting.sh SQLRight --oracle NOREC --feedback save_all
+```
+
+The bug bisecting process is expected to finish in `1` hours. 
+
+#### 4.1.5 Figures:
+
+Make sure you have finished the steps in `Session 4.1.1 - 4.1.4`. 
+
+The following scripts will generate *Figure 6a, c* in the paper. 
+
 ```sh
 cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Feedback_Test
 python3 copy_results.py
 python3 run_plots.py
 ```
 
-### 4.2 Using TLP oracle (Figure 6d):
+**Expectations**:
 
-#### 4.2.1 Run the SQLRight SQLite3 Drop All configiguration, for 24 hours:
+- For bugs of SQLite (NoREC): `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. 
+- For coverage of SQLite (NoREC): `SQLRight` should have the highest code coverage among the other baselines. 
+
+### 4.2 TLP oracle:
+
+#### 4.2.1 SQLRight
+
+Make sure you have finished `Session 3.4.1` in this Artifact Evaluation. 
+
+#### 4.2.2 SQLRight Drop All
+
+<sub>`121` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
+
 ```sh
 cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --feedback drop_all 
 ```
 
-#### 4.2.2 Run the SQLRight SQLite3 Random Save configiguration, for 24 hours:
+After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
+
 ```sh
 cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_bisecting.sh SQLRight --oracle TLP --feedback drop_all 
+```
+
+The bug bisecting process is expected to finish in `1` hours. 
+
+#### 4.2.3 SQLRight Random Save
+
+<sub>`121` CPU hours</sub>
+
+**WARNING**: Due to the aggresive query seed handling strategies, the SQLright Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `15GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `75GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --feedback random_save
 ```
 
-#### 4.2.3 Run the SQLRight SQLite3 Save All configiguration, for 24 hours:
+After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
+
 ```sh
 cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_bisecting.sh SQLRight --oracle TLP --feedback random_save
+```
+
+The bug bisecting process is expected to finish in `1` hours. 
+
+#### 4.2.4 Run the SQLRight SQLite3 Save All configiguration, for 24 hours:
+
+<sub>`121` CPU hours</sub>
+
+**WARNING**: Due to the aggresive query seed handling strategies, the SQLright Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --feedback save_all
 ```
 
-#### 4.2.4 Plot the figures:
+After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
+
+```sh
+cd <sqlright_root>/SQLite/scripts
+bash run_sqlite_bisecting.sh SQLRight --oracle TLP --feedback save_all
+```
+
+The bug bisecting process is expected to finish in `1` hours. 
+
+#### 4.2.5 Figures:
+
+Make sure you have finished the steps in `Session 4.2.1 - 4.2.4`. 
+
+The following scripts will generate *Figure 6b, d* in the paper. 
+
 ```sh
 cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Feedback_Test
 python3 copy_results.py
 python3 run_plots.py
 ```
+
+**Expectations**:
+
+- For bugs of SQLite (TLP): `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. 
+- For coverage of SQLite (TLP): `SQLRight` should have the highest code coverage among the other baselines. 
 
 ## 5. Contribution of Validity components:
 
