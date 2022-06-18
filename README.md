@@ -7,7 +7,11 @@ Update: May 24, 2022
 Paper: Detecting Logical Bugs of DBMS with Coverage-based Guidance
 
 This document is to help users reproduce the results we reported in our submission. 
-It contains the following descriptions:
+
+Currently supported DBMS:
+1. SQLite3
+2. PostgreSQL
+3. MySQL
 
 ## Getting Started
 
