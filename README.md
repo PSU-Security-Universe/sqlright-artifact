@@ -621,7 +621,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/MySQL/TLP/
 
 #### 4.1.1 SQLRight
 
-Make sure you have finished `Session 3.1.1` in this Artifact Evaluation. 
+Make sure you have finished *Session 3.1.1* in this Artifact Evaluation. 
 
 #### 4.1.2 SQLRight Drop All
 
@@ -821,42 +821,65 @@ python3 count_queue_depth.py
 
 
 <br/><br/>
-## 5. Contribution of Validity components:
+## 5. Contribution of Validity Components
 
-### 5.1 SQLite, NoREC oracle (Figure 7c, f, i):
+### 5.1 SQLite, NoREC Oracle
 
-#### 5.1.1 Run the SQLRight SQLite3 fuzzing for 24 hours. 
+#### 5.1.1 SQLRight 
 
-This evaluation is the same as the one in session `3.1.1`. We can reuse the evaluation results. 
+Make sure you have finished *Session 3.1.1* in this Artifact Evaluation. 
 
-#### 5.1.2 Run the SQLRight no-ctx-valid fuzzing for 24 hours. 
+#### 5.1.2 SQLRight No-Ctx-Valid 
 
-Run
+<sub>`121` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
-#### 5.1.3 Run the SQLRight no-db-par-ctx-valid fuzzing for 24 hours. 
+After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-Run
+```sh
+bash run_sqlite_bisecting.sh no-ctx-valid --oracle NOREC
+```
+
+The bug bisecting process is expected to finish in `1` hour.
+
+#### 5.1.3 SQLRight No-DB-Par-Ctx-Valid 
+
+<sub>`121` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
-#### 5.1.4 Run the Squirrel-oracle fuzzing for 24 hours. 
-
-Run
+After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
-cd <sqlright_root>/SQLite/scripts
-bash run_sqlite_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle NOREC
+bash run_sqlite_bisecting.sh no-db-par-ctx-valid --oracle NOREC
 ```
 
+The bug bisecting process is expected to finish in `1` hour.
+
+#### 5.1.4 Run the Squirrel-oracle fuzzing for 24 hours. 
+
+Make sure you have finished *Session 3.1.2* in this Artifact Evaluation. 
+
 #### 5.1.5 Plot the figures:
+
+The following scripts will generate *Figure 7a, c, f, i* in the paper.
 
 ```sh
 cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Validate_Parts
@@ -864,9 +887,19 @@ python3 copy_results.py
 python3 run_plots.py
 ```
 
-### 5.2 PostgreSQL, NoREC oracle (Figure 7e, h, k):
+The figures will be generated in folder: `<sqlright_root>/Plot_Scripts/SQLite3/NoREC/Validate_Parts/plots`. 
 
-#### 5.2.1 Run the SQLRight PostgreSQL fuzzing for 24 hours. 
+**Expectations**:
+
+- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destory the plot region and render the script outputs an unreadable plots. 
+- For SQLite code coverage figure: `SQLRight` and `SQLRight non-deter` should have the highest code coverage among the other baselines. `SQLRight non-ctx-valid` could have a coverage very close to the `SQLRight` config, but in general, `SQLRight non-ctx-valid` is slightly worse in coverage compared to `SQLRight`. 
+- For SQLite query validity: `SQLRight` and `SQLRight non-deter` should have the highest query validity. 
+- For SQLite valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
+
+--------------------------------------------------------------
+### 5.2 PostgreSQL, NoREC oracle
+
+#### 5.2.1 SQLRight
 
 This evaluation is the same as the one in session `3.2.1`. We can reuse the evaluation results. 
 
