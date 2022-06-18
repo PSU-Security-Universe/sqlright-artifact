@@ -19,7 +19,7 @@ x = list(np.arange(0, 72.2, 0.2))
 y = [1] * len(x)
 plot_with_style(x, y, style_id = 1, markevery=30)
 
-plot_sqlancer_corr_over_time_2("./SQLancer/plot_data_0", markevery = 30, line_style = 2)
+plot_sqlancer_corr_over_time_2("./sqlancer/plot_data_0", markevery = 30, line_style = 2)
 
 
 # plt.xlabel('Time (hour)', fontsize = 20)

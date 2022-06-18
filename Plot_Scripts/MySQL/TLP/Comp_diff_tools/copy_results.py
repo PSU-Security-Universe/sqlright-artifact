@@ -11,11 +11,11 @@ if not os.path.exists(mysql_results_dir):
 
 sqlright_res_dir = os.path.join(mysql_results_dir, "sqlright_mysql_TLP")
 sqlancer_res_dir = os.path.join(mysql_results_dir, "sqlancer_mysql")
-sqlancer_config_str = "sqlancer_sqlite_TLP"
+sqlancer_config_str = "sqlancer_mysql_TLP"
 squirrel_oracle_res_dir = os.path.join(mysql_results_dir, "squirrel_oracle_TLP")
 
 
 copy_sqlright_contents_in_dir(sqlright_res_dir, os.path.join(os.getcwd(), "../SQLRight_MySQL_TLP"))
-copy_sqlancer_contents_in_dir(sqlright_res_dir, sqlancer_config_str,os.path.join(os.getcwd(), "./sqlancer"))
+copy_sqlancer_contents_in_dir(sqlancer_res_dir, sqlancer_config_str, os.path.join(os.getcwd(), "./sqlancer"))
 copy_sqlright_contents_in_dir(squirrel_oracle_res_dir, os.path.join(os.getcwd(), "./squirrel"))
 

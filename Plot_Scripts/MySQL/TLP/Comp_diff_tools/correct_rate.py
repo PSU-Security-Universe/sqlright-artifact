@@ -20,7 +20,7 @@ x = list(np.arange(0, 72.2, 0.2))
 y = [0] * len(x)
 plot_with_style(x, y, style_id = 1, markevery=30)
 
-plot_sqlancer_default_correct_rate("sqlancer/log_0")
+plot_sqlancer_default_correct_rate()
 
 plt.xlim(0, 72)
 # plt.ylim(-1, 105)

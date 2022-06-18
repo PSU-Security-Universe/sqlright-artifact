@@ -12,8 +12,8 @@ import paramiko
 sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
-plot_sql_correct_rate("../SQLRight_MySQL_TLP/", markevery = 10, line_style = 4)
-plot_sql_correct_rate("./non_deter/", markevery = 10, line_style = 0)
+plot_sql_correct_rate("../SQLRight_MySQL_TLP/", markevery = 10, line_style = 0)
+plot_sql_correct_rate("./non_deter/", markevery = 10, line_style = 4)
 plot_sql_correct_rate("./SQLRight_with_squ_valid/", markevery = 10, line_style = 2)
 # sqlright with squ parser
 x = list(np.arange(0, 24.2, 0.2))

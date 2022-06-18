@@ -14,7 +14,7 @@ from plot_funcs import *
 
 plot_sql_bugs("../SQLRight_MySQL_TLP/", markevery = 30, line_style = 0)
 plot_sql_bugs("./squirrel/", markevery = 30, line_style = 1)
-plot_sql_bugs("./SQLancer/", markevery = 30, line_style = 2)
+plot_sql_bugs("./sqlancer/", markevery = 30, line_style = 2)
 
 
 # plt.xlabel('Time (hour)', fontsize = 20)

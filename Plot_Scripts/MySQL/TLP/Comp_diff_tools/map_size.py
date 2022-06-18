@@ -14,7 +14,7 @@ from plot_funcs import *
 
 plot_sql_mapsize("../SQLRight_MySQL_TLP/", markevery = 30, line_style = 0)
 plot_sql_mapsize("./squirrel/", markevery = 30, line_style = 1)
-plot_sql_mapsize("./SQLancer/plot_data_0", markevery = 30, line_style = 2)
+plot_sql_mapsize("./sqlancer/", markevery = 30, line_style = 2)
 
 
 # plt.xlabel('Time (hour)', fontsize = 20)
