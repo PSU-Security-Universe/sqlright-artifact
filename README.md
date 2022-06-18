@@ -594,6 +594,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/MySQL/TLP/
 - For MySQL query validity: `SQLRight` has a higher validity than `Squirrel-oracle`. 
 - For MySQL valid stmts / hr: `SQLRight` has more valid_stmts / hr than `Squirrel-oracle`.
 
+<br/><br/>
 ## 4. Contribution of Code-Coverage Feedback
 
 ### 4.1 NoREC oracle
