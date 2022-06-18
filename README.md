@@ -163,6 +163,8 @@ The bug bisecting process is expected to finish in `1` hour.
 
 Run the following command. Let the fuzzing processes run for 72 hours.
 
+**WARNING**: The `Squirrel-Oracle` process consumes a large amount of memory. In our evaluation, we observed a maximum of `190GB` of memory usage PER `Squirrel-Oracle` process after running for 72 hours. With 5 concurrent processes, the evalution could use in total of `600GB` of memory within 72 hours. If not enough memory is available, consider using a smaller number of `--num-concurrent`.  
+
 ```sh
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
@@ -185,13 +187,15 @@ The bug bisecting process is expected to finish in `1` hour.
 
 Run the following command. Let the `SQLancer` processes run for 72 hours. 
 
-**Warning: The SQLancer process will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `80GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `400GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. **
+**WARNING**: The SQLancer process will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `80GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `400GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
 # Call 5 instances of SQLancer. 
 bash run_sqlite_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 ```
+
+After `72` hours, stop the Docker container instance. 
 
 #### 3.1.4 Figures. 
 
@@ -205,7 +209,7 @@ python3 run_plots.py
 
 The figures will be generated in folder `<sqlright_root>/Plot_Scripts/SQLite3/NoREC/Comp_diff_tools_NoREC/plots`.
 
-**Expectation**:
+**Expectations**:
 
 - For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 3` bugs being detected by `SQLRight` in `72` hours. 
 - For SQLite code coverage figure: `SQLRight` should have the highest code coverage among the other baselines. 
@@ -214,30 +218,57 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/SQLite3/No
 
 
 --------------------------------------------------------------------------
-### 3.2 PostgreSQL, NoREC oracle (Figure 6d, g, j)
+### 3.2 PostgreSQL, NoREC
 
-#### 3.2.1 Run the SQLRight PostgreSQL fuzzing for 72 hours. 
+#### 3.2.1 SQLRight
+
+<sub>`360` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for `72` hours.
 
 ```sh
 cd <sqlright_root>/PostgreSQL/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_postgres_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
-#### 3.2.2 Run the Squirrel with oracle PostgreSQL fuzzing for 72 hours.
+After `72` hours, stop the Docker container instance. 
+
+Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process for PostgreSQL fuzzings. 
+
+#### 3.2.2 Squirrel-Oracle.
+
+<sub>`360` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 72 hours.
 
 ```sh
 cd <sqlright_root>/PostgreSQL/scripts
 bash run_postgres_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
-#### 3.2.3 Run the SQLancer PostgreSQL for 72 hours.
+After `72` hours, stop the Docker container instance. 
+
+#### 3.2.3 SQLancer
+
+<sub>`360` CPU hours</sub>
+
+Run the following command. Let the `SQLancer` processes run for 72 hours. 
+
+**WARNING**: The SQLancer process will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `50GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `250GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
 ```sh
 cd <sqlright_root>/PostgreSQL/scripts
 bash run_postgres_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 ```
 
-#### 3.2.4 Plot the figures. 
+After `72` hours, stop the Docker container instance. 
+
+#### 3.2.4 Figures 
+
+The following scripts will generate *Figure 5e, h, k* in the paper. 
 
 ```sh
 cd <sqlright_root>/Plot_Scripts/Postgres/NoREC/Comp_diff_tools_NoREC
@@ -245,7 +276,13 @@ python3 copy_results.py
 python3 run_plots.py
 ```
 
-The plots would be generated in folder `plots`.
+The plots will be generated in folder `<sqlright_root>/Plot_Scripts/Postgres/NoREC/Comp_diff_tools_NoREC/plots`. 
+
+**Expectations**:
+
+- For SQLite code coverage figure: `SQLRight` should have the highest code coverage among the other baselines. 
+- For SQLite query validity: `SQLancer` have the highest query validity, while `SQLRight` performs better than `Squirrel-oracle`. 
+- For SQLite query validity: `SQLancer` have the highest valid stmts / hr, while `SQLRight` performs better than `Squirrel-oracle`.
 
 ### 3.3 MySQL, NoREC oracle (Figure 6d, g, j)
 
