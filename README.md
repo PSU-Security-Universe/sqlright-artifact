@@ -965,6 +965,8 @@ Make sure you have finished *Session 3.2.2* in this Artifact Evaluation.
 
 #### 5.2.5 Plot the figures:
 
+Because we did not detect False Positives when using `SQLRight non-deter` in our PostgreSQL evaluations, the current `SQLRight non-deter` implementation is basically identical to `SQLRight`. We therefore skip `SQLRight non-deter` in this Artifact Evaluation. 
+
 The following scripts will generate *Figure 7e, h, k* in the paper.
 
 ```sh
@@ -1075,40 +1077,92 @@ python3 run_plots.py
 - For MySQL query validity: `SQLRight` and `SQLRight non-deter` should have the highest query validity. 
 - For MySQL valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
 
-### 5.4 SQLite, TLP oracle (Figure 9c, f, i):
+--------------------------------------------------
+### 5.4 SQLite, TLP Oracle
 
-#### 5.4.1 Run the SQLRight SQLite3 fuzzing for 24 hours. 
+#### 5.4.1 SQLRight 
 
-This evaluation is the same as the one in session `3.4.1`. We can reuse the evaluation results. 
+Make sure you have finished *Session 3.4.1* in this Artifact Evaluation. 
 
-#### 5.4.2 Run the SQLRight no-ctx-valid fuzzing for 24 hours. 
+#### 5.4.2 SQLRight No-Ctx-Valid 
 
-Run
+<sub>`121` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
+
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
 ```
 
-#### 5.4.3 Run the SQLRight no-db-par-ctx-valid fuzzing for 24 hours. 
+After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-Run
+```sh
+bash run_sqlite_bisecting.sh no-ctx-valid --oracle TLP
+```
+
+The bug bisecting process is expected to finish in `1` hour.
+
+#### 5.4.3 SQLRight No-DB-Par-Ctx-Valid 
+
+<sub>`121` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
+
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
 ```
 
-#### 5.4.4 Run the Squirrel-oracle fuzzing for 24 hours. 
+After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-Run
+```sh
+bash run_sqlite_bisecting.sh no-db-par-ctx-valid --oracle TLP
+```
+
+The bug bisecting process is expected to finish in `1` hour.
+
+#### 5.4.4 Squirrel-Oracle
+
+Make sure you have finished *Session 3.4.2* in this Artifact Evaluation. 
+
+#### 5.4.5 SQLRight Non-Deter
+
+<sub>`121` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
+
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
-bash run_sqlite_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle TLP
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
+bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --non-deter
 ```
 
-#### 5.4.5 Plot the figures:
+After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
+
+```sh
+bash run_sqlite_bisecting.sh SQLRight --oracle TLP --non-deter
+```
+
+The bug bisecting process is expected to finish in `1` hour. 
+
+#### 5.4.6 Figures:
+
+The following scripts will generate *Figure 9a, c, f, i* in the paper.
 
 ```sh
 cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Validate_Parts
@@ -1116,40 +1170,69 @@ python3 copy_results.py
 python3 run_plots.py
 ```
 
-### 5.5 PostgreSQL, NoREC oracle (Figure 9e, h, k):
+The figures will be generated in folder: `<sqlright_root>/Plot_Scripts/SQLite3/TLP/Validate_Parts/plots`. 
 
-#### 5.5.1 Run the SQLRight PostgreSQL fuzzing for 24 hours. 
+**Expectations**:
 
-This evaluation is the same as the one in session `3.5.1`. We can reuse the evaluation results. 
+- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destory the plot region and render the script outputs an unreadable plots. 
+- For SQLite code coverage figure: `SQLRight` and `SQLRight non-deter` should have the highest code coverage among the other baselines. 
+- For SQLite query validity: `SQLRight` and `SQLRight non-deter` should have the highest query validity. 
+- For SQLite valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
 
-#### 5.5.2 Run the SQLRight no-ctx-valid fuzzing for 24 hours. 
+--------------------------------------------------------------
+### 5.5 PostgreSQL, TLP oracle
 
-Run
+#### 5.5.1 SQLRight
+
+Make sure you have finished *Session 3.5.1* in this Artifact Evaluation. 
+
+#### 5.5.2 SQLRight No-Ctx-Valid
+
+<sub>`120` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
+
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 ```sh
 cd <sqlright_root>/PostgreSQL/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_postgres_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
 ```
 
-#### 5.5.3 Run the SQLRight no-db-par-ctx-valid fuzzing for 24 hours. 
+After 24 hours, stop the Docker container instance. 
 
-Run
+Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process for PostgreSQL fuzzings. 
+
+#### 5.5.3 SQLRight No-DB-Par-Ctx-Valid 
+
+<sub>`120` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for `24` hours.
+
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 ```sh
 cd <sqlright_root>/PostgreSQL/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_postgres_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
 ```
 
+After `24` hours, stop the Docker container instance. 
+
 #### 5.5.4 Run the Squirrel-oracle fuzzing for 24 hours. 
 
-Run
-
-```sh
-cd <sqlright_root>/PostgreSQL/scripts
-bash run_postgres_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle TLP
-```
+Make sure you have finished *Session 3.5.2* in this Artifact Evaluation. 
 
 #### 5.5.5 Plot the figures:
+
+Because we did not detect False Positives when using `SQLRight non-deter` in our PostgreSQL evaluations, the current `SQLRight non-deter` implementation is basically identical to `SQLRight`. We therefore skip `SQLRight non-deter` in this Artifact Evaluation. 
+
+The following scripts will generate *Figure 9e, h, k* in the paper.
 
 ```sh
 cd <sqlright_root>/Plot_Scripts/Postgres/TLP/Validate_Parts
@@ -1157,43 +1240,116 @@ python3 copy_results.py
 python3 run_plots.py
 ```
 
-### 5.6 MySQL, TLP oracle (Figure 9d, g, j):
+The figures will be generated in folder: `<sqlright_root>/Plot_Scripts/Postgres/NoREC/Validate_Parts/plots`. 
 
-#### 5.6.1 Run the SQLRight MySQL fuzzing for 24 hours. 
+**Expectations**:
 
-This evaluation is the same as the one in session `3.6.1`. We can reuse the evaluation results. 
+- For PostgreSQL code coverage figure: `SQLRight` and `SQLRight non-deter` should have the highest code coverage among the other baselines. `SQLRight non-ctx-valid` could have a coverage very close to the `SQLRight` config, but in general, `SQLRight non-ctx-valid` is slightly worse in coverage compared to `SQLRight`. 
+- For PostgreSQL query validity: `SQLRight` and `SQLRight non-deter` should have the highest query validity. 
+- For PostgreSQL valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
 
-#### 5.6.2 Run the SQLRight no-ctx-valid fuzzing for 24 hours. 
+--------------------------------------------------------------------------
+### 5.6 MySQL, TLP oracle
 
-Run
+#### 5.6.1 SQLRight
+
+Make sure you have finished *Session 3.6.1* in this Artifact Evaluation. 
+
+#### 5.6.2 SQLRight No-Ctx-Valid
+
+<sub>`125` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
+
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 ```sh
 cd <sqlright_root>/MySQL/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_mysql_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
 ```
 
-#### 5.6.3 Run the SQLRight no-db-par-ctx-valid fuzzing for 24 hours. 
+After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-Run
+```sh
+bash run_mysql_bisecting.sh no-ctx-valid --oracle TLP
+```
+
+The bug bisecting process is expected to finish in `5` hours.
+
+#### 5.6.3 SQLRight No-DB-Par-Ctx-Valid
+
+<sub>`125` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
+
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 ```sh
 cd <sqlright_root>/MySQL/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process.
 bash run_mysql_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 --oracle TLP
 ```
 
-#### 5.6.4 Run the Squirrel-oracle fuzzing for 24 hours. 
+After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-Run
+```sh
+bash run_mysql_bisecting.sh no-db-par-ctx-valid --oracle TLP
+```
+
+The bug bisecting process is expected to finish in `5` hour.
+
+#### 5.6.4 Squirrel-Oracle 
+
+Make sure you have finished *Session 3.6.2* in this Artifact Evaluation. 
+
+#### 5.6.5 SQLRight Non-Deter
+
+<sub>`125` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 24 hours.
+
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 ```sh
 cd <sqlright_root>/MySQL/scripts
-bash run_mysql_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle TLP
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
+bash run_mysql_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TLP --non-deter
 ```
 
-#### 5.6.5 Plot the figures:
+After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
+
+```sh
+bash run_mysql_bisecting.sh SQLRight --oracle TLP --non-deter
+```
+
+The bug bisecting process is expected to finish in `5` hour.
+
+#### 5.6.6 Figures:
+
+The following scripts will generate *Figure 9b, d, g, j* in the paper.
 
 ```sh
 cd <sqlright_root>/Plot_Scripts/MySQL/TLP/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
 ```
+
+**Expectations**:
+
+- For MySQL logical bugs figure: The current bisecting and bug filtering scipts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. In general, `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 1` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destory the plot region and render the script outputs an unreadable plots. 
+- For MySQL code coverage figure: `SQLRight` and `SQLRight non-deter` should have the highest code coverage among the other baselines. `SQLRight non-ctx-valid` could have a coverage very close to the `SQLRight` config, but in general, `SQLRight non-ctx-valid` is slightly worse in coverage compared to `SQLRight`. 
+- For MySQL query validity: `SQLRight` and `SQLRight non-deter` should have the highest query validity. 
+- For MySQL valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
+
+<br/><br/>
+<br/><br/>
+# End of the Artifact Evaluation Instructions
+
+We hereby thank all the reviewers for putting in the hard work to reproduce the results we presented in the paper. Have a great Summer and have a great USENIX Security 2022 conferece! 
