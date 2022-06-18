@@ -17,7 +17,7 @@ Currently supported DBMS:
 
 ### Operating System configuration and Source Code setup
 
-All of the experiments are evaluated on a `X86-64` CPU with an `Ubuntu 20.04 LTS` operating system. We recommand more than `500GB` of memory for the evaluation and `1TB` hard drive storage usage. All the experiments are evaluated in a Docker env, we recommend to use Docker version >= `20.10.16` to reproduce the results. Before the start of the experiment, we need to configure a few system settings to be applied to the host operating system. 
+All of the experiments are evaluated on a `X86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommand more than `500GB` of memory for the evaluation and `1TB` hard drive storage usage. All the experiments are evaluated in a Docker env, we recommend to use Docker version >= `20.10.16` to reproduce the results. Before the start of the experiment, we need to configure a few system settings to be applied to the host operating system. 
 
 ```sh
 # Open a terminal from the Ubuntu system if you are using a Desktop distribution. 
@@ -62,10 +62,18 @@ The total Artifact Evaluation is expected to consume a total of `#TODO` CPU hour
 Our paper presents `SQLRight`, a tool that combines coverage-based guidance, validity-oriented mutations and oracles to detect logical bugs in Database Management Systems. For Artifact Evaluation, we release:
 
 - (1) The `SQLRight` source code. 
-- (2) The paper's final version. 
+- (2) The paper's final version. [Paper Link in Repo](Paper/paper_no_names.pdf)
 - (3) Information and the script to reproduce the evaluated benchmarks. 
 
-## 2. Build the Docker environment to run the evaluations:
+**Session 2** contains the instructions to build all the Docker images required for our evaluation. These are the prerequisite steps before we run any fuzzing evaluations. 
+
+**Session 3** contains the instructions to evaluate `Comparison with Existing Tools` (**Section 5.2** in the paper). It includes the steps to generate the figures from *Figure 5* and *Figure 8* in the paper. It consumes about `#TODO` CPU hours.
+
+**Session 4** contains the instructions to evaluate `Contribution of Coverage Feedback` (**Section 5.3** in the paper). It includes the steps to generate *Figure 6* and *Table 3* in the paper. It consumes about `#TODO` CPU hours.
+
+**Session 5** contains the instructions to evalute `Contribution of Validity` (**Section 5.4** in the paper). It includes the steps to generate *Figure 7*, *Figure 9* and *Table 4* in the paper. It consumes about `#TODO` CPU hours.
+
+## 2. Build the Docker environment to run the evaluations
 
 ### Building the Docker image that contains the SQLite3 fuzzing scripts. 
 
