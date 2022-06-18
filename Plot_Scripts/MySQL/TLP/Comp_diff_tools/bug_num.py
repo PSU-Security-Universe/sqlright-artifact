@@ -13,7 +13,7 @@ sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
 plot_sql_bugs("../SQLRight_MySQL_TLP/", markevery = 30, line_style = 0)
-plot_sql_bugs("./squirrel/second_run/", markevery = 30, line_style = 1)
+plot_sql_bugs("./squirrel/", markevery = 30, line_style = 1)
 plot_sql_bugs("./SQLancer/", markevery = 30, line_style = 2)
 
 
