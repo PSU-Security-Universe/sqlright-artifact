@@ -551,7 +551,7 @@ bash run_mysql_bisecting.sh SQLRight --oracle TLP
 
 The bug bisecting process is expected to finish in `7` hours. 
 
-#### 3.6.2 Run the Squirrel with oracle MySQL fuzzing for 72 hours.
+#### 3.6.2 Squirrel-Oracle.
 
 <sub>`367` CPU hours</sub>
 
@@ -575,7 +575,27 @@ bash run_mysql_bisecting.sh squirrel-oracle --oracle TLP
 
 The bug bisecting process is expected to finish in `7` hours. 
 
-#### 3.3.3 Plot the figures. 
+#### 3.6.3 SQLancer.
+
+<sub>`360` CPU hours</sub>
+
+Run the following command. Let the SQLancer processes run for 72 hours.
+
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
+
+**WARNING**: The SQLancer process will generate a large amount of cache data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`.
+
+```sh
+cd <sqlright_root>/MySQL/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
+bash run_mysql_fuzzing.sh sqlancer  --num-concurrent 5 --oracle TLP
+```
+
+After `72` hours, stop the Docker container instance. 
+
+#### 3.6.4 Figures. 
 
 The following scripts will generate *Figure 8b, d, g, j* in the paper. 
 
