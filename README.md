@@ -1352,4 +1352,6 @@ python3 run_plots.py
 <br/><br/>
 # End of the Artifact Evaluation Instructions
 
-We hereby thank all the reviewers for putting in the hard work to reproduce the results we presented in the paper. Have a great Summer and have a great USENIX Security 2022 conferece! 
+We hereby thank all the reviewers for putting in the hard work to reproduce the results we presented in the paper. 
+
+Have a great Summer and have a great USENIX Security 2022 conferece! 
