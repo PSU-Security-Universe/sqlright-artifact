@@ -18,7 +18,7 @@ Currently supported DBMS:
 
 ### Operating System configuration and Source Code setup
 
-All of the experiments are evaluated on a `X86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommand more than `500GB` of memory for the evaluation and `1TB` hard drive storage usage. All the experiments are evaluated in a Docker env, we recommend to use Docker version >= `20.10.16` to reproduce the results. Before the start of the experiment, we need to configure a few system settings to be applied to the host operating system. 
+All of the experiments are evaluated on a `X86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommand more than `500GB` of memory for the evaluation and `1.5TB` hard drive storage (preferably SSDs). All the experiments are evaluated in a Docker env, we recommend to use Docker version >= `20.10.16` to reproduce the results. Before the start of the experiment, we need to configure a few system settings to be applied to the host operating system. 
 
 ```sh
 # Open a terminal from the Ubuntu system if you are using a Desktop distribution. 
@@ -57,7 +57,7 @@ git clone git@github.com:PSU-Security-Universe/sqlright-artifact.git  # TODO: Ma
 <br/><br/>
 ## 0. Artifact Expectation
 
-The total Artifact Evaluation is expected to consume a total of `8834` CPU hours. We recommend using a machine with >= `20` cores of CPU, `500GB` of memory and `1TB` of storage space to reproduce the results. The code and the scripts of our built tool `SQLRight` are being released in this repository. Using the instructions below, one should be able to reproduce all the evaluations (Figures, Tables) shown in our Final Paper. 
+The total Artifact Evaluation is expected to consume a total of `8834` CPU hours. We recommend using a machine with >= `20` cores of CPU, `500GB` of memory and `1.5TB` of storage space(preferably SSDs) to reproduce the results. The code and the scripts of our built tool `SQLRight` are being released in this repository. Using the instructions below, one should be able to reproduce all the evaluations (Figures, Tables) shown in our Final Paper. 
 
 
 <br/><br/>
