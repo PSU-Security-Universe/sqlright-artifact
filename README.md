@@ -1,5 +1,7 @@
 # sqlright-artifact: The code, analysis scripts and results for USENIX 2022 Artifact Evaluation
 
+<a href="Paper/paper_no_names.pdf"><img src="Paper/paper_no_names.png" align="right" width="250"></a>
+
 Version: 1.0\
 Update: May 24, 2022
 Paper: Detecting Logical Bugs of DBMS with Coverage-based Guidance
