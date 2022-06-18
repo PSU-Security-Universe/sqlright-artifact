@@ -79,9 +79,9 @@ Our paper presents `SQLRight`, a tool that combines coverage-based guidance, val
 
 
 <br/><br/>
-## 2. Build the Docker environment to run the evaluations
+## 2.  Build the Docker Environment
 
-### Build the Docker image for SQLite3 evaluations. 
+### 2.1  Build the Docker Image for SQLite3 evaluations
 
 Execute the following command before running any SQLite3 related evaluations. 
 
@@ -93,7 +93,8 @@ bash setup_sqlite.sh
 
 After the command finihsed, a Docker Image named `sqlright_sqlite` is created. 
 
-### Building the Docker image that contains the PostgreSQL fuzzing scripts.
+--------------------------------------------------------------------------
+### 2.2  Build the Docker Image for PostgreSQL evaluations
 
 Execute the following command before running any PostgreSQL related evaluations. 
 
@@ -105,7 +106,8 @@ bash setup_postgres.sh
 
 After the command finihsed, a Docker Image named `sqlright_postgres` is created. 
 
-### Building the Docker image that contains the MySQL fuzzing scripts.
+--------------------------------------------------------------------------
+### 2.3  Build the Docker Image for MySQL evaluations
 
 Execute the following command before running any PostgreSQL related evaluations. 
 
@@ -116,43 +118,74 @@ bash setup_mysql.sh
 bash setup_mysql_bisecting.sh
 ```
 
-After the command finihsed, a Docker Image named `sqlright_mysql` is created. 
+After the command finihsed, two Docker Images named `sqlright_mysql` and `sqlright_mysql_bisecting` are created. 
+
+
 
 <br/><br/>
-## 3. Comparison between different tools:
+## 3. Comparison Between Different Tools
 
-### 3.1 SQLite, NoREC oracle (Figure 6c, f, i)
+### 3.1 SQLite, NoREC oracle
 
-#### 3.1.1 Run the SQLRight SQLite3 fuzzing for 72 hours.
+#### 3.1.1 SQLRight <sub>`361` CPU hours</sub>
 
-Explanation of the command:
+Run the following command. 
 
-The `start-core` flag binds the fuzzing process to the specific CPU core. 
-
-The `num-concurrent` flag determines the number of concurrent fuzzing processes. 
-
-The `oracle` flag determines the oracle used for the fuzzing. Current supported: `NOREC` and `TLP`. 
+The bash command will invoke the fuzzing script inside Docker. Let the fuzzing processes run for `72` hours. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based)
 bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
-#### 3.1.2 Run the Squirrel SQLite3 fuzzing for 72 hours. 
+Explanation of the command:
+
+- The `start-core` flag binds the fuzzing process to the specific CPU core. 
+
+- The `num-concurrent` flag determines the number of concurrent fuzzing processes. 
+
+- The `oracle` flag determines the oracle used for the fuzzing. Currently support: `NOREC` and `TLP`. 
+
+After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. The bug bisecting process is expected to finish in `1` hour. 
+
+```sh
+bash run_sqlite_bisecting.sh SQLRight --oracle NOREC
+```
+
+#### 3.1.2 Squirrel-Oracle <sub>`361` CPU hours</sub>
+
+Run the following command. Let the fuzzing processes run for 72 hours.
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
+# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
+# Please adjust the CORE ID based on your machine, 
+# and do not use conflict core id with other running evaluation process. 
 bash run_sqlite_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
-#### 3.1.3 Run the SQLancer SQLite3 for 72 hours. 
+After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. The bug bisecting process is expected to finish in `1` hour. 
+
+```sh
+bash run_sqlite_bisecting.sh squirrel-oracle --oracle NOREC
+```
+
+#### 3.1.3 SQLancer <sub>`360` CPU hours</sub>
+
+Run the following command. Let the `SQLancer` processes run for 72 hours. 
+
+**Warning: The SQLancer process will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `80GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `400GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. **
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
+# Call 5 instances of SQLancer. 
 bash run_sqlite_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 ```
 
-#### 3.1.4 Plot the figures. 
+#### 3.1.4 Figures. 
+
+The following scripts will generate *Figure 5a, c, f, i*. 
 
 ```sh
 cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Comp_diff_tools_NoREC
@@ -160,8 +193,17 @@ python3 copy_results.py
 python3 run_plots.py
 ```
 
-The plots would be generated in folder `plots`.
+The figures will be generated in folder `<sqlright_root>/Plot_Scripts/SQLite3/NoREC/Comp_diff_tools_NoREC/plots`.
 
+**Expectation**:
+
+- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 3` bugs being detected by `SQLRight` in `72` hours. 
+- For SQLite code coverage figure: `SQLRight` should have the highest code coverage among the other baselines. 
+- For SQLite query validity: `SQLancer` have the highest query validity, while `SQLRight` performs better than `Squirrel-oracle`. 
+- For SQLite query validity: `SQLancer` have the highest valid stmts / hr, while `SQLRight` performs better than `Squirrel-oracle`.
+
+
+--------------------------------------------------------------------------
 ### 3.2 PostgreSQL, NoREC oracle (Figure 6d, g, j)
 
 #### 3.2.1 Run the SQLRight PostgreSQL fuzzing for 72 hours. 
