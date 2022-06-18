@@ -7,6 +7,12 @@ from pathlib import Path
 from loguru import logger
 import os
 
+is_bug_1_checked = False
+is_bug_2_checked = False
+is_bug_3_checked = False
+is_bug_4_checked = False
+is_bug_5_checked = False
+is_bug_6_checked = False
 
 def read_queries_from_files():
     mysql_samples = Path(constants.BUG_SAMPLES_PATH)
@@ -148,6 +154,13 @@ def dumps_inconsistent_queries(query: str, same_result_query_index: List[int]):
 
 def is_identified_bug(all_query:str):
 
+    global is_bug_1_checked
+    global is_bug_2_checked
+    global is_bug_3_checked
+    global is_bug_4_checked
+    global is_bug_5_checked
+    global is_bug_6_checked
+
     all_query_l = all_query.splitlines()
 
     select_query = ""
@@ -161,26 +174,36 @@ def is_identified_bug(all_query:str):
 
     # MySQL Bug pattern 1: "ALL/ANY":
     if "all" in select_query.casefold() or "any" in select_query.casefold():
-        return True
+        if not is_bug_1_checked:
+            is_bug_1_checked = True
+            return True
 
     # MySQL Bug pattern 2: Unique KEY and <=> NULL
     if "unique key" in all_query.casefold() and "<=>" in select_query:
-        return True
+        if not is_bug_2_checked:
+            is_bug_2_checked = True
+            return True
 
     # MySQL Bug pattern 3: "GTID_SUBSET"
     if "gtid_subset" in select_query.casefold():
-        return True
+        if not is_bug_3_checked:
+            is_bug_3_checked = True
+            return True
 
     # MySQL bug pattern 4: GROUP BY HUGE NUMBER
     ## Skip
 
     # MySQL bug pattern 5: ExtractValue()
     if "extractvalue" in select_query.casefold():
-        return True
-
+        if not is_bug_5_checked:
+            is_bug_5_checked = True
+            return True
+        
     # MySQL bug pattern 6: Like and Escape
     if "like" in select_query.casefold() and "escape" in select_query.casefold():
-        return True
+        if not is_bug_6_checked:
+            is_bug_6_checked = True
+            return True
 
     return False
 
