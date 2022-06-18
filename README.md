@@ -801,6 +801,26 @@ python3 run_plots.py
 - For bugs of SQLite (TLP): `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. 
 - For coverage of SQLite (TLP): `SQLRight` should have the highest code coverage among the other baselines. 
 
+## 4.3. Mutation Depth
+
+Get the mutation depth information shown in the *Table 3* in the paper. 
+
+Make sure you have finished *Session 4.1 and 4.2*.  
+
+```sh
+cd <sqlright_root>/Plot_scripts
+python3 count_queue_depth.py
+```
+
+**Expectations**:
+
+- The Queue Depth information would be returned. 
+- The mutation depth number returned could be slightly different between each run. 
+- The `Max Depth` from SQLRight NoREC and TLP should be larger than other baselines
+- SQLRight NoREC and TLP should have more queue seeds located in a deeper depth, compared to other baselines. 
+
+
+<br/><br/>
 ## 5. Contribution of Validity components:
 
 ### 5.1 SQLite, NoREC oracle (Figure 7c, f, i):
@@ -1048,16 +1068,3 @@ cd <sqlright_root>/Plot_Scripts/MySQL/TLP/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
 ```
-
-## 6. Mutation Depth.
-
-Get the mutation depth information shown in the Table 3 in the paper. 
-
-This evaluation are based on the data generated from Session 4: `Contribution of code-coverage feedback`. Please finish the Session 4 experiment first before running the following command.
-
-```sh
-cd <sqlright_root>/Plot_scripts
-python3 count_queue_depth.py
-```
-
-The Queue Depth information would be returned. Although the mutation depth number returned could be slightly different between each run, and it could be slightly different from the number shown in the paper. But in general, the `Max Depth` from SQLRight NoREC and TLP should be larger than other baselines, and SQLRight NoREC and TLP should have more queue seeds located in a deeper depth, compared to other baselines. 
