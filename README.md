@@ -13,6 +13,7 @@ Currently supported DBMS:
 2. PostgreSQL
 3. MySQL
 
+<br/><br/>
 ## Getting Started
 
 ### Operating System configuration and Source Code setup
@@ -53,10 +54,13 @@ cd ~ # Assuming the home directory
 git clone git@github.com:PSU-Security-Universe/sqlright-artifact.git  # TODO: May refer to other link if we are using Zenodo. 
 ```
 
+<br/><br/>
 ## 0. Artifact Expectation
 
 The total Artifact Evaluation is expected to consume a total of `#TODO` CPU hours. We recommend using a machine with >= `20` cores of CPU, `500GB` of memory and `1TB` of storage space to reproduce the results. The code and the scripts of our built tool `SQLRight` are being released in this repository. Using the instructions below, one should be able to reproduce all the evaluations (Figures, Tables) shown in our Final Paper. 
 
+
+<br/><br/>
 ## 1. Artifact Overview
 
 Our paper presents `SQLRight`, a tool that combines coverage-based guidance, validity-oriented mutations and oracles to detect logical bugs in Database Management Systems. For Artifact Evaluation, we release:
@@ -73,30 +77,48 @@ Our paper presents `SQLRight`, a tool that combines coverage-based guidance, val
 
 **Session 5** contains the instructions to evalute `Contribution of Validity` (**Section 5.4** in the paper). It includes the steps to generate *Figure 7*, *Figure 9* and *Table 4* in the paper. It consumes about `#TODO` CPU hours.
 
+
+<br/><br/>
 ## 2. Build the Docker environment to run the evaluations
 
-### Building the Docker image that contains the SQLite3 fuzzing scripts. 
+### Build the Docker image for SQLite3 evaluations. 
 
+Execute the following command before running any SQLite3 related evaluations. 
+
+The Docker build process can last for about `1` hour. Expect long runtime when executing the commands. 
 ```sh
 cd <sqlright_root>/SQLite/scripts/
 bash setup_sqlite.sh
 ```
 
+After the command finihsed, a Docker Image named `sqlright_sqlite` is created. 
+
 ### Building the Docker image that contains the PostgreSQL fuzzing scripts.
 
+Execute the following command before running any PostgreSQL related evaluations. 
+
+The Docker build process can last for about `1` hour. Expect long runtime when executing the commands. 
 ```sh
 cd <sqlright_root>/PostgreSQL/scripts/
 bash setup_postgres.sh
 ```
 
+After the command finihsed, a Docker Image named `sqlright_postgres` is created. 
+
 ### Building the Docker image that contains the MySQL fuzzing scripts.
 
+Execute the following command before running any PostgreSQL related evaluations. 
+
+The Docker build process can last for about `3` hour. Expect long runtime when executing the commands. The created Docker Image will have around `70GB` of storage space. 
 ```sh
 cd <sqlright_root>/MySQL/scripts/
 bash setup_mysql.sh
 bash setup_mysql_bisecting.sh
 ```
 
+After the command finihsed, a Docker Image named `sqlright_mysql` is created. 
+
+<br/><br/>
 ## 3. Comparison between different tools:
 
 ### 3.1 SQLite, NoREC oracle (Figure 6c, f, i)
