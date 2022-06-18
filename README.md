@@ -11,7 +11,8 @@ It contains the following descriptions:
 
 ### Operating System configuration and Source Code setup
 
-All of the experiments are evaluated on a `X86-64` `Ubuntu 20.04 LTS` operating system. All the experiments are evaluated in a Docker env, we recommend using Docker version above 20.10.16 to reproduce the results. Before the start of the experiment, we need to configure a few system settings. 
+All of the experiments are evaluated on a `X86-64` CPU with an `Ubuntu 20.04 LTS` operating system. We recommand more than `500GB` of memory for the evaluation and `1TB` hard drive storage usage. All the experiments are evaluated in a Docker env, we recommend to use Docker version >= `20.10.16` to reproduce the results. Before the start of the experiment, we need to configure a few system settings to be applied to the host operating system. 
+
 ```sh
 # Open a terminal from the Ubuntu system if you are using a Desktop distribution. 
 sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc
@@ -21,20 +22,13 @@ sudo apt-get install -y libpq-dev
 cd /sys/devices/system/cpu
 echo performance | sudo tee cpu*/cpufreq/scaling_governor
 
-# Avoid having crashes misinterpreted as hangs
+# Avoid having crashes being misinterpreted as hangs
 sudo sh -c " echo core >/proc/sys/kernel/core_pattern "
 ```
 
-We need to reset the system settgings every time we restart the computer. If the system settings are not setup correctly, the fuzzing process would failed to run. 
+Since the operating system will automatically reset some settings, we need to reset the system settgings using the above script every time the computer is being restarted. If the system settings are not setup correctly, the fuzzing process inside Docker will be failed to run. 
 
-And then, go to the path where you want to dump the sqlright source code:
-
-```sh
-cd ~ # Assuming the home directory
-git clone git@github.com:PSU-Security-Universe/sqlright-artifact.git  # TODO: May refer to other link if we are using Zenodo. 
-```
-
-And then, here is some required python modules required for the figures plotting:
+We will use some python3 script to generate the plots. Therefore, we should install some python3 dependencies in the host operating system. 
 ```sh
 sudo apt-get install python3
 sudo apt-get install python3-pip
@@ -46,7 +40,16 @@ pip3 install pandas
 pip3 install paramiko
 ```
 
+And then, go to the path where you want to dump the sqlright source code:
+
+```sh
+cd ~ # Assuming the home directory
+git clone git@github.com:PSU-Security-Universe/sqlright-artifact.git  # TODO: May refer to other link if we are using Zenodo. 
+```
+
 ## 0. Artifact Expectation
+
+The total Artifact Evaluation is expected to consume a total of `#TODO` CPU hours. We recommend using a machine with >= `20` cores of CPU, `500GB` of memory and `1TB` of storage space to reproduce the results. The code and the scripts of our built tool `SQLRight` are being released in this repository. Using the instructions below, one should be able to reproduce all the evaluations (Figures, Tables) shown in our Final Paper. 
 
 ## 1. Artifact Overview
 
