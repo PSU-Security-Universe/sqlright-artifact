@@ -127,7 +127,9 @@ After the command finihsed, two Docker Images named `sqlright_mysql` and `sqlrig
 
 ### 3.1 SQLite, NoREC oracle
 
-#### 3.1.1 SQLRight <sub>`361` CPU hours</sub>
+#### 3.1.1 SQLRight   
+
+<sub>`361` CPU hours</sub>
 
 Run the following command. 
 
@@ -147,13 +149,17 @@ Explanation of the command:
 
 - The `oracle` flag determines the oracle used for the fuzzing. Currently support: `NOREC` and `TLP`. 
 
-After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. The bug bisecting process is expected to finish in `1` hour. 
+After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
 bash run_sqlite_bisecting.sh SQLRight --oracle NOREC
 ```
 
-#### 3.1.2 Squirrel-Oracle <sub>`361` CPU hours</sub>
+The bug bisecting process is expected to finish in `1` hour. 
+
+#### 3.1.2 Squirrel-Oracle 
+
+<sub>`361` CPU hours</sub>
 
 Run the following command. Let the fuzzing processes run for 72 hours.
 
@@ -165,13 +171,17 @@ cd <sqlright_root>/SQLite/scripts
 bash run_sqlite_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --oracle NOREC
 ```
 
-After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. The bug bisecting process is expected to finish in `1` hour. 
+After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
 bash run_sqlite_bisecting.sh squirrel-oracle --oracle NOREC
 ```
 
-#### 3.1.3 SQLancer <sub>`360` CPU hours</sub>
+The bug bisecting process is expected to finish in `1` hour. 
+
+#### 3.1.3 SQLancer 
+
+<sub>`360` CPU hours</sub>
 
 Run the following command. Let the `SQLancer` processes run for 72 hours. 
 
@@ -185,7 +195,7 @@ bash run_sqlite_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 
 #### 3.1.4 Figures. 
 
-The following scripts will generate *Figure 5a, c, f, i*. 
+The following scripts will generate *Figure 5a, c, f, i* in the paper. 
 
 ```sh
 cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Comp_diff_tools_NoREC
