@@ -469,7 +469,7 @@ After `72` hours, stop the Docker container instance.
 The following scripts will generate *Figure 8a, c, f, i* in the paper. 
 
 ```sh
-cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Comp_diff_tool
+cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Comp_diff_tools
 python3 copy_results.py
 python3 run_plots.py
 ```
