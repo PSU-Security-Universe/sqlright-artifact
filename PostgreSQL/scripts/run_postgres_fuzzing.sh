@@ -45,6 +45,7 @@ if [ $# > 4 ] && [ "$1" == "SQLRight" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/postgres/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
+        --name $resoutdir \
         sqlright_postgres /bin/bash /home/postgres/scripts/run_sqlright_postgres_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "no-ctx-valid" ]; then
@@ -82,6 +83,7 @@ elif [ $# > 4 ] && [ "$1" == "no-ctx-valid" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/postgres/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
+        --name $resoutdir \
         sqlright_postgres /bin/bash /home/postgres/scripts/run_no_ctx_valid_postgres_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "no-db-par-ctx-valid" ]; then
@@ -120,6 +122,7 @@ elif [ $# > 4 ] && [ "$1" == "no-db-par-ctx-valid" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/postgres/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
+        --name $resoutdir \
         sqlright_postgres /bin/bash /home/postgres/scripts/run_no_db_par_ctx_valid_postgres_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
@@ -157,6 +160,7 @@ elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/postgres/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/postgres/fuzzing/Bug_Analysis \
+        --name $resoutdir \
         sqlright_postgres /bin/bash /home/postgres/scripts/run_squirrel_oracle_postgres_fuzzing_helper.sh ${@:2}
 
 elif [ "$1" == "sqlancer" ]; then
@@ -236,6 +240,7 @@ elif [ "$1" == "sqlancer" ]; then
         sudo -b docker run -it --rm \
             -v $(pwd)/$resoutdir:/home/postgres/sqlancer/sqlancer/target/logs \
             -v $(pwd)/$covoutdir:/home/postgres/sqlancer/sqlancer_cov/outputs_0 \
+            --name $resoutdir \
             sqlright_postgres /bin/bash /home/postgres/scripts/run_sqlancer_helper.sh ${@:2}
 
     done
