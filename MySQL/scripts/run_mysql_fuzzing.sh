@@ -52,6 +52,7 @@ if [ $# > 4 ] && [ "$1" == "SQLRight" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/mysql/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/mysql/fuzzing/Bug_Analysis \
+        --name $resoutdir \
         sqlright_mysql /bin/bash /home/mysql/scripts/run_sqlright_mysql_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "no-ctx-valid" ]; then
@@ -89,6 +90,7 @@ elif [ $# > 4 ] && [ "$1" == "no-ctx-valid" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/mysql/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/mysql/fuzzing/Bug_Analysis \
+        --name $resoutdir \
         sqlright_mysql /bin/bash /home/mysql/scripts/run_no_ctx_valid_mysql_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "no-db-par-ctx-valid" ]; then
@@ -127,6 +129,7 @@ elif [ $# > 4 ] && [ "$1" == "no-db-par-ctx-valid" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/mysql/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/mysql/fuzzing/Bug_Analysis \
+        --name $resoutdir \
         sqlright_mysql /bin/bash /home/mysql/scripts/run_no_db_par_ctx_valid_mysql_fuzzing_helper.sh ${@:2}
 
 elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
@@ -164,6 +167,7 @@ elif [ $# > 4 ] && [ "$1" == "squirrel-oracle" ]; then
     sudo docker run -i --rm \
         -v $(pwd)/$resoutdir:/home/mysql/fuzzing/fuzz_root/outputs \
         -v $(pwd)/$bugoutdir:/home/mysql/fuzzing/Bug_Analysis \
+        --name $resoutdir \
         sqlright_mysql /bin/bash /home/mysql/scripts/run_squirrel_oracle_mysql_fuzzing_helper.sh ${@:2}
 
 elif [ "$1" == "sqlancer" ]; then
@@ -246,6 +250,7 @@ elif [ "$1" == "sqlancer" ]; then
         sudo -b docker run -it --rm \
             -v $(pwd)/$resoutdir:/home/mysql/sqlancer/sqlancer/target/logs \
             -v $(pwd)/$covoutdir:/home/mysql/sqlancer/sqlancer_cov/outputs_0 \
+            --name $resoutdir \
             sqlright_mysql /bin/bash /home/mysql/scripts/run_sqlancer_helper.sh ${@:2}
 
     done
@@ -259,5 +264,5 @@ elif [ "$1" == "sqlancer" ]; then
 
 else
     echo "Wrong arguments: $@"
-    echo "Usage: bash run_mysql_fuzzing.sh <config> --start-core <num> --num-concurrent <num> -O <oracle> [--non-deter] "
+        echo "Usage: bash run_mysql_fuzzing.sh <config> --start-core <num> --num-concurrent <num> -O <oracle> [--non-deter] "
 fi

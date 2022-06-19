@@ -46,9 +46,11 @@ if [ "$1" == "SQLRight" ]; then
     fi
 
     bugoutdir="$bugoutdir/bug_samples"
+    resoutdir="$resoutdir""_bisecting"
 
     sudo docker run -i --rm \
         -v $(pwd)/$bugoutdir:/home/mysql/bisecting_scripts/bug_samples \
+        --name $resoutdir \
         sqlright_mysql_bisecting /bin/bash /home/mysql/scripts/run_mysql_bisecting_helper.sh ${@:2}
 
 elif [ "$1" == "no-ctx-valid" ]; then
@@ -80,9 +82,11 @@ elif [ "$1" == "no-ctx-valid" ]; then
     fi
 
     bugoutdir="$bugoutdir/bug_samples"
+    resoutdir="$resoutdir""_bisecting"
 
     sudo docker run -i --rm \
         -v $(pwd)/$bugoutdir:/home/mysql/bisecting_scripts/bug_samples \
+        --name $resoutdir \
         sqlright_mysql_bisecting /bin/bash /home/mysql/scripts/run_mysql_bisecting_helper.sh ${@:2}
 
 elif [ "$1" == "no-db-par-ctx-valid" ]; then
@@ -114,9 +118,11 @@ elif [ "$1" == "no-db-par-ctx-valid" ]; then
     fi
 
     bugoutdir="$bugoutdir/bug_samples"
+    resoutdir="$resoutdir""_bisecting"
 
     sudo docker run -i --rm \
         -v $(pwd)/$bugoutdir:/home/mysql/bisecting_scripts/bug_samples \
+        --name $resoutdir \
         sqlright_mysql_bisecting /bin/bash /home/mysql/scripts/run_mysql_bisecting_helper.sh ${@:2}
 
 elif [ "$1" == "squirrel-oracle" ]; then
@@ -148,9 +154,11 @@ elif [ "$1" == "squirrel-oracle" ]; then
     fi
 
     bugoutdir="$bugoutdir/bug_samples"
+    resoutdir="$resoutdir""_bisecting"
 
     sudo docker run -i --rm \
         -v $(pwd)/$bugoutdir:/home/mysql/bisecting_scripts/bug_samples \
+        --name $resoutdir \
         sqlright_mysql_bisecting /bin/bash /home/mysql/scripts/run_mysql_bisecting_helper.sh ${@:2}
 
 elif [ "$1" == "sqlancer" ]; then
