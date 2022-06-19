@@ -86,7 +86,7 @@ RUN ./configure --enable-debug --enable-fts5
 RUN make -j$(nproc)
 
 # Setup the SQLRight source code.
-FROM sqlite3_build AS SQLRight_build
+FROM sqlite3_build AS sqlright_build
 
 USER root
 WORKDIR /home/sqlite/src
@@ -98,7 +98,7 @@ WORKDIR /home/sqlite/src
 RUN make -j$(nproc)
 
 # Setup the no_ctx_valid configuration
-FROM SQLRight_build AS no_ctx_valid_sqlite
+FROM sqlright_build AS no_ctx_valid_sqlite
 
 USER sqlite
 WORKDIR /home/sqlite
@@ -168,7 +168,7 @@ RUN mkdir -p logs
 
 
 # Setup the fuzzing context
-FROM sqlancer_sqlite AS SQLite3_fuzzing
+FROM sqlancer_sqlite AS sqlite3_fuzzing
 USER sqlite
 WORKDIR /home/sqlite
 RUN mkdir -p fuzzing
