@@ -1332,7 +1332,7 @@ bash run_mysql_bisecting.sh SQLRight --oracle TLP --non-deter
 
 The bug bisecting process is expected to finish in `5` hour.
 
-#### 5.6.6 Figures:
+#### 5.6.6 Figures
 
 The following scripts will generate *Figure 9b, d, g, j* in the paper.
 
@@ -1348,6 +1348,24 @@ python3 run_plots.py
 - For MySQL code coverage figure: `SQLRight` and `SQLRight non-deter` should have the highest code coverage among the other baselines. `SQLRight non-ctx-valid` could have a coverage very close to the `SQLRight` config, but in general, `SQLRight non-ctx-valid` is slightly worse in coverage compared to `SQLRight`. 
 - For MySQL query validity: `SQLRight` and `SQLRight non-deter` should have the highest query validity. 
 - For MySQL valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
+
+--------------------------------------------------------------------------
+### 5.7 False Positives from Non-Deter
+
+Make sure you have finished *Section 5.1 - 5.6* first.
+
+The following scripts will generate *Table 4* in the paper. 
+
+```sh
+cd <sqlright_root>/Plot_Scripts/
+python3 count_false_positives.py
+```
+
+**Expectations**:
+
+- We have introduced some extra filters that filter out some obvious False Positives in the Artifact, in order to produce a more accurate bug number without any manual efforts. Thus, the False Positives number reported by the Artifact script is less than the ones we reported in the paper. 
+- For all configurations, the `WITHOUT non-deter` settings should always have less bugs reported compared to the `WITH non-deter` settings, due to the extra False Positives produced by the non-deterministic queries. 
+
 
 <br/><br/>
 <br/><br/>
