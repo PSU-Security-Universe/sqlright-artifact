@@ -18,13 +18,18 @@ Currently supported DBMS:
 
 ### Operating System configuration and Source Code setup
 
-All of the experiments are evaluated on a `X86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommend more than `500GB` of memory for the evaluation and `1.5TB` hard drive storage (preferably SSDs). All the experiments are evaluated in a Docker env, we recommend to use Docker version >= `20.10.16` to reproduce the results. Before the start of the experiment, we need to configure a few system settings to be applied to the host operating system. 
+All of the experiments are evaluated on a `x86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommend to reserve `>= 20` cores of CPUs, `>= 500GB` of memory and `>= 1.5TB` hard drive storage (preferably SSDs) for the evaluations. All the experiments are evaluated in Docker envs. We recommend to use Docker with version `>= 20.10.16` to reproduce the results. Before the start of the evaluations, we firstly need to configure a few system settings on the host operating system. 
 
 ```sh
-# Open a terminal from the Ubuntu system if you are using a Desktop distribution. 
-sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc
+# Basic Dependencies. 
+# Open the terminal app from the Ubuntu host system, if you are using a Ubuntu Desktop distribution. 
+sudo apt-get install -y build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc
 sudo apt-get install -y libpq-dev
+```
 
+```sh
+# System Configurations. 
+# Open the terminal app from the Ubuntu host system, if you are using a Ubuntu Desktop distribution. 
 # Disable On-demand CPU scaling
 cd /sys/devices/system/cpu
 echo performance | sudo tee cpu*/cpufreq/scaling_governor
@@ -33,13 +38,13 @@ echo performance | sudo tee cpu*/cpufreq/scaling_governor
 sudo sh -c " echo core >/proc/sys/kernel/core_pattern "
 ```
 
-Since the operating system will automatically reset some settings upon restarts, we need to reset the system settgings using the above scripts every time the computer is being restarted. If the system settings are not being setup correctly, the fuzzing process inside Docker will failed. 
+**WARNING**: Since the operating system will automatically reset some settings upon restarts, we need to reset the system settgings using the above scripts **EVERY TIME** after the computer restarted. If the system settings are not being setup correctly, all the fuzzing processes inside Docker will failed. 
 
-We will use python3 scripts in the host system to generate the Figures. Therefore, we should install the python3 dependencies in the host operating system. 
+We use python3 scripts in the host operating system to generate the paper Figures. Therefore, we should install the python3 dependencies in the host operating system. 
 
 ```sh
-sudo apt-get install python3
-sudo apt-get install python3-pip
+sudo apt-get install -y python3
+sudo apt-get install -y python3-pip
 
 # Use `sudo` to run pip3 if necessary. 
 pip3 install matplotlib
@@ -48,7 +53,7 @@ pip3 install pandas
 pip3 install paramiko
 ```
 
-The whole Artifact Evaluations are built within the `Docker` virtualized environment. If the host system does not have the Docker application installed, here is the command to install `Docker` in `Ubuntu` host system. 
+The whole Artifact Evaluations are built within the `Docker` virtualized environment. If the host system does not have the `Docker` application installed, here is the command to install `Docker` in `Ubuntu`. 
 
 ```sh
 # The script is grabbed from Docker official documentation: https://docs.docker.com/engine/install/ubuntu/
@@ -83,7 +88,7 @@ sudo docker run hello-world
 
 By default, interacting with `Docker` requires the `root` privilege from the host system. For a normal (non-root) user, calling `docker` requires the `sudo` command prefix. 
 
-For every evaluations we apply in this Artifact, due to their long runtime, we recommend to use a `terminal multiplexer` tool to hold the command running shell, so that the terminal doesn't need to be kept open while waiting for the long evaluation time to end. Here we show two `terminal multiplexer` tools we suggested:
+For every evaluations we applied in this Artifact, due to their long runtime, we recommend to use a `terminal multiplexer` tool to hold the command running shell, so that the terminal doesn't need to be kept open while waiting for the long evaluation time to end. Here we show two `terminal multiplexer` tools we suggested:
 
 ```sh
 # screen
@@ -117,7 +122,7 @@ git clone https://github.com/PSU-Security-Universe/sqlright-artifact.git  # TODO
 <br/><br/>
 ## 0. Artifact Expectations
 
-The total Artifact Evaluation is expected to consume a total of `8834` CPU hours. We recommend using a machine with >= `20` cores of CPU, `500GB` of memory and `1.5TB` of storage space(preferably SSDs) to reproduce the results. The code and the scripts of our built tool `SQLRight` are being released in this repository. Using the instructions below, one should be able to reproduce all the evaluations (Figures, Tables) shown in our Final Paper. 
+This Artifact Evaluation is expected to consume a total of `8834` CPU hours. We recommend using a machine with `>= 20` cores of CPU, `>= 500GB` of memory and `>= 1.5TB` of storage space(preferably SSDs) to reproduce the results. All the code and the scripts of our built tool `SQLRight` are being released in this repository. Using the instructions below, one should be able to reproduce all the evaluations (Figures, Tables) shown in our Final Paper. 
 
 
 <br/><br/>
@@ -126,16 +131,17 @@ The total Artifact Evaluation is expected to consume a total of `8834` CPU hours
 Our paper presents `SQLRight`, a tool that combines coverage-based guidance, validity-oriented mutations and oracles to detect logical bugs in Database Management Systems. For Artifact Evaluation, we release:
 
 - (1) The `SQLRight` source code. 
-- (2) The paper's final version. [Paper Link in Repo](Paper/paper_no_names.pdf)
-- (3) Information and the script to reproduce the evaluated benchmarks. 
+- (2) The baselines' source code. 
+- (3) The paper's final version. [Paper Link inside This Repo](Paper/paper_no_names.pdf)
+- (4) Information and the scripts to reproduce the evaluated benchmarks. 
 
-**Session 2** contains the instructions to build all the Docker images required for our evaluation. These are the prerequisite steps before we run any fuzzing evaluations. 
+*Session 2* contains the instructions to build all the Docker images required for our evaluation. These are the prerequisite steps before we run any fuzzing evaluations. 
 
-**Session 3** contains the instructions to evaluate `Comparison with Existing Tools` (**Section 5.2** in the paper). It includes the steps to generate the figures from *Figure 5* and *Figure 8* in the paper. It consumes about `6152` CPU hours.
+*Session 3* contains the instructions to evaluate `Comparison with Existing Tools` (*Section 5.2* in the paper). It includes the steps to generate the figures from *Figure 5* and *Figure 8* in the paper. It consumes about `6152` CPU hours. 
 
-**Session 4** contains the instructions to evaluate `Contribution of Coverage Feedback` (**Section 5.3** in the paper). It includes the steps to generate *Figure 6* and *Table 3* in the paper. It consumes about `726` CPU hours.
+*Session 4* contains the instructions to evaluate `Contribution of Coverage Feedback` (*Section 5.3* in the paper). It includes the steps to generate *Figure 6* and *Table 3* in the paper. It consumes about `726` CPU hours. 
 
-**Session 5** contains the instructions to evalute `Contribution of Validity` (**Section 5.4** in the paper). It includes the steps to generate *Figure 7*, *Figure 9* and *Table 4* in the paper. It consumes about `1956` CPU hours.
+*Session 5* contains the instructions to evalute `Contribution of Validity` (*Section 5.4* in the paper). It includes the steps to generate *Figure 7*, *Figure 9* and *Table 4* in the paper. It consumes about `1956` CPU hours. 
 
 
 <br/><br/>
