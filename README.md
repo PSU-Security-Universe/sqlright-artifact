@@ -737,6 +737,9 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle N
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_drop_all_NOREC
+# Run bug bisecting
 cd <sqlright_root>/SQLite/scripts
 bash run_sqlite_bisecting.sh SQLRight --oracle NOREC --feedback drop_all 
 ```
@@ -760,6 +763,9 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle N
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_random_save_NOREC
+# Run bug bisecting
 cd <sqlright_root>/SQLite/scripts
 bash run_sqlite_bisecting.sh SQLRight --oracle NOREC --feedback random_save
 ```
@@ -783,6 +789,9 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle N
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_save_all_NOREC
+# Run bug bisecting
 cd <sqlright_root>/SQLite/scripts
 bash run_sqlite_bisecting.sh SQLRight --oracle NOREC --feedback save_all
 ```
@@ -806,6 +815,7 @@ python3 run_plots.py
 - For bugs of SQLite (NoREC): `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. 
 - For coverage of SQLite (NoREC): `SQLRight` should have the highest code coverage among the other baselines. 
 
+--------------------------------------
 ### 4.2 TLP oracle:
 
 #### 4.2.1 SQLRight
@@ -829,6 +839,9 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle T
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_drop_all_TLP
+# Run bug bisecting
 cd <sqlright_root>/SQLite/scripts
 bash run_sqlite_bisecting.sh SQLRight --oracle TLP --feedback drop_all 
 ```
@@ -852,6 +865,9 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle T
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_random_save_TLP
+# Run bug bisecting
 cd <sqlright_root>/SQLite/scripts
 bash run_sqlite_bisecting.sh SQLRight --oracle TLP --feedback random_save
 ```
@@ -875,6 +891,9 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle T
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_save_all_TLP
+# Run bug bisecting
 cd <sqlright_root>/SQLite/scripts
 bash run_sqlite_bisecting.sh SQLRight --oracle TLP --feedback save_all
 ```
@@ -898,7 +917,8 @@ python3 run_plots.py
 - For bugs of SQLite (TLP): `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. 
 - For coverage of SQLite (TLP): `SQLRight` should have the highest code coverage among the other baselines. 
 
-## 4.3. Mutation Depth
+---------------------------------------------
+### 4.3. Mutation Depth
 
 Get the mutation depth information shown in the *Table 3* in the paper. 
 
@@ -943,6 +963,9 @@ bash run_sqlite_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --orac
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_no_ctx_valid_NOREC
+# Run bug bisecting
 bash run_sqlite_bisecting.sh no-ctx-valid --oracle NOREC
 ```
 
@@ -965,6 +988,9 @@ bash run_sqlite_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_no_db_par_ctx_valid_NOREC
+# Run bug bisecting
 bash run_sqlite_bisecting.sh no-db-par-ctx-valid --oracle NOREC
 ```
 
@@ -991,6 +1017,9 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle N
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_NOREC_non_deter
+# Run bug bisecting
 bash run_sqlite_bisecting.sh SQLRight --oracle NOREC --non-deter
 ```
 
@@ -1038,6 +1067,10 @@ bash run_postgres_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --or
 
 After 24 hours, stop the Docker container instance. 
 
+```sh
+sudo docker stop sqlright_postgres_no_ctx_valid_NOREC
+```
+
 Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process for PostgreSQL fuzzings. 
 
 #### 5.2.3 SQLRight No-DB-Par-Ctx-Valid 
@@ -1055,6 +1088,10 @@ bash run_postgres_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent
 ```
 
 After `24` hours, stop the Docker container instance. 
+
+```sh
+sudo docker stop sqlright_postgres_no_db_par_ctx_valid_NOREC
+```
 
 #### 5.2.4 Run the Squirrel-oracle fuzzing for 24 hours. 
 
@@ -1104,6 +1141,9 @@ bash run_mysql_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracl
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_mysql_no_ctx_valid_NOREC
+# Run bug bisecting
 bash run_mysql_bisecting.sh no-ctx-valid --oracle NOREC
 ```
 
@@ -1126,6 +1166,9 @@ bash run_mysql_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_mysql_no_db_par_ctx_valid_NOREC
+# Run bug bisecting
 bash run_mysql_bisecting.sh no-db-par-ctx-valid --oracle NOREC
 ```
 
@@ -1152,6 +1195,9 @@ bash run_mysql_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NO
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_mysql_NOREC_non_deter
+# Run bug bisecting
 bash run_mysql_bisecting.sh SQLRight --oracle NOREC --non-deter
 ```
 
@@ -1200,6 +1246,9 @@ bash run_sqlite_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --orac
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_no_ctx_valid_TLP
+# Run bug bisecting
 bash run_sqlite_bisecting.sh no-ctx-valid --oracle TLP
 ```
 
@@ -1224,6 +1273,9 @@ bash run_sqlite_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_no_db_par_ctx_valid_TLP
+# Run bug bisecting
 bash run_sqlite_bisecting.sh no-db-par-ctx-valid --oracle TLP
 ```
 
@@ -1252,6 +1304,9 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle T
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_TLP_non_deter
+# Run bug bisecting
 bash run_sqlite_bisecting.sh SQLRight --oracle TLP --non-deter
 ```
 
@@ -1301,6 +1356,10 @@ bash run_postgres_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --or
 
 After 24 hours, stop the Docker container instance. 
 
+```sh
+sudo docker stop sqlright_postgres_no_ctx_valid_TLP
+```
+
 Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process for PostgreSQL fuzzings. 
 
 #### 5.5.3 SQLRight No-DB-Par-Ctx-Valid 
@@ -1320,6 +1379,10 @@ bash run_postgres_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent
 ```
 
 After `24` hours, stop the Docker container instance. 
+
+```sh
+sudo docker stop sqlright_postgres_no_db_par_ctx_valid_TLP
+```
 
 #### 5.5.4 Run the Squirrel-oracle fuzzing for 24 hours. 
 
@@ -1371,6 +1434,9 @@ bash run_mysql_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracl
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_mysql_no_ctx_valid_TLP
+# Run bug bisecting
 bash run_mysql_bisecting.sh no-ctx-valid --oracle TLP
 ```
 
@@ -1395,6 +1461,9 @@ bash run_mysql_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_mysql_no_db_par_ctx_valid_TLP
+# Run bug bisecting
 bash run_mysql_bisecting.sh no-db-par-ctx-valid --oracle TLP
 ```
 
@@ -1423,6 +1492,9 @@ bash run_mysql_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TL
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_mysql_TLP_non_deter
+# Run bug bisecting
 bash run_mysql_bisecting.sh SQLRight --oracle TLP --non-deter
 ```
 
