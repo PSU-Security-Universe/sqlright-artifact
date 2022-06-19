@@ -18,7 +18,7 @@ Currently supported DBMS:
 
 ### Operating System configuration and Source Code setup
 
-All of the experiments are evaluated on a `X86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommand more than `500GB` of memory for the evaluation and `1.5TB` hard drive storage (preferably SSDs). All the experiments are evaluated in a Docker env, we recommend to use Docker version >= `20.10.16` to reproduce the results. Before the start of the experiment, we need to configure a few system settings to be applied to the host operating system. 
+All of the experiments are evaluated on a `X86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommend more than `500GB` of memory for the evaluation and `1.5TB` hard drive storage (preferably SSDs). All the experiments are evaluated in a Docker env, we recommend to use Docker version >= `20.10.16` to reproduce the results. Before the start of the experiment, we need to configure a few system settings to be applied to the host operating system. 
 
 ```sh
 # Open a terminal from the Ubuntu system if you are using a Desktop distribution. 
@@ -41,22 +41,57 @@ We will use python3 scripts in the host system to generate the Figures. Therefor
 sudo apt-get install python3
 sudo apt-get install python3-pip
 
-# Use root to run pip3 if necessary. 
+# Use `sudo` to run pip3 if necessary. 
 pip3 install matplotlib
 pip3 install numpy
 pip3 install pandas
 pip3 install paramiko
 ```
 
-And then, go to the path where you want to dump the sqlright source code:
+The whole Artifact Evaluations are built within the `Docker` virtualized environment. If the host system does not have the Docker application installed, here is the command to install `Docker` in `Ubuntu` host system. 
+
+```sh
+# The script is grabbed from Docker official documentation: https://docs.docker.com/engine/install/ubuntu/
+
+sudo apt-get remove docker docker-engine docker.io containerd runc
+
+sudo apt-get update
+sudo apt-get install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+    
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# The next script could fail on some machines. However, the following installation process should still succeed. 
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+# Receiving a GPG error when running apt-get update?
+# Your default umask may not be set correctly, causing the public key file for the repo to not be detected. Run the following command and then try to update your repo again: sudo chmod a+r /etc/apt/keyrings/docker.gpg.
+
+# To test the Docker installation. 
+sudo docker run hello-world
+# Expected outputs 'Hello from Docker!'
+``` 
+
+By default, interacting with `Docker` requires the `root` privilege from the host system. For a normal (non-root) user, calling `docker` requires the `sudo` command prefix. 
+
+And then, go to the path where you want to download the sqlright source code:
 
 ```sh
 cd ~ # Assuming the home directory
-git clone git@github.com:PSU-Security-Universe/sqlright-artifact.git  # TODO: May refer to other link if we are using Zenodo. 
+git clone https://github.com/PSU-Security-Universe/sqlright-artifact.git  # TODO: May refer to other link if we are using Zenodo. 
 ```
 
 <br/><br/>
-## 0. Artifact Expectation
+## 0. Artifact Expectations
 
 The total Artifact Evaluation is expected to consume a total of `8834` CPU hours. We recommend using a machine with >= `20` cores of CPU, `500GB` of memory and `1.5TB` of storage space(preferably SSDs) to reproduce the results. The code and the scripts of our built tool `SQLRight` are being released in this repository. Using the instructions below, one should be able to reproduce all the evaluations (Figures, Tables) shown in our Final Paper. 
 
@@ -347,7 +382,7 @@ python3 run_plots.py
 
 The figures will be generated in folder `<sqlright_root>/Plot_Scripts/MySQL/NoREC/Comp_diff_tools/plots`. 
 
-**Expectation**:
+**Expectations**:
 
 - For MySQL logical bugs figure: The current bisecting and bug filtering scipts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. But in general, `SQLRight` should detect the most bugs (`>= 2` bugs in 72 hours).  
 - For MySQL code coverage figure: `SQLRight` should have the highest code coverage among the other baselines. 
@@ -608,7 +643,7 @@ python3 run_plots.py
 
 The figures will be generated in folder `<sqlright_root>/Plot_Scripts/MySQL/TLP/Comp_diff_tools/plots`. 
 
-**Expectation**:
+**Expectations**:
 
 - For MySQL logical bugs figure: The current bisecting and bug filtering scipts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. But in general, `SQLRight` should detect the most bugs (`>= 1` bugs in 72 hours).  
 - For MySQL code coverage figure: `SQLRight` should have the highest code coverage among the other baselines. 
