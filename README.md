@@ -33,9 +33,10 @@ echo performance | sudo tee cpu*/cpufreq/scaling_governor
 sudo sh -c " echo core >/proc/sys/kernel/core_pattern "
 ```
 
-Since the operating system will automatically reset some settings, we need to reset the system settgings using the above script every time the computer is being restarted. If the system settings are not setup correctly, the fuzzing process inside Docker will be failed to run. 
+Since the operating system will automatically reset some settings upon restarts, we need to reset the system settgings using the above scripts every time the computer is being restarted. If the system settings are not being setup correctly, the fuzzing process inside Docker will failed. 
 
-We will use some python3 script to generate the plots. Therefore, we should install some python3 dependencies in the host operating system. 
+We will use python3 scripts in the host system to generate the Figures. Therefore, we should install the python3 dependencies in the host operating system. 
+
 ```sh
 sudo apt-get install python3
 sudo apt-get install python3-pip
@@ -109,7 +110,7 @@ After the command finihsed, a Docker Image named `sqlright_postgres` is created.
 --------------------------------------------------------------------------
 ### 2.3  Build the Docker Image for MySQL evaluations
 
-Execute the following command before running any PostgreSQL related evaluations. 
+Execute the following command before running any MySQL related evaluations. 
 
 The Docker build process can last for about `3` hour. Expect long runtime when executing the commands. The created Docker Image will have around `70GB` of storage space. 
 ```sh
