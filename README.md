@@ -1354,4 +1354,4 @@ python3 run_plots.py
 
 We hereby thank all the reviewers for putting in the hard work to reproduce the results we presented in the paper. 
 
-Have a great Summe. And have a great USENIX Security 2022 conference! 
+Have a great Summer. And have a great USENIX Security 2022 conference! 
