@@ -83,7 +83,31 @@ sudo docker run hello-world
 
 By default, interacting with `Docker` requires the `root` privilege from the host system. For a normal (non-root) user, calling `docker` requires the `sudo` command prefix. 
 
-And then, go to the path where you want to download the sqlright source code:
+For every evaluations we apply in this Artifact, due to their long runtime, we recommend to use a `terminal multiplexer` tool to hold the command running shell, so that the terminal doesn't need to be kept open while waiting for the long evaluation time to end. Here we show two `terminal multiplexer` tools we suggested:
+
+```sh
+# screen
+# screen install
+sudo apt install screen
+# screen usage
+screen -S test_id_0 # Create a new screen session named test_id_0
+# Run whatever commands in the hosted shell
+<Ctrl-a> <Ctrl-d> # Detach from the running shell. 
+screen -r test_id_0 # reattach to the running shell. 
+exit # Exit and close the running screen session. 
+
+# tmux
+# tmux install
+sudo apt install tmux
+# tmux usage
+tmux new-session -s test_id_0 # Session name is test_id_0
+# Run whatever commands in the hosted shell
+<Ctrl-b> <d> # Detach from the running tmux session.
+tmux attach -t test_id_0
+exit # Exit and close the running tmux session.
+```
+
+At last, go to the path where you want to download the sqlright source code:
 
 ```sh
 cd ~ # Assuming the home directory
