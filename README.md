@@ -20,14 +20,14 @@ Currently supported DBMS:
 
 All of the experiments are evaluated on a `x86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommend to reserve `>= 20` cores of CPUs, `>= 600GB` of memory and `>= 1.5TB` hard drive storage (preferably SSDs) for the evaluations. All the experiments are evaluated in Docker envs. We recommend to use Docker with version `>= 20.10.16` to reproduce the results. Before the start of the evaluations, we firstly need to configure a few system settings on the host operating system. 
 
-```sh
+```bash
 # Basic Dependencies. 
 # Open the terminal app from the Ubuntu host system, if you are using a Ubuntu Desktop distribution. 
 sudo apt-get install -y build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc
 sudo apt-get install -y libpq-dev
 ```
 
-```sh
+```bash
 # System Configurations. 
 # Open the terminal app from the Ubuntu host system, if you are using a Ubuntu Desktop distribution. 
 # Disable On-demand CPU scaling
@@ -42,7 +42,7 @@ sudo sh -c " echo core >/proc/sys/kernel/core_pattern "
 
 We use python3 scripts in the host operating system to generate the paper Figures. Therefore, we should install the python3 dependencies in the host operating system. 
 
-```sh
+```bash
 sudo apt-get install -y python3
 sudo apt-get install -y python3-pip
 
@@ -55,7 +55,7 @@ pip3 install paramiko
 
 The whole Artifact Evaluations are built within the `Docker` virtualized environment. If the host system does not have the `Docker` application installed, here is the command to install `Docker` in `Ubuntu`. 
 
-```sh
+```bash
 # The script is grabbed from Docker official documentation: https://docs.docker.com/engine/install/ubuntu/
 
 sudo apt-get remove docker docker-engine docker.io containerd runc
@@ -90,7 +90,7 @@ By default, interacting with `Docker` requires the `root` privilege from the hos
 
 For every evaluations we applied in this Artifact, due to their long runtime, we recommend to use a `terminal multiplexer` tool to hold the command running shell, so that the terminal doesn't need to be kept open while waiting for the long evaluation time to end. Here we show two `terminal multiplexer` tools we suggested:
 
-```sh
+```bash
 # screen
 # screen install
 sudo apt install screen
@@ -114,7 +114,7 @@ exit # Exit and close the running tmux session.
 
 At last, go to the path where you want to download the `SQLRight` source code:
 
-```sh
+```bash
 cd ~ # Assuming the home directory
 git clone https://github.com/PSU-Security-Universe/sqlright-artifact.git  # TODO: May refer to other link if we are using Zenodo. 
 ```
@@ -152,7 +152,7 @@ Our paper presents `SQLRight`, a tool that combines coverage-based guidance, val
 Execute the following commands before running any SQLite3 related evaluations. 
 
 The Docker build process can last for about `1` hour. Expect long runtime when executing the commands. 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts/
 bash setup_sqlite.sh
 ```
@@ -165,7 +165,7 @@ After the command finihsed, a Docker Image named `sqlright_sqlite` is created.
 Execute the following commands before running any PostgreSQL related evaluations. 
 
 The Docker build process can last for about `1` hour. Expect long runtime when executing the commands. 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts/
 bash setup_postgres.sh
 ```
@@ -178,7 +178,7 @@ After the command finihsed, a Docker Image named `sqlright_postgres` is created.
 Execute the following commands before running any MySQL related evaluations. 
 
 The Docker build process can last for about `3` hour. Expect long runtime when executing the commands. The created Docker Image will have around `70GB` of storage space. 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts/
 bash setup_mysql.sh
 bash setup_mysql_bisecting.sh
@@ -201,7 +201,7 @@ Run the following commands.
 
 The following bash scripts will wake the fuzzing script inside `sqlright_sqlite` Docker image. Let the fuzzing processes run for `72` hours. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based)
 bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NOREC
@@ -223,7 +223,7 @@ Back to the current evaluation. :-)
 
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_NOREC
 # Run bug bisecting
@@ -240,7 +240,7 @@ Run the following commands. Let the fuzzing processes run for 72 hours.
 
 **WARNING**: The `Squirrel-Oracle` process consumes a large amount of memory. In our evaluation, we observed a maximum of `190GB` of memory usage PER `Squirrel-Oracle` process after running for 72 hours. With 5 concurrent processes, the evalution could use in total of `600GB` of memory within 72 hours. If not enough memory is available, consider using a smaller number of `--num-concurrent` to avoid Out-Of-Memory (OOM) kill.  
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -250,7 +250,7 @@ bash run_sqlite_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --o
 
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop squirrel_oracle_NOREC
 # Run bug bisecting
@@ -267,7 +267,7 @@ Run the following command. Let the `SQLancer` processes run for 72 hours.
 
 **WARNING**: The SQLancer process will generate a large amount of `cache` data. And it will save these cache to the local file system. We expected around `80GB` of cache being generated from EACH SQLancer instances. Following the command below, we call 5 instances of SQLancer, which will dump `400GB` of cache data to the hard disk. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Call 5 instances of SQLancer. 
 bash run_sqlite_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
@@ -275,7 +275,7 @@ bash run_sqlite_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 
 After `72` hours, stop the Docker container instance. 
 
-```sh
+```bash
 # Stop the sqlancer process
 sudo docker ps --filter name=sqlancer_sqlite_NOREC_raw_* --filter status=running -aq | xargs sudo docker stop
 ```
@@ -284,7 +284,7 @@ sudo docker ps --filter name=sqlancer_sqlite_NOREC_raw_* --filter status=running
 
 The following scripts will generate *Figure 5a, c, f, i* in the paper. 
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Comp_diff_tools_NoREC
 python3 copy_results.py
 python3 run_plots.py
@@ -309,7 +309,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/SQLite3/No
 
 Run the following command. Let the fuzzing processes run for `72` hours.
 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -319,7 +319,7 @@ bash run_postgres_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle
 
 After `72` hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker stop sqlright_postgres_NOREC
 ```
 
@@ -331,7 +331,7 @@ Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process
 
 Run the following command. Let the fuzzing processes run for 72 hours.
 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -341,7 +341,7 @@ bash run_postgres_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 -
 
 After `72` hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker stop squirrel_oracle_NOREC
 ```
 
@@ -355,14 +355,14 @@ Run the following command. Let the `SQLancer` processes run for 72 hours.
 
 **WARNING**: The SQLancer process will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `50GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `250GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts
 bash run_postgres_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 ```
 
 After `72` hours, stop the Docker container instances. 
 
-```sh
+```bash
 sudo docker ps --filter name=sqlancer_postgres_NOREC_raw_* --filter status=running -aq | xargs sudo docker stop
 ```
 
@@ -370,7 +370,7 @@ sudo docker ps --filter name=sqlancer_postgres_NOREC_raw_* --filter status=runni
 
 The following scripts will generate *Figure 5e, h, k* in the paper. 
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/Postgres/NoREC/Comp_diff_tools_NoREC
 python3 copy_results.py
 python3 run_plots.py
@@ -393,7 +393,7 @@ The plots will be generated in folder `<sqlright_root>/Plot_Scripts/Postgres/NoR
 
 Run the following command. Let the `SQLancer` processes run for 72 hours. 
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -403,7 +403,7 @@ bash run_mysql_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NO
 
 After `72` hours, stop the Docker container instance. And then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_mysql_NOREC
 # Run bug bisecting
@@ -418,7 +418,7 @@ The bug bisecting process is expected to finish in `7` hours.
 
 Run the following command. Let the fuzzing processes run for 72 hours.
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -428,7 +428,7 @@ bash run_mysql_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --or
 
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop squirrel_oracle_NOREC
 # Run bug bisecting
@@ -441,7 +441,7 @@ The bug bisecting process is expected to finish in `7` hours.
 
 The following scripts will generate *Figure 5b, d, g, j* in the paper. 
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/MySQL/NoREC/Comp_diff_tools
 python3 copy_results.py
 python3 run_plots.py
@@ -469,7 +469,7 @@ The bash command will invoke the fuzzing script inside Docker. Let the fuzzing p
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations.
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -481,7 +481,7 @@ After `72` hours, stop the Docker container instance, and then run the following
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_TLP
 # Run bug bisecting
@@ -500,7 +500,7 @@ Run the following command. Let the fuzzing processes run for 72 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluation. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -510,7 +510,7 @@ bash run_sqlite_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --o
 
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop squirrel_oracle_TLP
 # Run bug bisecting
@@ -529,7 +529,7 @@ Run the following command. Let the `SQLancer` processes run for 72 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluation. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Call 5 instances of SQLancer. 
 bash run_sqlite_fuzzing.sh sqlancer --num-concurrent 5 --oracle TLP
@@ -537,7 +537,7 @@ bash run_sqlite_fuzzing.sh sqlancer --num-concurrent 5 --oracle TLP
 
 After `72` hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker ps --filter name=sqlancer_sqlite_TLP_raw_* --filter status=running -aq | xargs sudo docker stop
 ```
 
@@ -545,7 +545,7 @@ sudo docker ps --filter name=sqlancer_sqlite_TLP_raw_* --filter status=running -
 
 The following scripts will generate *Figure 8a, c, f, i* in the paper. 
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Comp_diff_tools
 python3 copy_results.py
 python3 run_plots.py
@@ -572,7 +572,7 @@ Run the following command. Let the fuzzing processes run for `72` hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -582,7 +582,7 @@ bash run_postgres_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle
 
 After `72` hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker stop sqlright_postgres_TLP
 ```
 
@@ -596,7 +596,7 @@ Run the following command. Let the fuzzing processes run for 72 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -606,7 +606,7 @@ bash run_postgres_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 -
 
 After `72` hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker stop squirrel_oracle_TLP
 ```
 
@@ -620,14 +620,14 @@ Run the following command. Let the `SQLancer` processes run for 72 hours.
 
 **WARNING**: The SQLancer process will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `50GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `250GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts
 bash run_postgres_fuzzing.sh sqlancer --num-concurrent 5 --oracle TLP
 ```
 
 After `72` hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker ps --filter name=sqlancer_postgres_TLP_raw_* --filter status=running -aq | xargs sudo docker stop
 ```
 
@@ -635,7 +635,7 @@ sudo docker ps --filter name=sqlancer_postgres_TLP_raw_* --filter status=running
 
 The following scripts will generate *Figure 8e, h, k* in the paper. 
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/Postgres/TLP/Comp_diff_tools_TLP
 python3 copy_results.py
 python3 run_plots.py
@@ -660,7 +660,7 @@ Run the following command. Let the `SQLancer` processes run for 72 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -670,7 +670,7 @@ bash run_mysql_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TL
 
 After `72` hours, stop the Docker container instance. And then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_mysql_TLP
 # Run bug bisecting
@@ -687,7 +687,7 @@ Run the following command. Let the fuzzing processes run for 72 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -697,7 +697,7 @@ bash run_mysql_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --or
 
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop squirrel_oracle_TLP
 # Run bug bisecting
@@ -716,14 +716,14 @@ Run the following command. Let the SQLancer processes run for 72 hours.
 
 **WARNING**: The SQLancer process will generate a large amount of cache data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call `5` instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`.
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 bash run_mysql_fuzzing.sh sqlancer  --num-concurrent 5 --oracle TLP
 ```
 
 After `72` hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker ps --filter name=sqlancer_mysql_TLP_raw_* --filter status=running -aq | xargs sudo docker stop
 ```
 
@@ -731,7 +731,7 @@ sudo docker ps --filter name=sqlancer_mysql_TLP_raw_* --filter status=running -a
 
 The following scripts will generate *Figure 8b, d, g, j* in the paper. 
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/MySQL/TLP/Comp_diff_tools
 python3 copy_results.py
 python3 run_plots.py
@@ -761,7 +761,7 @@ Make sure you have finished *Session 3.1.1* in this Artifact Evaluation.
 
 Run the following command. Let the fuzzing processes run for 24 hours.
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -771,7 +771,7 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle N
 
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_drop_all_NOREC
 # Run bug bisecting
@@ -787,7 +787,7 @@ The bug bisecting process is expected to finish in `1` hours.
 
 **WARNING**: Due to the aggresive query seed handling strategy, the `SQLRight` Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `15GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `75GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -797,7 +797,7 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle N
 
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_random_save_NOREC
 # Run bug bisecting
@@ -813,7 +813,7 @@ The bug bisecting process is expected to finish in `1` hours.
 
 **WARNING**: Due to the aggresive query seed handling strategy, the `SQLRight` Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -823,7 +823,7 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle N
 
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_save_all_NOREC
 # Run bug bisecting
@@ -839,7 +839,7 @@ Make sure you have finished the steps in `Session 4.1.1 - 4.1.4`.
 
 The following scripts will generate *Figure 6a, c* in the paper. 
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Feedback_Test
 python3 copy_results.py
 python3 run_plots.py
@@ -865,7 +865,7 @@ Make sure you have finished `Session 3.4.1` in this Artifact Evaluation.
 
 Run the following command. Let the fuzzing processes run for 24 hours.
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -875,7 +875,7 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle T
 
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_drop_all_TLP
 # Run bug bisecting
@@ -891,7 +891,7 @@ The bug bisecting process is expected to finish in `1` hours.
 
 **WARNING**: Due to the aggresive query seed handling strategy, the `SQLRight` Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `15GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `75GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -901,7 +901,7 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle T
 
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_random_save_TLP
 # Run bug bisecting
@@ -917,7 +917,7 @@ The bug bisecting process is expected to finish in `1` hours.
 
 **WARNING**: Due to the aggresive query seed handling strategy, the `SQLRight` Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -927,7 +927,7 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle T
 
 After `24` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_save_all_TLP
 # Run bug bisecting
@@ -943,7 +943,7 @@ Make sure you have finished the steps in `Session 4.2.1 - 4.2.4`.
 
 The following scripts will generate *Figure 6b, d* in the paper. 
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Feedback_Tests
 python3 copy_results.py
 python3 run_plots.py
@@ -963,7 +963,7 @@ Get the mutation depth information shown in the *Table 3* in the paper.
 
 Make sure you have finished all tests in *Session 4.1 and 4.2*. 
 
-```sh
+```bash
 cd <sqlright_root>/Plot_scripts
 python3 count_queue_depth.py
 ```
@@ -991,7 +991,7 @@ Make sure you have finished *Session 3.1.1* in this Artifact Evaluation.
 
 Run the following command. Let the fuzzing processes run for 24 hours.
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1001,7 +1001,7 @@ bash run_sqlite_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --orac
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_no_ctx_valid_NOREC
 # Run bug bisecting
@@ -1016,7 +1016,7 @@ The bug bisecting process is expected to finish in `1` hour.
 
 Run the following command. Let the fuzzing processes run for 24 hours.
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1026,7 +1026,7 @@ bash run_sqlite_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_no_db_par_ctx_valid_NOREC
 # Run bug bisecting
@@ -1045,7 +1045,7 @@ Make sure you have finished *Session 3.1.2* in this Artifact Evaluation.
 
 Run the following command. Let the fuzzing processes run for 24 hours.
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1055,7 +1055,7 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle N
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_NOREC_non_deter
 # Run bug bisecting
@@ -1068,7 +1068,7 @@ The bug bisecting process is expected to finish in `1` hour.
 
 The following scripts will generate *Figure 7a, c, f, i* in the paper.
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1096,7 +1096,7 @@ Make sure you have finished *Session 3.2.1* in this Artifact Evaluation.
 
 Run the following command. Let the fuzzing processes run for 24 hours.
 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1106,7 +1106,7 @@ bash run_postgres_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --or
 
 After 24 hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker stop sqlright_postgres_no_ctx_valid_NOREC
 ```
 
@@ -1118,7 +1118,7 @@ Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process
 
 Run the following command. Let the fuzzing processes run for `24` hours.
 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1128,7 +1128,7 @@ bash run_postgres_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent
 
 After `24` hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker stop sqlright_postgres_no_db_par_ctx_valid_NOREC
 ```
 
@@ -1142,7 +1142,7 @@ Because we did not detect False Positives when using `SQLRight non-deter` in our
 
 The following scripts will generate *Figure 7e, h, k* in the paper.
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/Postgres/NoREC/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1169,7 +1169,7 @@ Make sure you have finished *Session 3.3.1* in this Artifact Evaluation.
 
 Run the following command. Let the fuzzing processes run for 24 hours.
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1179,7 +1179,7 @@ bash run_mysql_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracl
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_mysql_no_ctx_valid_NOREC
 # Run bug bisecting
@@ -1194,7 +1194,7 @@ The bug bisecting process is expected to finish in `5` hours.
 
 Run the following command. Let the fuzzing processes run for 24 hours.
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1204,7 +1204,7 @@ bash run_mysql_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_mysql_no_db_par_ctx_valid_NOREC
 # Run bug bisecting
@@ -1223,7 +1223,7 @@ Make sure you have finished *Session 3.3.2* in this Artifact Evaluation.
 
 Run the following command. Let the fuzzing processes run for 24 hours.
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1233,7 +1233,7 @@ bash run_mysql_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NO
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_mysql_NOREC_non_deter
 # Run bug bisecting
@@ -1246,7 +1246,7 @@ The bug bisecting process is expected to finish in `5` hour.
 
 The following scripts will generate *Figure 7b, d, g, j* in the paper.
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/MySQL/NoREC/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1274,7 +1274,7 @@ Run the following command. Let the fuzzing processes run for 24 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1284,7 +1284,7 @@ bash run_sqlite_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --orac
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_no_ctx_valid_TLP
 # Run bug bisecting
@@ -1301,7 +1301,7 @@ Run the following command. Let the fuzzing processes run for 24 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1311,7 +1311,7 @@ bash run_sqlite_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_no_db_par_ctx_valid_TLP
 # Run bug bisecting
@@ -1332,7 +1332,7 @@ Run the following command. Let the fuzzing processes run for 24 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/SQLite/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1342,7 +1342,7 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle T
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_sqlite_TLP_non_deter
 # Run bug bisecting
@@ -1355,7 +1355,7 @@ The bug bisecting process is expected to finish in `1` hour.
 
 The following scripts will generate *Figure 9a, c, f, i* in the paper.
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1385,7 +1385,7 @@ Run the following command. Let the fuzzing processes run for 24 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1395,7 +1395,7 @@ bash run_postgres_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --or
 
 After 24 hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker stop sqlright_postgres_no_ctx_valid_TLP
 ```
 
@@ -1409,7 +1409,7 @@ Run the following command. Let the fuzzing processes run for `24` hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/PostgreSQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1419,7 +1419,7 @@ bash run_postgres_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent
 
 After `24` hours, stop the Docker container instance. 
 
-```sh
+```bash
 sudo docker stop sqlright_postgres_no_db_par_ctx_valid_TLP
 ```
 
@@ -1433,7 +1433,7 @@ Because we did not detect False Positives when using `SQLRight non-deter` in our
 
 The following scripts will generate *Figure 9e, h, k* in the paper.
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/Postgres/TLP/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1462,7 +1462,7 @@ Run the following command. Let the fuzzing processes run for 24 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1472,7 +1472,7 @@ bash run_mysql_fuzzing.sh no-ctx-valid --start-core 0 --num-concurrent 5 --oracl
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_mysql_no_ctx_valid_TLP
 # Run bug bisecting
@@ -1489,7 +1489,7 @@ Run the following command. Let the fuzzing processes run for 24 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1499,7 +1499,7 @@ bash run_mysql_fuzzing.sh no-db-par-ctx-valid --start-core 0 --num-concurrent 5 
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_mysql_no_db_par_ctx_valid_TLP
 # Run bug bisecting
@@ -1520,7 +1520,7 @@ Run the following command. Let the fuzzing processes run for 24 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-```sh
+```bash
 cd <sqlright_root>/MySQL/scripts
 # Run the fuzzing with CPU core 1~5 (core id is 0-based). 
 # Please adjust the CORE ID based on your machine, 
@@ -1530,7 +1530,7 @@ bash run_mysql_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TL
 
 After 24 hours, stop the Docker container instance. And then run the following bug bisecting command:
 
-```sh
+```bash
 # Stop the fuzzing process
 sudo docker stop sqlright_mysql_TLP_non_deter
 # Run bug bisecting
@@ -1543,7 +1543,7 @@ The bug bisecting process is expected to finish in `5` hour.
 
 The following scripts will generate *Figure 9b, d, g, j* in the paper.
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/MySQL/TLP/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1563,7 +1563,7 @@ Make sure you have finished *Section 5.1 - 5.6* first.
 
 The following scripts will generate *Table 4* in the paper. 
 
-```sh
+```bash
 cd <sqlright_root>/Plot_Scripts/
 python3 count_false_positives.py
 ```
