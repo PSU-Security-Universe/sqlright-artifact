@@ -188,6 +188,9 @@ Explanation of the command:
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_NOREC
+# Run bug bisecting
 bash run_sqlite_bisecting.sh SQLRight --oracle NOREC
 ```
 
@@ -212,6 +215,9 @@ bash run_sqlite_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --o
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop squirrel_oracle_NOREC
+# Run bug bisecting
 bash run_sqlite_bisecting.sh squirrel-oracle --oracle NOREC
 ```
 
@@ -232,6 +238,11 @@ bash run_sqlite_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 ```
 
 After `72` hours, stop the Docker container instance. 
+
+```sh
+# Stop the sqlancer process
+sudo docker ps --filter name=sqlancer_sqlite_NOREC_raw_* --filter status=running -aq | xargs sudo docker stop
+```
 
 #### 3.1.4 Figures. 
 
@@ -272,6 +283,10 @@ bash run_postgres_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle
 
 After `72` hours, stop the Docker container instance. 
 
+```sh
+sudo docker stop sqlright_postgres_NOREC
+```
+
 Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process for PostgreSQL fuzzings. 
 
 #### 3.2.2 Squirrel-Oracle.
@@ -290,6 +305,10 @@ bash run_postgres_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 -
 
 After `72` hours, stop the Docker container instance. 
 
+```sh
+sudo docker stop squirrel_oracle_NOREC
+```
+
 #### 3.2.3 SQLancer
 
 <sub>`360` CPU hours</sub>
@@ -304,6 +323,10 @@ bash run_postgres_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 ```
 
 After `72` hours, stop the Docker container instance. 
+
+```sh
+sudo docker ps --filter name=sqlancer_postgres_NOREC_raw_* --filter status=running -aq | xargs sudo docker stop
+```
 
 #### 3.2.4 Figures 
 
@@ -343,6 +366,9 @@ bash run_mysql_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle NO
 After `72` hours, stop the Docker container instance. And then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_mysql_NOREC
+# Run bug bisecting
 bash run_mysql_bisecting.sh SQLRight --oracle NOREC
 ```
 
@@ -365,6 +391,9 @@ bash run_mysql_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --or
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop squirrel_oracle_NOREC
+# Run bug bisecting
 bash run_mysql_bisecting.sh squirrel-oracle --oracle NOREC
 ```
 
@@ -415,6 +444,9 @@ After `72` hours, stop the Docker container instance, and then run the following
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_sqlite_TLP
+# Run bug bisecting
 bash run_sqlite_bisecting.sh SQLRight --oracle TLP
 ```
 
@@ -441,6 +473,9 @@ bash run_sqlite_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --o
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop squirrel_oracle_TLP
+# Run bug bisecting
 bash run_sqlite_bisecting.sh squirrel-oracle --oracle TLP
 ```
 
@@ -463,6 +498,10 @@ bash run_sqlite_fuzzing.sh sqlancer --num-concurrent 5 --oracle TLP
 ```
 
 After `72` hours, stop the Docker container instance. 
+
+```sh
+sudo docker ps --filter name=sqlancer_sqlite_TLP_raw_* --filter status=running -aq | xargs sudo docker stop
+```
 
 #### 3.4.4 Figures. 
 
@@ -505,6 +544,10 @@ bash run_postgres_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle
 
 After `72` hours, stop the Docker container instance. 
 
+```sh
+sudo docker stop sqlright_postgres_TLP
+```
+
 Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process for PostgreSQL fuzzings. 
 
 #### 3.5.2 Squirrel-Oracle.
@@ -525,6 +568,10 @@ bash run_postgres_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 -
 
 After `72` hours, stop the Docker container instance. 
 
+```sh
+sudo docker stop squirrel_oracle_TLP
+```
+
 #### 3.5.3 SQLancer
 
 <sub>`360` CPU hours</sub>
@@ -541,6 +588,10 @@ bash run_postgres_fuzzing.sh sqlancer --num-concurrent 5 --oracle TLP
 ```
 
 After `72` hours, stop the Docker container instance. 
+
+```sh
+sudo docker ps --filter name=sqlancer_postgres_TLP_raw_* --filter status=running -aq | xargs sudo docker stop
+```
 
 #### 3.5.4 Figures 
 
@@ -582,6 +633,9 @@ bash run_mysql_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle TL
 After `72` hours, stop the Docker container instance. And then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop sqlright_mysql_TLP
+# Run bug bisecting
 bash run_mysql_bisecting.sh SQLRight --oracle TLP
 ```
 
@@ -606,6 +660,9 @@ bash run_mysql_fuzzing.sh squirrel-oracle --start-core 0 --num-concurrent 5 --or
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
 ```sh
+# Stop the fuzzing process
+sudo docker stop squirrel_oracle_TLP
+# Run bug bisecting
 bash run_mysql_bisecting.sh squirrel-oracle --oracle TLP
 ```
 
@@ -630,6 +687,10 @@ bash run_mysql_fuzzing.sh sqlancer  --num-concurrent 5 --oracle TLP
 ```
 
 After `72` hours, stop the Docker container instance. 
+
+```sh
+sudo docker ps --filter name=sqlancer_mysql_TLP_raw_* --filter status=running -aq | xargs sudo docker stop
+```
 
 #### 3.6.4 Figures. 
 
