@@ -2,8 +2,8 @@
 
 <a href="Paper/paper_no_names.pdf"><img src="Paper/paper_no_names.png" align="right" width="250"></a>
 
-Version: 1.0\
-Update: May 24, 2022
+Version: 1.0
+Update: Jun 19, 2022
 Paper: Detecting Logical Bugs of DBMS with Coverage-based Guidance
 
 This document is to help users reproduce the results we reported in our submission. 
