@@ -827,7 +827,7 @@ Make sure you have finished the steps in `Session 4.2.1 - 4.2.4`.
 The following scripts will generate *Figure 6b, d* in the paper. 
 
 ```sh
-cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Feedback_Test
+cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Feedback_Tests
 python3 copy_results.py
 python3 run_plots.py
 ```
