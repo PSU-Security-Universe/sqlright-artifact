@@ -18,7 +18,7 @@ Currently supported DBMS:
 
 ### Operating System configuration and Source Code setup
 
-All of the experiments are evaluated on a `x86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommend to reserve `>= 20` cores of CPUs, `>= 500GB` of memory and `>= 1.5TB` hard drive storage (preferably SSDs) for the evaluations. All the experiments are evaluated in Docker envs. We recommend to use Docker with version `>= 20.10.16` to reproduce the results. Before the start of the evaluations, we firstly need to configure a few system settings on the host operating system. 
+All of the experiments are evaluated on a `x86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommend to reserve `>= 20` cores of CPUs, `>= 600GB` of memory and `>= 1.5TB` hard drive storage (preferably SSDs) for the evaluations. All the experiments are evaluated in Docker envs. We recommend to use Docker with version `>= 20.10.16` to reproduce the results. Before the start of the evaluations, we firstly need to configure a few system settings on the host operating system. 
 
 ```sh
 # Basic Dependencies. 
@@ -112,7 +112,7 @@ tmux attach -t test_id_0
 exit # Exit and close the running tmux session.
 ```
 
-At last, go to the path where you want to download the sqlright source code:
+At last, go to the path where you want to download the `SQLRight` source code:
 
 ```sh
 cd ~ # Assuming the home directory
@@ -122,7 +122,7 @@ git clone https://github.com/PSU-Security-Universe/sqlright-artifact.git  # TODO
 <br/><br/>
 ## 0. Artifact Expectations
 
-This Artifact Evaluation is expected to consume a total of `8834` CPU hours. We recommend using a machine with `>= 20` cores of CPU, `>= 500GB` of memory and `>= 1.5TB` of storage space(preferably SSDs) to reproduce the results. All the code and the scripts of our built tool `SQLRight` are being released in this repository. Using the instructions below, one should be able to reproduce all the evaluations (Figures, Tables) shown in our Final Paper. 
+This Artifact Evaluation is expected to consume a total of `8834` CPU hours. We recommend using a machine with `>= 20` cores of CPU, `>= 600GB` of memory and `>= 1.5TB` of storage space(preferably SSDs) to reproduce the results. All the code and the scripts of our built tool `SQLRight` are being released in this repository. Using the instructions below, one should be able to reproduce all the evaluations (Figures, Tables) shown in our Final Paper. 
 
 
 <br/><br/>
@@ -149,7 +149,7 @@ Our paper presents `SQLRight`, a tool that combines coverage-based guidance, val
 
 ### 2.1  Build the Docker Image for SQLite3 evaluations
 
-Execute the following command before running any SQLite3 related evaluations. 
+Execute the following commands before running any SQLite3 related evaluations. 
 
 The Docker build process can last for about `1` hour. Expect long runtime when executing the commands. 
 ```sh
@@ -162,7 +162,7 @@ After the command finihsed, a Docker Image named `sqlright_sqlite` is created.
 --------------------------------------------------------------------------
 ### 2.2  Build the Docker Image for PostgreSQL evaluations
 
-Execute the following command before running any PostgreSQL related evaluations. 
+Execute the following commands before running any PostgreSQL related evaluations. 
 
 The Docker build process can last for about `1` hour. Expect long runtime when executing the commands. 
 ```sh
@@ -173,9 +173,9 @@ bash setup_postgres.sh
 After the command finihsed, a Docker Image named `sqlright_postgres` is created. 
 
 --------------------------------------------------------------------------
-### 2.3  Build the Docker Image for MySQL evaluations
+### 2.3  Build the Docker Images for MySQL evaluations
 
-Execute the following command before running any MySQL related evaluations. 
+Execute the following commands before running any MySQL related evaluations. 
 
 The Docker build process can last for about `3` hour. Expect long runtime when executing the commands. The created Docker Image will have around `70GB` of storage space. 
 ```sh
@@ -197,9 +197,9 @@ After the command finihsed, two Docker Images named `sqlright_mysql` and `sqlrig
 
 <sub>`361` CPU hours</sub>
 
-Run the following command. 
+Run the following commands. 
 
-The bash command will invoke the fuzzing script inside Docker. Let the fuzzing processes run for `72` hours. 
+The following bash scripts will wake the fuzzing script inside `sqlright_sqlite` Docker image. Let the fuzzing processes run for `72` hours. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
@@ -209,11 +209,17 @@ bash run_sqlite_fuzzing.sh SQLRight --start-core 0 --num-concurrent 5 --oracle N
 
 Explanation of the command:
 
-- The `start-core` flag binds the fuzzing process to the specific CPU core. 
+- The argument `SQLRight` determines the current running configurations. Currently support `SQLRight`, `no-ctx-valid`, `no-db-par-ctx-valid`, `squirrel-oracle` and `sqlancer`. Other configurations will be demonstrated in the subsequent testing scripts. 
 
-- The `num-concurrent` flag determines the number of concurrent fuzzing processes. 
+- The `start-core` flag binds the fuzzing process to the specific CPU core. The index starts with `0`. Using `start-core 0` will bind the first fuzzing process to the first CPU core on your machine. Combined with `num-concurrent`, the script will bind each fuzzing process to a unique CPU core, in order to avoid performance penalty introduced by running mutliple processes on one CPU core. For example, flags: `--start-core 0 --num-concurrent 5` will bind `5` fuzzing processes to CPU core `1~5`. Throughout all the evaluation scripts we show in this instruction, we use a default value of `0` for `--start-core`. However, please adjust the CORE-ID based on your testing scenarios, and avoid conflicted CORE-ID already used by other running evaluation processes. 
+
+- The `num-concurrent` flag determines the number of concurrent fuzzing processes. If the testing machine is constrainted by CPU cores, memory size or hard drive space, consider using a lower value for this flag. In our paper evaluations, we use the value of `5` across all the configurations. 
+
+- **Attention**: Make sure `start-core + num-concurrent` won't exceed the total CPU core count of your machine. Otherwise, the script will return error and the fuzzing process will failed to launch. 
 
 - The `oracle` flag determines the oracle used for the fuzzing. Currently support: `NOREC` and `TLP`. 
+
+Back to the current evaluation. :-)
 
 After `72` hours, stop the Docker container instance, and then run the following bug bisecting command. 
 
@@ -224,15 +230,15 @@ sudo docker stop sqlright_sqlite_NOREC
 bash run_sqlite_bisecting.sh SQLRight --oracle NOREC
 ```
 
-The bug bisecting process is expected to finish in `1` hour. 
+The bug bisecting process is expected to finish in `1` hour. The bisecting script doesn't require `--start-core` and `--num-concurrent` flags. And it will auto exit upon finished. 
 
 #### 3.1.2 Squirrel-Oracle 
 
 <sub>`361` CPU hours</sub>
 
-Run the following command. Let the fuzzing processes run for 72 hours.
+Run the following commands. Let the fuzzing processes run for 72 hours.
 
-**WARNING**: The `Squirrel-Oracle` process consumes a large amount of memory. In our evaluation, we observed a maximum of `190GB` of memory usage PER `Squirrel-Oracle` process after running for 72 hours. With 5 concurrent processes, the evalution could use in total of `600GB` of memory within 72 hours. If not enough memory is available, consider using a smaller number of `--num-concurrent`.  
+**WARNING**: The `Squirrel-Oracle` process consumes a large amount of memory. In our evaluation, we observed a maximum of `190GB` of memory usage PER `Squirrel-Oracle` process after running for 72 hours. With 5 concurrent processes, the evalution could use in total of `600GB` of memory within 72 hours. If not enough memory is available, consider using a smaller number of `--num-concurrent` to avoid Out-Of-Memory (OOM) kill.  
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
@@ -259,7 +265,7 @@ The bug bisecting process is expected to finish in `1` hour.
 
 Run the following command. Let the `SQLancer` processes run for 72 hours. 
 
-**WARNING**: The SQLancer process will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `80GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `400GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
+**WARNING**: The SQLancer process will generate a large amount of `cache` data. And it will save these cache to the local file system. We expected around `80GB` of cache being generated from EACH SQLancer instances. Following the command below, we call 5 instances of SQLancer, which will dump `400GB` of cache data to the hard disk. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
@@ -339,6 +345,8 @@ After `72` hours, stop the Docker container instance.
 sudo docker stop squirrel_oracle_NOREC
 ```
 
+Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process for PostgreSQL fuzzings. 
+
 #### 3.2.3 SQLancer
 
 <sub>`360` CPU hours</sub>
@@ -352,7 +360,7 @@ cd <sqlright_root>/PostgreSQL/scripts
 bash run_postgres_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 ```
 
-After `72` hours, stop the Docker container instance. 
+After `72` hours, stop the Docker container instances. 
 
 ```sh
 sudo docker ps --filter name=sqlancer_postgres_NOREC_raw_* --filter status=running -aq | xargs sudo docker stop
@@ -488,9 +496,9 @@ The bug bisecting process is expected to finish in `1` hour.
 
 Run the following command. Let the fuzzing processes run for 72 hours.
 
-**WARNING**: The `Squirrel-Oracle` process consumes a large amount of memory. In our evaluation, we observed a maximum of `100GB` of memory usage PER `Squirrel-Oracle` process after running for 72 hours. With 5 concurrent processes, the evalution could use in total of `500GB` of memory within 72 hours. If not enough memory is available, consider using a smaller number of `--num-concurrent`.  
+**WARNING**: The `Squirrel-Oracle` process consumes a large amount of memory. In our evaluation, we observed a maximum of `100GB` of memory usage PER `Squirrel-Oracle` process after running for 72 hours. With 5 concurrent processes, the evalution could use in total of `600GB` of memory within 72 hours. If not enough memory is available, consider using a smaller number of `--num-concurrent`.  
 
-**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluation. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
@@ -519,7 +527,7 @@ Run the following command. Let the `SQLancer` processes run for 72 hours.
 
 **WARNING**: The SQLancer process will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `50GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `250GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
-**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
+**Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluation. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
@@ -543,7 +551,7 @@ python3 copy_results.py
 python3 run_plots.py
 ```
 
-The figures will be generated in folder `<sqlright_root>/Plot_Scripts/SQLite3/TLP/Comp_diff_tool/plots`.
+The figures will be generated in folder `<sqlright_root>/Plot_Scripts/SQLite3/TLP/Comp_diff_tools/plots`.
 
 **Expectations**:
 
@@ -706,13 +714,10 @@ Run the following command. Let the SQLancer processes run for 72 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
-**WARNING**: The SQLancer process will generate a large amount of cache data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`.
+**WARNING**: The SQLancer process will generate a large amount of cache data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call `5` instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`.
 
 ```sh
 cd <sqlright_root>/MySQL/scripts
-# Run the fuzzing with CPU core 1~5 (core id is 0-based). 
-# Please adjust the CORE ID based on your machine, 
-# and do not use conflict core id with other running evaluation process. 
 bash run_mysql_fuzzing.sh sqlancer  --num-concurrent 5 --oracle TLP
 ```
 
@@ -780,7 +785,7 @@ The bug bisecting process is expected to finish in `1` hours.
 
 <sub>`121` CPU hours</sub>
 
-**WARNING**: Due to the aggresive query seed handling strategies, the SQLright Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `15GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `75GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
+**WARNING**: Due to the aggresive query seed handling strategy, the `SQLRight` Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `15GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `75GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
@@ -806,7 +811,7 @@ The bug bisecting process is expected to finish in `1` hours.
 
 <sub>`121` CPU hours</sub>
 
-**WARNING**: Due to the aggresive query seed handling strategies, the SQLright Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
+**WARNING**: Due to the aggresive query seed handling strategy, the `SQLRight` Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
@@ -839,6 +844,8 @@ cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Feedback_Test
 python3 copy_results.py
 python3 run_plots.py
 ```
+
+The figures will be saved in folder: `Plot_Scripts/SQLite3/NoREC/Feedback_Test/plots`.
 
 **Expectations**:
 
@@ -882,7 +889,7 @@ The bug bisecting process is expected to finish in `1` hours.
 
 <sub>`121` CPU hours</sub>
 
-**WARNING**: Due to the aggresive query seed handling strategies, the SQLright Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `15GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `75GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
+**WARNING**: Due to the aggresive query seed handling strategy, the `SQLRight` Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `15GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `75GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
@@ -908,7 +915,7 @@ The bug bisecting process is expected to finish in `1` hours.
 
 <sub>`121` CPU hours</sub>
 
-**WARNING**: Due to the aggresive query seed handling strategies, the SQLright Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
+**WARNING**: Due to the aggresive query seed handling strategy, the `SQLRight` Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
 
 ```sh
 cd <sqlright_root>/SQLite/scripts
@@ -942,6 +949,8 @@ python3 copy_results.py
 python3 run_plots.py
 ```
 
+The figures will be generated in folder `Plot_Scripts/SQLite3/TLP/Feedback_Tests/plots`. 
+
 **Expectations**:
 
 - For bugs of SQLite (TLP): `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. 
@@ -952,7 +961,7 @@ python3 run_plots.py
 
 Get the mutation depth information shown in the *Table 3* in the paper. 
 
-Make sure you have finished *Session 4.1 and 4.2*.  
+Make sure you have finished all tests in *Session 4.1 and 4.2*. 
 
 ```sh
 cd <sqlright_root>/Plot_scripts
@@ -961,7 +970,7 @@ python3 count_queue_depth.py
 
 **Expectations**:
 
-- The Queue Depth information would be returned. 
+- The Queue Depth information will be returned. 
 - The mutation depth number returned could be slightly different between each run. 
 - The `Max Depth` from SQLRight NoREC and TLP should be larger than other baselines
 - SQLRight NoREC and TLP should have more queue seeds located in a deeper depth, compared to other baselines. 
@@ -1561,7 +1570,8 @@ python3 count_false_positives.py
 
 **Expectations**:
 
-- We have introduced some extra filters that filter out some obvious False Positives in the Artifact, in order to produce a more accurate bug number without any manual efforts. Thus, the False Positives number reported by the Artifact script is less than the ones we reported in the paper. 
+- The script will return the reported bug numbers for the configs in *Table 4*. 
+- We have introduced some extra filters that can filter out obvious False Positives. We includes these filters in the Artifact implementation, in order to reduce the manual efforts for excluding FPs, and to produce a more accurate bug numbers. Therefore, the bug number reported by the current Artifact script could be slightly less than the ones we reported in the paper (*Table 3*). 
 - For all configurations, the `WITHOUT non-deter` settings should always have less bugs reported compared to the `WITH non-deter` settings, due to the extra False Positives produced by the non-deterministic queries. 
 
 
