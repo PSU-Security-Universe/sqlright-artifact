@@ -51,6 +51,7 @@ pip3 install matplotlib
 pip3 install numpy
 pip3 install pandas
 pip3 install paramiko
+pip3 install datetime
 ```
 
 The whole Artifact Evaluations are built within the `Docker` virtualized environment. If the host system does not have the `Docker` application installed, here is the command to install `Docker` in `Ubuntu`. 
@@ -273,6 +274,8 @@ cd <sqlright_root>/SQLite/scripts
 bash run_sqlite_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 ```
 
+**Attention**: Expect some error messages: `unable to setup input stream: unable to set IO streams as raw terminal: input/output error`. It won't impact the evaluation process. 
+
 After `72` hours, stop the Docker container instance. 
 
 ```bash
@@ -285,6 +288,11 @@ sudo docker ps --filter name=sqlancer_sqlite_NOREC_raw_* --filter status=running
 The following scripts will generate *Figure 5a, c, f, i* in the paper. 
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/SQLite/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Comp_diff_tools_NoREC
 python3 copy_results.py
 python3 run_plots.py
@@ -360,6 +368,8 @@ cd <sqlright_root>/PostgreSQL/scripts
 bash run_postgres_fuzzing.sh sqlancer --num-concurrent 5 --oracle NOREC
 ```
 
+**Attention**: Expect some error messages: `unable to setup input stream: unable to set IO streams as raw terminal: input/output error`. It won't impact the evaluation process. 
+
 After `72` hours, stop the Docker container instances. 
 
 ```bash
@@ -371,6 +381,11 @@ sudo docker ps --filter name=sqlancer_postgres_NOREC_raw_* --filter status=runni
 The following scripts will generate *Figure 5e, h, k* in the paper. 
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/PostgreSQL/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/Postgres/NoREC/Comp_diff_tools_NoREC
 python3 copy_results.py
 python3 run_plots.py
@@ -442,6 +457,11 @@ The bug bisecting process is expected to finish in `7` hours.
 The following scripts will generate *Figure 5b, d, g, j* in the paper. 
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/MySQL/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/MySQL/NoREC/Comp_diff_tools
 python3 copy_results.py
 python3 run_plots.py
@@ -546,6 +566,11 @@ sudo docker ps --filter name=sqlancer_sqlite_TLP_raw_* --filter status=running -
 The following scripts will generate *Figure 8a, c, f, i* in the paper. 
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/SQLite/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Comp_diff_tools
 python3 copy_results.py
 python3 run_plots.py
@@ -636,6 +661,11 @@ sudo docker ps --filter name=sqlancer_postgres_TLP_raw_* --filter status=running
 The following scripts will generate *Figure 8e, h, k* in the paper. 
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/PostgreSQL/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/Postgres/TLP/Comp_diff_tools_TLP
 python3 copy_results.py
 python3 run_plots.py
@@ -732,6 +762,11 @@ sudo docker ps --filter name=sqlancer_mysql_TLP_raw_* --filter status=running -a
 The following scripts will generate *Figure 8b, d, g, j* in the paper. 
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/MySQL/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/MySQL/TLP/Comp_diff_tools
 python3 copy_results.py
 python3 run_plots.py
@@ -807,7 +842,7 @@ bash run_sqlite_bisecting.sh SQLRight --oracle NOREC --feedback random_save
 
 The bug bisecting process is expected to finish in `1` hours. 
 
-#### 4.1.4 Run the SQLRight SQLite3 Save All configiguration, for 24 hours:
+#### 4.1.4 SQLRight Save All
 
 <sub>`121` CPU hours</sub>
 
@@ -833,13 +868,18 @@ bash run_sqlite_bisecting.sh SQLRight --oracle NOREC --feedback save_all
 
 The bug bisecting process is expected to finish in `1` hours. 
 
-#### 4.1.5 Figures:
+#### 4.1.5 Figures
 
 Make sure you have finished the steps in `Session 4.1.1 - 4.1.4`. 
 
 The following scripts will generate *Figure 6a, c* in the paper. 
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/SQLite/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Feedback_Test
 python3 copy_results.py
 python3 run_plots.py
@@ -911,8 +951,7 @@ bash run_sqlite_bisecting.sh SQLRight --oracle TLP --feedback random_save
 
 The bug bisecting process is expected to finish in `1` hours. 
 
-#### 4.2.4 Run the SQLRight SQLite3 Save All configiguration, for 24 hours:
-
+#### 4.2.4 SQLRight Save All
 <sub>`121` CPU hours</sub>
 
 **WARNING**: Due to the aggresive query seed handling strategy, the `SQLRight` Random Save config will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLRight instance. Following the command below, we will call 5 instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
@@ -937,13 +976,18 @@ bash run_sqlite_bisecting.sh SQLRight --oracle TLP --feedback save_all
 
 The bug bisecting process is expected to finish in `1` hours. 
 
-#### 4.2.5 Figures:
+#### 4.2.5 Figures
 
 Make sure you have finished the steps in `Session 4.2.1 - 4.2.4`. 
 
 The following scripts will generate *Figure 6b, d* in the paper. 
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/SQLite/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Feedback_Tests
 python3 copy_results.py
 python3 run_plots.py
@@ -1064,11 +1108,16 @@ bash run_sqlite_bisecting.sh SQLRight --oracle NOREC --non-deter
 
 The bug bisecting process is expected to finish in `1` hour. 
 
-#### 5.1.6 Figures:
+#### 5.1.6 Figures
 
 The following scripts will generate *Figure 7a, c, f, i* in the paper.
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/SQLite/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/SQLite3/NoREC/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1132,17 +1181,22 @@ After `24` hours, stop the Docker container instance.
 sudo docker stop sqlright_postgres_no_db_par_ctx_valid_NOREC
 ```
 
-#### 5.2.4 Run the Squirrel-oracle fuzzing for 24 hours. 
+#### 5.2.4 Squirrel-Oracle
 
 Make sure you have finished *Session 3.2.2* in this Artifact Evaluation. 
 
-#### 5.2.5 Plot the figures:
+#### 5.2.5 Figures
 
 Because we did not detect False Positives when using `SQLRight non-deter` in our PostgreSQL evaluations, the current `SQLRight non-deter` implementation is basically identical to `SQLRight`. We therefore skip `SQLRight non-deter` in this Artifact Evaluation. 
 
 The following scripts will generate *Figure 7e, h, k* in the paper.
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/PostgreSQL/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/Postgres/NoREC/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1242,11 +1296,16 @@ bash run_mysql_bisecting.sh SQLRight --oracle NOREC --non-deter
 
 The bug bisecting process is expected to finish in `5` hour.
 
-#### 5.3.6 Figures:
+#### 5.3.6 Figures
 
 The following scripts will generate *Figure 7b, d, g, j* in the paper.
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/MySQL/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/MySQL/NoREC/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1351,11 +1410,16 @@ bash run_sqlite_bisecting.sh SQLRight --oracle TLP --non-deter
 
 The bug bisecting process is expected to finish in `1` hour. 
 
-#### 5.4.6 Figures:
+#### 5.4.6 Figures
 
 The following scripts will generate *Figure 9a, c, f, i* in the paper.
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/SQLite/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/SQLite3/TLP/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1423,17 +1487,22 @@ After `24` hours, stop the Docker container instance.
 sudo docker stop sqlright_postgres_no_db_par_ctx_valid_TLP
 ```
 
-#### 5.5.4 Run the Squirrel-oracle fuzzing for 24 hours. 
+#### 5.5.4 Squirrel-Oracle
 
 Make sure you have finished *Session 3.5.2* in this Artifact Evaluation. 
 
-#### 5.5.5 Plot the figures:
+#### 5.5.5 Figures
 
 Because we did not detect False Positives when using `SQLRight non-deter` in our PostgreSQL evaluations, the current `SQLRight non-deter` implementation is basically identical to `SQLRight`. We therefore skip `SQLRight non-deter` in this Artifact Evaluation. 
 
 The following scripts will generate *Figure 9e, h, k* in the paper.
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/PostgreSQL/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/Postgres/TLP/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
@@ -1544,6 +1613,11 @@ The bug bisecting process is expected to finish in `5` hour.
 The following scripts will generate *Figure 9b, d, g, j* in the paper.
 
 ```bash
+# If you use the `root` user to execute the docker command. It is possible that you need to change the privilege access for the Results output folder. 
+cd <sqlright_root>/MySQL/Results
+sudo chown -R <your_user_name> ./*
+
+# Plot the figures
 cd <sqlright_root>/Plot_Scripts/MySQL/TLP/Validate_Parts
 python3 copy_results.py
 python3 run_plots.py
