@@ -3726,6 +3726,10 @@ static u8 save_if_interesting(char** argv, void* mem, u32 len, u8 fault) {
   u8  keeping = 0, res;
   vector<IR *> ir_set;
 
+  if (len == 0) {
+      return;
+  }
+
   /* Remove empty string begin saved into the queue. */
   string cur_saved_string = g_mutator.extract_struct(g_current_ir);
   if (is_str_empty(cur_saved_string)) {
