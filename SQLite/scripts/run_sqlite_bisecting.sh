@@ -48,6 +48,7 @@ if [ "$1" == "SQLRight" ]; then
     bugoutdir="$bugoutdir/bug_samples"
     resoutdir="$resoutdir""_bisecting"
     
+    echo "Begins to run bug bisecting. "
     sudo docker run -i --rm \
         -v $(pwd)/$bugoutdir:/home/sqlite/bisecting/bug_samples \
         --name $resoutdir \
@@ -84,6 +85,7 @@ elif [ "$1" == "no-ctx-valid" ]; then
     bugoutdir="$bugoutdir/bug_samples"
     resoutdir="$resoutdir""_bisecting"
 
+    echo "Begins to run bug bisecting. "
     sudo docker run -i --rm \
         -v $(pwd)/$bugoutdir:/home/sqlite/bisecting/bug_samples \
         --name $resoutdir \
@@ -120,6 +122,7 @@ elif [ "$1" == "no-db-par-ctx-valid" ]; then
     bugoutdir="$bugoutdir/bug_samples"
     resoutdir="$resoutdir""_bisecting"
 
+    echo "Begins to run bug bisecting. "
     sudo docker run -i --rm \
         -v $(pwd)/$bugoutdir:/home/sqlite/bisecting/bug_samples \
         --name $resoutdir \
@@ -156,6 +159,7 @@ elif [ "$1" == "squirrel-oracle" ]; then
     bugoutdir="$bugoutdir/bug_samples"
     resoutdir="$resoutdir""_bisecting"
 
+    echo "Begins to run bug bisecting. "
     sudo docker run -i --rm \
         -v $(pwd)/$bugoutdir:/home/sqlite/bisecting/bug_samples \
         --name $resoutdir \
