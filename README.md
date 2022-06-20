@@ -29,7 +29,7 @@ Currently supported DBMS:
       - [3.1.1 SQLRight](#311-sqlright)
       - [3.1.2 Squirrel-Oracle](#312-squirrel-oracle)
       - [3.1.3 SQLancer](#313-sqlancer)
-      - [3.1.4 Figures.](#314-figures)
+      - [3.1.4 Figures](#314-figures)
     + [3.2 PostgreSQL NoREC](#32-postgresql-norec)
       - [3.2.1 SQLRight](#321-sqlright)
       - [3.2.2 Squirrel-Oracle.](#322-squirrel-oracle)
@@ -37,23 +37,23 @@ Currently supported DBMS:
       - [3.2.4 Figures](#324-figures)
     + [3.3 MySQL NoREC](#33-mysql-norec)
       - [3.3.1 SQLRight](#331-sqlright)
-      - [3.3.2 Run the Squirrel with oracle MySQL fuzzing for 72 hours.](#332-run-the-squirrel-with-oracle-mysql-fuzzing-for-72-hours)
-      - [3.3.3 Plot the figures.](#333-plot-the-figures)
+      - [3.3.2 Squirrel-Oracle](#332-squirrel-oracle)
+      - [3.3.3 Figures](#333-figures)
     + [3.4 SQLite TLP](#34-sqlite-tlp)
       - [3.4.1 SQLRight](#341-sqlright)
       - [3.4.2 Squirrel-Oracle](#342-squirrel-oracle)
       - [3.4.3 SQLancer](#343-sqlancer)
-      - [3.4.4 Figures.](#344-figures)
+      - [3.4.4 Figures](#344-figures)
     + [3.5 PostgreSQL TLP](#35-postgresql-tlp)
       - [3.5.1 SQLRight](#351-sqlright)
-      - [3.5.2 Squirrel-Oracle.](#352-squirrel-oracle)
+      - [3.5.2 Squirrel-Oracle](#352-squirrel-oracle)
       - [3.5.3 SQLancer](#353-sqlancer)
       - [3.5.4 Figures](#354-figures)
     + [3.6 MySQL TLP](#36-mysql-tlp)
       - [3.6.1 SQLRight](#361-sqlright)
       - [3.6.2 Squirrel-Oracle.](#362-squirrel-oracle)
-      - [3.6.3 SQLancer.](#363-sqlancer)
-      - [3.6.4 Figures.](#364-figures)
+      - [3.6.3 SQLancer](#363-sqlancer)
+      - [3.6.4 Figures](#364-figures)
   * [4. Contribution of Code-Coverage Feedback](#4-contribution-of-code-coverage-feedback)
     + [4.1 NoREC](#41-norec)
       - [4.1.1 SQLRight](#411-sqlright)
@@ -383,7 +383,7 @@ After `72` hours, stop the Docker container instance.
 sudo docker ps --filter name=sqlancer_sqlite_NOREC_raw_* --filter status=running -aq | xargs sudo docker stop
 ```
 
-#### 3.1.4 Figures. 
+#### 3.1.4 Figures
 
 The following scripts will generate *Figure 5a, c, f, i* in the paper. 
 
@@ -527,7 +527,7 @@ bash run_mysql_bisecting.sh SQLRight --oracle NOREC
 
 The bug bisecting process is expected to finish in `7` hours. 
 
-#### 3.3.2 Run the Squirrel with oracle MySQL fuzzing for 72 hours.
+#### 3.3.2 Squirrel-Oracle
 
 <sub>`367` CPU hours</sub>
 
@@ -552,7 +552,7 @@ bash run_mysql_bisecting.sh squirrel-oracle --oracle NOREC
 
 The bug bisecting process is expected to finish in `7` hours. 
 
-#### 3.3.3 Plot the figures. 
+#### 3.3.3 Figures 
 
 The following scripts will generate *Figure 5b, d, g, j* in the paper. 
 
@@ -661,7 +661,7 @@ After `72` hours, stop the Docker container instance.
 sudo docker ps --filter name=sqlancer_sqlite_TLP_raw_* --filter status=running -aq | xargs sudo docker stop
 ```
 
-#### 3.4.4 Figures. 
+#### 3.4.4 Figures
 
 The following scripts will generate *Figure 8a, c, f, i* in the paper. 
 
@@ -713,7 +713,7 @@ sudo docker stop sqlright_postgres_TLP
 
 Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process for PostgreSQL fuzzings. 
 
-#### 3.5.2 Squirrel-Oracle.
+#### 3.5.2 Squirrel-Oracle
 
 <sub>`360` CPU hours</sub>
 
@@ -836,7 +836,7 @@ bash run_mysql_bisecting.sh squirrel-oracle --oracle TLP
 
 The bug bisecting process is expected to finish in `7` hours. 
 
-#### 3.6.3 SQLancer.
+#### 3.6.3 SQLancer
 
 <sub>`360` CPU hours</sub>
 
@@ -857,7 +857,7 @@ After `72` hours, stop the Docker container instance.
 sudo docker ps --filter name=sqlancer_mysql_TLP_raw_* --filter status=running -aq | xargs sudo docker stop
 ```
 
-#### 3.6.4 Figures. 
+#### 3.6.4 Figures
 
 The following scripts will generate *Figure 8b, d, g, j* in the paper. 
 
