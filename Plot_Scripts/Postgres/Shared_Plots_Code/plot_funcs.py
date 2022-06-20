@@ -105,6 +105,7 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
+            print("The file:%s has too few entries. Skipped. " % (cur_file_name))
             continue
         cur_file_fd = cur_file_fd['unix_time'][last_idx]
         if cur_file_fd > latest_time:
@@ -112,9 +113,8 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
             file_name = os.path.join(file_dir, cur_file_name)
 
     if file_name == "":
-        print("Error: Cannot find plot_data_* file in dir %s" % (file_dir))
-    print("Reading file_name: %s" % (file_name))
-    
+        print("Error: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. " % (cur_file_name))
+
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
         file['time'] = pd.to_datetime(file['unix_time'], unit='s')
@@ -320,6 +320,7 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
+            print("The file:%s has too few entries. Skipped. " % (cur_file_name))
             continue
         cur_file_fd = cur_file_fd['unix_time'][last_idx]
         if cur_file_fd > latest_time:
@@ -327,7 +328,7 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
             file_name = os.path.join(file_dir, cur_file_name)
 
     if file_name == "":
-        print("Error: Cannot find plot_data_* file in dir %s" % (file_dir))
+        print("Error: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. " % (cur_file_name))
     
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -483,6 +484,7 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
+            print("The file:%s has too few entries. Skipped. " % (cur_file_name))
             continue
         cur_file_fd = cur_file_fd['unix_time'][last_idx]
         if cur_file_fd > latest_time:
@@ -490,7 +492,7 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
             file_name = os.path.join(file_dir, cur_file_name)
 
     if file_name == "":
-        print("Error: Cannot find plot_data_* file in dir %s" % (file_dir))
+        print("Error: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. " % (cur_file_name))
 
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
