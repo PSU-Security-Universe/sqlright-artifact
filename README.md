@@ -18,6 +18,7 @@ Currently supported DBMS:
 <!--ts-->
   * [Getting Started](#getting-started)
     + [Operating System configuration and Source Code setup](#operating-system-configuration-and-source-code-setup)
+    + [Troubleshooting](#troubleshooting)
   * [0. Artifact Expectations](#0-artifact-expectations)
   * [1. Artifact Overview](#1-artifact-overview)
   * [2.  Build the Docker Images](#2--build-the-docker-images)
@@ -219,6 +220,16 @@ At last, go to the path where you want to download the `SQLRight` source code:
 cd ~ # Assuming the home directory
 git clone https://github.com/PSU-Security-Universe/sqlright-artifact.git  # TODO: May refer to other link if we are using Zenodo. 
 ```
+
+### Troubleshooting
+
+- If the Docker Image building process failed or stuck at some steps for a couple hours, consider to clean the Docker environments. The following command will clean up the Docker cache, and we can rebuild another Docker Images from scratch. 
+
+```bash
+sudo docker system prune --all
+```
+
+- If any fuzzing processes failed to launch, immediately return errors, or never output any results while running, please check whether the `System Configuration` has been setup correctly. Specifically, please repeat the steps of `Disable On-demand CPU scaling` and `Avoid having crashes being misinterpreted as hangs` before retrying the fuzzing scripts. 
 
 <br/><br/>
 ## 0. Artifact Expectations
