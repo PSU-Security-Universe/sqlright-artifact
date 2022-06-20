@@ -290,6 +290,9 @@ After the command finihsed, a Docker Image named `sqlright_postgres` is created.
 Execute the following commands before running any MySQL related evaluations. 
 
 The Docker build process can last for about `3` hour. Expect long runtime when executing the commands. The created Docker Image will have around `70GB` of storage space. 
+
+We expect some **Warnings** being returned from the MySQL compilation process. The **Warnings** won't impact the build process. 
+
 ```bash
 cd <sqlright_root>/MySQL/scripts/
 bash setup_mysql.sh

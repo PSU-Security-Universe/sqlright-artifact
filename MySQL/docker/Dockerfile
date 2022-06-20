@@ -116,7 +116,7 @@ RUN mkdir bld
 WORKDIR /home/mysql/src/parser/mysql-server/bld
 
 # Mute the Warning information. The modified version of the MySQL does return many Warnings while compiling. Known problem, ignore them. 
-RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost -DCMAKE_C_FLAGS="-w" -DCMAKE_CXX_FLAGS="-w" 
+RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost 
 RUN make -j$(nproc)
 
 WORKDIR /home/mysql/src
@@ -158,7 +158,7 @@ RUN mkdir bld
 WORKDIR /home/mysql/Validaty_Components_Config/No_Ctx_Valid/src/parser/mysql-server/bld
 
 # Mute the Warning information. The modified version of the MySQL does return many Warnings while compiling. Known problem, ignore them. 
-RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost -DCMAKE_C_FLAGS="-w" -DCMAKE_CXX_FLAGS="-w"
+RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost
 RUN make -j$(nproc) 
 
 WORKDIR /home/mysql/Validaty_Components_Config/No_Ctx_Valid/src
