@@ -663,6 +663,8 @@ Run the following command. Let the `SQLancer` processes run for 72 hours.
 
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluation. 
 
+**Attention**: Expect some error messages: `unable to setup input stream: unable to set IO streams as raw terminal: input/output error`. It won't impact the evaluation process. 
+
 ```bash
 cd <sqlright_root>/SQLite/scripts
 # Call 5 instances of SQLancer. 
@@ -758,6 +760,8 @@ Run the following command. Let the `SQLancer` processes run for 72 hours.
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 **WARNING**: The SQLancer process will generate a large amount of `cache` data, and it will save the cache to the file system. We expected around `50GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call 5 instances of SQLancer, which will dump `250GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`. 
+
+**Attention**: Expect some error messages: `unable to setup input stream: unable to set IO streams as raw terminal: input/output error`. It won't impact the evaluation process. 
 
 ```bash
 cd <sqlright_root>/PostgreSQL/scripts
@@ -859,6 +863,8 @@ Run the following command. Let the SQLancer processes run for 72 hours.
 **Attention**: Be careful with the `--oracle` flag. Here we are using `TLP` instead of `NOREC` in the previous evaluations. 
 
 **WARNING**: The SQLancer process will generate a large amount of cache data, and it will save the cache to the file system. We expected around `20GB` of cache being generated from EACH SQLancer instances. Following the command below, we will call `5` instances of SQLancer, which will dump `100GB` of cache data. If not enough storage space is available, consider using a smaller number of `--num-concurrent`.
+
+**Attention**: Expect some error messages: `unable to setup input stream: unable to set IO streams as raw terminal: input/output error`. It won't impact the evaluation process. 
 
 ```bash
 cd <sqlright_root>/MySQL/scripts
