@@ -18,6 +18,7 @@ Currently supported DBMS:
 <!--ts-->
   * [Getting Started](#getting-started)
     + [Operating System configuration and Source Code setup](#operating-system-configuration-and-source-code-setup)
+    + [Troubleshooting](#troubleshooting)
   * [0. Artifact Expectations](#0-artifact-expectations)
   * [1. Artifact Overview](#1-artifact-overview)
   * [2.  Build the Docker Images](#2--build-the-docker-images)
