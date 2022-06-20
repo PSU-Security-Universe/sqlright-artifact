@@ -101,7 +101,7 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
     for cur_file_name in os.listdir(file_dir):
         if "plot_data_" not in cur_file_name:
             continue
-        print("Reading file_name: %s" % (cur_file_name))
+#        print("Reading file_name: %s" % (cur_file_name))
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
