@@ -520,7 +520,7 @@ The plots will be generated in folder `<sqlright_root>/Plot_Scripts/Postgres/NoR
 
 <sub>`367` CPU hours</sub>
 
-Run the following command. Let the `SQLancer` processes run for 72 hours. 
+Run the following command. Let the `SQLRight` processes run for 72 hours. 
 
 ```bash
 cd <sqlright_root>/MySQL/scripts
