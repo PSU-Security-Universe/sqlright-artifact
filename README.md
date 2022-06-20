@@ -14,7 +14,7 @@ Currently supported DBMS:
 3. MySQL
 
 <br/><br/>
-## Table of contents
+## Table of Contents
 <!--ts-->
   * [Getting Started](#getting-started)
     + [Operating System configuration and Source Code setup](#operating-system-configuration-and-source-code-setup)
