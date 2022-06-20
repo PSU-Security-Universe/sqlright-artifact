@@ -32,7 +32,7 @@ Currently supported DBMS:
       - [3.1.4 Figures](#314-figures)
     + [3.2 PostgreSQL NoREC](#32-postgresql-norec)
       - [3.2.1 SQLRight](#321-sqlright)
-      - [3.2.2 Squirrel-Oracle.](#322-squirrel-oracle)
+      - [3.2.2 Squirrel-Oracle](#322-squirrel-oracle)
       - [3.2.3 SQLancer](#323-sqlancer)
       - [3.2.4 Figures](#324-figures)
     + [3.3 MySQL NoREC](#33-mysql-norec)
@@ -51,7 +51,7 @@ Currently supported DBMS:
       - [3.5.4 Figures](#354-figures)
     + [3.6 MySQL TLP](#36-mysql-tlp)
       - [3.6.1 SQLRight](#361-sqlright)
-      - [3.6.2 Squirrel-Oracle.](#362-squirrel-oracle)
+      - [3.6.2 Squirrel-Oracle](#362-squirrel-oracle)
       - [3.6.3 SQLancer](#363-sqlancer)
       - [3.6.4 Figures](#364-figures)
   * [4. Contribution of Code-Coverage Feedback](#4-contribution-of-code-coverage-feedback)
@@ -433,7 +433,7 @@ sudo docker stop sqlright_postgres_NOREC
 
 Since we did not find any bugs for PostgreSQL, we skip the bug bisecting process for PostgreSQL fuzzings. 
 
-#### 3.2.2 Squirrel-Oracle.
+#### 3.2.2 Squirrel-Oracle
 
 <sub>`360` CPU hours</sub>
 
@@ -809,7 +809,7 @@ bash run_mysql_bisecting.sh SQLRight --oracle TLP
 
 The bug bisecting process is expected to finish in `7` hours. 
 
-#### 3.6.2 Squirrel-Oracle.
+#### 3.6.2 Squirrel-Oracle
 
 <sub>`367` CPU hours</sub>
 
