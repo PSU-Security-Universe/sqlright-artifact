@@ -192,7 +192,7 @@ After the command finihsed, two Docker Images named `sqlright_mysql` and `sqlrig
 <br/><br/>
 ## 3. Comparison Between Different Tools
 
-### 3.1 SQLite, NoREC oracle
+### 3.1 SQLite NoREC oracle
 
 #### 3.1.1 SQLRight   
 
@@ -309,7 +309,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/SQLite3/No
 
 
 --------------------------------------------------------------------------
-### 3.2 PostgreSQL, NoREC
+### 3.2 PostgreSQL NoREC
 
 #### 3.2.1 SQLRight
 
@@ -400,7 +400,7 @@ The plots will be generated in folder `<sqlright_root>/Plot_Scripts/Postgres/NoR
 - For PostgreSQL valid stmts / hr: `SQLancer` have the highest valid stmts / hr, while `SQLRight` performs better than `Squirrel-oracle`.
 
 --------------------------------------------------------------------------
-### 3.3 MySQL, NoREC
+### 3.3 MySQL NoREC
 
 #### 3.3.1 SQLRight
 
@@ -477,7 +477,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/MySQL/NoRE
 - For MySQL valid stmts / hr: `SQLRight` has more valid_stmts / hr than `Squirrel-oracle`.
 
 ---------------------------------------
-### 3.4 SQLite, TLP oracle
+### 3.4 SQLite TLP
 
 #### 3.4.1 SQLRight   
 
@@ -587,7 +587,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/SQLite3/TL
 
 
 --------------------------------------------------------------------------
-### 3.5 PostgreSQL, TLP
+### 3.5 PostgreSQL TLP
 
 #### 3.5.1 SQLRight
 
@@ -680,7 +680,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/Postgres/T
 - For PostgreSQL valid stmts / hr: `SQLancer` have the highest valid stmts / hr, while `SQLRight` performs better than `Squirrel-oracle`.
 
 --------------------------------------------------------------------------
-### 3.6 MySQL, TLP
+### 3.6 MySQL TLP
 
 #### 3.6.1 SQLRight
 
@@ -784,7 +784,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/MySQL/TLP/
 <br/><br/>
 ## 4. Contribution of Code-Coverage Feedback
 
-### 4.1 NoREC oracle
+### 4.1 NoREC
 
 #### 4.1.1 SQLRight
 
@@ -893,7 +893,7 @@ The figures will be saved in folder: `Plot_Scripts/SQLite3/NoREC/Feedback_Test/p
 - For coverage of SQLite (NoREC): `SQLRight` should have the highest code coverage among the other baselines. 
 
 --------------------------------------
-### 4.2 TLP oracle:
+### 4.2 TLP
 
 #### 4.2.1 SQLRight
 
@@ -1023,7 +1023,7 @@ python3 count_queue_depth.py
 <br/><br/>
 ## 5. Contribution of Validity Components
 
-### 5.1 SQLite, NoREC Oracle
+### 5.1 SQLite NoREC
 
 #### 5.1.1 SQLRight 
 
@@ -1133,7 +1133,7 @@ The figures will be generated in folder: `<sqlright_root>/Plot_Scripts/SQLite3/N
 - For SQLite valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
 
 --------------------------------------------------------------
-### 5.2 PostgreSQL, NoREC oracle
+### 5.2 PostgreSQL NoREC
 
 #### 5.2.1 SQLRight
 
@@ -1211,7 +1211,7 @@ The figures will be generated in folder: `<sqlright_root>/Plot_Scripts/Postgres/
 - For PostgreSQL valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
 
 --------------------------------------------------------------------------
-### 5.3 MySQL, NoREC oracle
+### 5.3 MySQL NoREC
 
 #### 5.3.1 SQLRight
 
@@ -1319,7 +1319,7 @@ python3 run_plots.py
 - For MySQL valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
 
 --------------------------------------------------
-### 5.4 SQLite, TLP Oracle
+### 5.4 SQLite TLP
 
 #### 5.4.1 SQLRight 
 
@@ -1435,7 +1435,7 @@ The figures will be generated in folder: `<sqlright_root>/Plot_Scripts/SQLite3/T
 - For SQLite valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
 
 --------------------------------------------------------------
-### 5.5 PostgreSQL, TLP oracle
+### 5.5 PostgreSQL TLP
 
 #### 5.5.1 SQLRight
 
@@ -1517,7 +1517,7 @@ The figures will be generated in folder: `<sqlright_root>/Plot_Scripts/Postgres/
 - For PostgreSQL valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
 
 --------------------------------------------------------------------------
-### 5.6 MySQL, TLP oracle
+### 5.6 MySQL TLP
 
 #### 5.6.1 SQLRight
 
