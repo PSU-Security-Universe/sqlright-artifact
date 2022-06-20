@@ -1,6 +1,0 @@
-2021-06-04 21:04:04.126 CST [2391457] ERROR:  INSERT has more expressions than target columns at character 60
-2021-06-04 21:04:04.126 CST [2391457] STATEMENT:  CREATE TABLE v0 ( v1 INT );
-	  INSERT INTO v0 VALUES ( 64, 'x', 2147483647 );
-	  INSERT INTO v0 VALUES ( 16 );
-	  UPDATE v0 SET v1 = 14 WHERE v1 = 255;
-	  SELECT v1 FROM v0;

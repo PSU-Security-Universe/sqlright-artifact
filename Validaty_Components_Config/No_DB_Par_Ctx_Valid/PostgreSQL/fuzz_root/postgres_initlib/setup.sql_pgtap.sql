@@ -1,1 +1,0 @@
-\i test/psql.sqlBEGIN;

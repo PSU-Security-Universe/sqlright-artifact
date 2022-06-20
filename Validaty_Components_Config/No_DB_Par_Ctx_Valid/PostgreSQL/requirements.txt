@@ -1,4 +1,0 @@
-black
-GitPython
-black
-pathlib

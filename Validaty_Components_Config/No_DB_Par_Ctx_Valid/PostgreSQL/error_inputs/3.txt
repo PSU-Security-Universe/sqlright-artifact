@@ -1,4 +1,0 @@
-2021-06-04 20:59:13.568 CST [2390126] ERROR:  UNION types character and integer cannot be matched at character 83 
-2021-06-04 20:59:13.568 CST [2390126] STATEMENT:  CREATE TABLE v0 ( v1 BIGINT, v2 INT, v3 CHAR );                 
-          SELECT v3 FROM v0 UNION SELECT v2 FROM v0;                                                              
-          REINDEX TABLE v0;                       
