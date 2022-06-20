@@ -8,6 +8,7 @@ RUN chmod 777 /tmp
 
 RUN apt -y update
 RUN apt -y upgrade
+RUN apt -y update
 RUN apt -y install bison
 RUN apt -y install build-essential
 RUN apt -y install clang
@@ -113,8 +114,10 @@ RUN bash ./replace-changed-code.sh
 WORKDIR /home/mysql/src/parser/mysql-server
 RUN mkdir bld
 WORKDIR /home/mysql/src/parser/mysql-server/bld
-RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost
-RUN make -j$(nproc) 
+
+# Mute the Warning information. The modified version of the MySQL does return many Warnings while compiling. Known problem, ignore them. 
+RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost -DCMAKE_C_FLAGS="-w" -DCMAKE_CXX_FLAGS="-w" 
+RUN make -j$(nproc)
 
 WORKDIR /home/mysql/src
 RUN make
@@ -153,8 +156,11 @@ RUN bash ./replace-changed-code.sh
 WORKDIR /home/mysql/Validaty_Components_Config/No_Ctx_Valid/src/parser/mysql-server
 RUN mkdir bld
 WORKDIR /home/mysql/Validaty_Components_Config/No_Ctx_Valid/src/parser/mysql-server/bld
-RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost
+
+# Mute the Warning information. The modified version of the MySQL does return many Warnings while compiling. Known problem, ignore them. 
+RUN cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=../boost -DCMAKE_C_FLAGS="-w" -DCMAKE_CXX_FLAGS="-w"
 RUN make -j$(nproc) 
+
 WORKDIR /home/mysql/Validaty_Components_Config/No_Ctx_Valid/src
 RUN make -j$(nproc)
 
