@@ -14,9 +14,9 @@ for subdir, dirs, files in os.walk("./"):
                 )
                 p.wait()
 
-                run_plot = "run_plots.py"
+                run_plots_py = "run_plots.py"
                 p = subprocess.Popen(
-                    ["python3", cur_file],
+                    ["python3", run_plots_py],
                     cwd = subdir
                 )
                 p.wait()
