@@ -23,7 +23,7 @@ sleep 60
 
 while :
 do
-    python3 mysql_rebooter.py
+    python3 mysql_rebooter.py > /dev/null
     sleep 60
 done
 

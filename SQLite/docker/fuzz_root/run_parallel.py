@@ -103,6 +103,7 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
 
     modi_env = dict()
     modi_env["AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES"] = "1"
+    modi_env["AFL_SKIP_CPUFREQ"] = "1"
 
     p = subprocess.Popen(
                         fuzzing_command,

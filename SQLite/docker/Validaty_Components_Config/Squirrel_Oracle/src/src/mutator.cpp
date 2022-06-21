@@ -786,37 +786,41 @@ map<IR*, set<IR*> > Mutator::build_dependency_graph(IR* root, map<IDTYPE, IDTYPE
 
 
             Mutator::~Mutator(){
-		cout << "HERE" << endl;
-                // delete ir_libary_3D_
-                for(auto &i: ir_libary_3D_){
-                    for(auto &j: i.second){
-                        for(auto &ir: j.second){
-                            deep_delete(ir);
-                        }
-                    }
-                }
-
-                //delete ir_libary_2D_
-                for(auto &i: ir_libary_2D_){
-                    for(auto &ir: i.second){
-                        deep_delete(ir);
-                    }
-                }
-
-                //delete left_lib
-                for(auto &i: left_lib){
-                    for(auto &ir: i.second){
-                        deep_delete(ir);
-                    }
-                }
-
-                //delete right_lib
-                for(auto &i: right_lib){
-                    for(auto &ir: i.second){
-                        deep_delete(ir);
-                    }
-                }
+                cout << "HERE" << endl;
+                /* Comment out all the free instructions. They will cause Segmentation Fault at the end of the problem termination. 
+                 *
+                 */
+//                // delete ir_libary_3D_
+//                for(auto &i: ir_libary_3D_){
+//                    for(auto &j: i.second){
+//                        for(auto &ir: j.second){
+//                            deep_delete(ir);
+//                        }
+//                    }
+//                }
+//
+//                //delete ir_libary_2D_
+//                for(auto &i: ir_libary_2D_){
+//                    for(auto &ir: i.second){
+//                        deep_delete(ir);
+//                    }
+//                }
+//
+//                //delete left_lib
+//                for(auto &i: left_lib){
+//                    for(auto &ir: i.second){
+//                        deep_delete(ir);
+//                    }
+//                }
+//
+//                //delete right_lib
+//                for(auto &i: right_lib){
+//                    for(auto &ir: i.second){
+//                        deep_delete(ir);
+//                    }
+//                }
             
+            // TODO:: Let it leak at the end of the problem. Fix it later. 
 
             }
 
