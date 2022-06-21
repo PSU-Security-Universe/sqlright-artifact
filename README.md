@@ -413,7 +413,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/SQLite3/No
 
 **Expectations**:
 
-- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 3` bugs being detected by `SQLRight` in `72` hours. 
+- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation around, we expect `>= 3` bugs being detected by `SQLRight` in `72` hours. 
 - For SQLite code coverage figure: `SQLRight` should have the highest code coverage among the other baselines. 
 - For SQLite query validity: `SQLancer` have the highest query validity, while `SQLRight` performs better than `Squirrel-oracle`. 
 - For SQLite valid stmts / hr: `SQLancer` have the highest valid stmts / hr, while `SQLRight` performs better than `Squirrel-oracle`.
@@ -582,7 +582,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/MySQL/NoRE
 
 **Expectations**:
 
-- For MySQL logical bugs figure: The current bisecting and bug filtering scipts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. But in general, `SQLRight` should detect the most bugs (`>= 2` bugs in 72 hours).  
+- For MySQL logical bugs figure: The current bisecting and bug filtering scripts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. But in general, `SQLRight` should detect the most bugs (`>= 2` bugs in 72 hours).  
 - For MySQL code coverage figure: `SQLRight` should have the highest code coverage among the other baselines. 
 - For MySQL query validity: `SQLRight` has higher validity than `Squirrel-oracle`. 
 - For MySQL valid stmts / hr: `SQLRight` has more valid_stmts / hr than `Squirrel-oracle`.
@@ -691,7 +691,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/SQLite3/TL
 
 **Expectations**:
 
-- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 1` bugs being detected by `SQLRight` in `72` hours. 
+- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation around, we expect `>= 1` bugs being detected by `SQLRight` in `72` hours. 
 - For SQLite code coverage figure: `SQLRight` should have the highest code coverage among the other baselines. 
 - For SQLite query validity: `SQLancer` have the highest query validity, while `SQLRight` performs better than `Squirrel-oracle`. 
 - For SQLite valid stmts / hr: `SQLancer` have the highest valid stmts / hr, while `SQLRight` performs better than `Squirrel-oracle`.
@@ -887,7 +887,7 @@ The figures will be generated in folder `<sqlright_root>/Plot_Scripts/MySQL/TLP/
 
 **Expectations**:
 
-- For MySQL logical bugs figure: The current bisecting and bug filtering scipts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. But in general, `SQLRight` should detect the most bugs (`>= 1` bugs in 72 hours).  
+- For MySQL logical bugs figure: The current bisecting and bug filtering scripts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. But in general, `SQLRight` should detect the most bugs (`>= 1` bugs in 72 hours).  
 - For MySQL code coverage figure: `SQLRight` should have the highest code coverage among the other baselines. 
 - For MySQL query validity: `SQLRight` has a higher validity than `Squirrel-oracle`. 
 - For MySQL valid stmts / hr: `SQLRight` has more valid_stmts / hr than `Squirrel-oracle`.
@@ -1000,7 +1000,7 @@ The figures will be saved in folder: `Plot_Scripts/SQLite3/NoREC/Feedback_Test/p
 
 **Expectations**:
 
-- For bugs of SQLite (NoREC): `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. 
+- For bugs of SQLite (NoREC): `SQLRight` should detect the most bugs. On different evaluation around, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. 
 - For coverage of SQLite (NoREC): `SQLRight` should have the highest code coverage among the other baselines. 
 
 --------------------------------------
@@ -1108,7 +1108,7 @@ The figures will be generated in folder `Plot_Scripts/SQLite3/TLP/Feedback_Tests
 
 **Expectations**:
 
-- For bugs of SQLite (TLP): `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. 
+- For bugs of SQLite (TLP): `SQLRight` should detect the most bugs. On different evaluation around, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. 
 - For coverage of SQLite (TLP): `SQLRight` should have the highest code coverage among the other baselines. 
 
 ---------------------------------------------
@@ -1238,7 +1238,7 @@ The figures will be generated in folder: `<sqlright_root>/Plot_Scripts/SQLite3/N
 
 **Expectations**:
 
-- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destory the plot region and render the script outputs an unreadable plots. 
+- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation around, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destroy the plot region and render the script outputs an unreadable plots. 
 - For SQLite code coverage figure: `SQLRight` and `SQLRight non-deter` should have the highest code coverage among the other baselines. `SQLRight non-ctx-valid` could have a coverage very close to the `SQLRight` config, but in general, `SQLRight non-ctx-valid` is slightly worse in coverage compared to `SQLRight`. 
 - For SQLite query validity: `SQLRight` and `SQLRight non-deter` should have the highest query validity. 
 - For SQLite valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
@@ -1424,7 +1424,7 @@ python3 run_plots.py
 
 **Expectations**:
 
-- For MySQL logical bugs figure: The current bisecting and bug filtering scipts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. In general, `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 1` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destory the plot region and render the script outputs an unreadable plots. 
+- For MySQL logical bugs figure: The current bisecting and bug filtering scripts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. In general, `SQLRight` should detect the most bugs. On different evaluation around, we expect `>= 1` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destroy the plot region and render the script outputs an unreadable plots. 
 - For MySQL code coverage figure: `SQLRight` and `SQLRight non-deter` should have the highest code coverage among the other baselines. `SQLRight non-ctx-valid` could have a coverage very close to the `SQLRight` config, but in general, `SQLRight non-ctx-valid` is slightly worse in coverage compared to `SQLRight`. 
 - For MySQL query validity: `SQLRight` and `SQLRight non-deter` should have the highest query validity. 
 - For MySQL valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
@@ -1540,7 +1540,7 @@ The figures will be generated in folder: `<sqlright_root>/Plot_Scripts/SQLite3/T
 
 **Expectations**:
 
-- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destory the plot region and render the script outputs an unreadable plots. 
+- For SQLite logical bugs figure: `SQLRight` should detect the most bugs. On different evaluation around, we expect `>= 2` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destroy the plot region and render the script outputs an unreadable plots. 
 - For SQLite code coverage figure: `SQLRight` and `SQLRight non-deter` should have the highest code coverage among the other baselines. 
 - For SQLite query validity: `SQLRight` and `SQLRight non-deter` should have the highest query validity. 
 - For SQLite valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
@@ -1736,7 +1736,7 @@ python3 run_plots.py
 
 **Expectations**:
 
-- For MySQL logical bugs figure: The current bisecting and bug filtering scipts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. In general, `SQLRight` should detect the most bugs. On different evaluation arounds, we expect `>= 1` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destory the plot region and render the script outputs an unreadable plots. 
+- For MySQL logical bugs figure: The current bisecting and bug filtering scripts could slightly over-estimate the number of unique bugs for MySQL. Some manual efforts might be needed to scan through the bug reports and deduplicate the bugs. In general, `SQLRight` should detect the most bugs. On different evaluation around, we expect `>= 1` bugs being detected by `SQLRight` in `24` hours. Additionally, we have muted the `SQLRight non-deter` config in the Artifact logical bugs figure. Because sometimes `non-deter` could produce tens of False Positives, which would destroy the plot region and render the script outputs an unreadable plots. 
 - For MySQL code coverage figure: `SQLRight` and `SQLRight non-deter` should have the highest code coverage among the other baselines. `SQLRight non-ctx-valid` could have a coverage very close to the `SQLRight` config, but in general, `SQLRight non-ctx-valid` is slightly worse in coverage compared to `SQLRight`. 
 - For MySQL query validity: `SQLRight` and `SQLRight non-deter` should have the highest query validity. 
 - For MySQL valid stmts / hr: `SQLRight` and `SQLRight non-deter` should have the highest number of valid stmts / hr. 
