@@ -29,7 +29,7 @@ def copy_sqlright_contents_in_dir(src:str, dest:str):
 
     bug_time_src = os.path.join(bug_time_src, "bug_samples/unique_bug_output")
     if not os.path.isdir(bug_time_src):
-        print("\n\n\nError: time.txt file from: %s not exists. Please run the bisecting algorithm first before calling the copy_results.py. \n\n\n" % (bug_time_src))
+        print("\n\n\n Warning: time.txt file from: %s not exists. It could be due to the bisecting algorithm not run, or the bisecting bug number is None. Double check whether the bisecting algorithm is called. \n\n\n" % (bug_time_src))
         print("Copy from %s to %s finished. \n" % (src, dest))
         return
         #exit(1)
