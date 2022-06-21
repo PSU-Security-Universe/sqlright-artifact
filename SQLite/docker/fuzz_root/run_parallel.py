@@ -34,7 +34,7 @@ except getopt.GetoptError:
 for opt, arg in opts:
     if opt in ("-o", "--odir"):
         output_dir_str = arg
-        print("Using output dir: %s" % (output_dir_str))
+#        print("Using IN-DOCKER (not host system output dir) output dir: %s" % (output_dir_str))
     elif opt in ("-c", "--start-core"):
         starting_core_id = int(arg)
         print("Using starting_core_id: %d" % (starting_core_id))
