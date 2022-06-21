@@ -91,7 +91,7 @@ def plot_sql_bugs(file_dir, markevery, line_style):
 
     # If the time.txt file not exists. Treat it as no bugs. 
     if not os.path.isfile(file_dir):
-        print("time.txt file: %s not exists. " % (file_dir))
+        #print("time.txt file: %s not exists. " % (file_dir))
         time_l = list(np.arange(0, 72.2, 0.2))
         bug_num_l = [0] * len(time_l)
         plot_with_style(time_l, bug_num_l, style_id=line_style, markevery=markevery)
@@ -158,7 +158,7 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
-            print("The file:%s has too few entries. Skipped. " % (cur_file_name))
+            print("Warning: The file:%s has too few entries. Skipped. " % (cur_file_name))
             continue
         cur_file_fd = cur_file_fd['unix_time'][last_idx]
         if cur_file_fd > latest_time:
@@ -166,7 +166,8 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
             file_name = os.path.join(file_dir, cur_file_name)
 
     if file_name == "":
-        print("Error: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. " % (cur_file_name))
+        print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
+        exit(1)
 
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -377,7 +378,7 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
-            print("The file:%s has too few entries. Skipped. " % (cur_file_name))
+            print("Warning: The file:%s has too few entries. Skipped. " % (cur_file_name))
             continue
         cur_file_fd = cur_file_fd['unix_time'][last_idx]
         if cur_file_fd > latest_time:
@@ -385,7 +386,8 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
             file_name = os.path.join(file_dir, cur_file_name)
 
     if file_name == "":
-        print("Error: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. " % (cur_file_name))
+        print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
+        exit(1)
     
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -456,7 +458,7 @@ def plot_sqlancer_corr_over_time(file_dir, markevery=2600, line_style = 2, is_do
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
-            print("The file:%s has too few entries. Skipped. " % (cur_file_name))
+            print("Warning: The file:%s has too few entries. Skipped. " % (cur_file_name))
             continue
         cur_file_fd = cur_file_fd['unix_time'][last_idx]
         if cur_file_fd > latest_time:
@@ -464,7 +466,8 @@ def plot_sqlancer_corr_over_time(file_dir, markevery=2600, line_style = 2, is_do
             file_name = os.path.join(file_dir, cur_file_name)
 
     if file_name == "":
-        print("Error: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. " % (cur_file_name))
+        print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
+        exit(1)
     
     for i in range(1):
         file = open(file_name)
@@ -614,7 +617,7 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
-            print("The file:%s has too few entries. Skipped. " % (cur_file_name))
+            print("Warning: The file:%s has too few entries. Skipped. " % (cur_file_name))
             continue
         cur_file_fd = cur_file_fd['unix_time'][last_idx]
         if cur_file_fd > latest_time:
@@ -622,7 +625,8 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
             file_name = os.path.join(file_dir, cur_file_name)
 
     if file_name == "":
-        print("Error: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. " % (cur_file_name))
+        print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
+        exit(1)
 
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -697,7 +701,6 @@ def sample_bug_num(x, y, last_delta = None, start_from_zero = False):
 def sample_plots(x, y, last_delta = None, start_from_zero = False):
     j = 1 # idx for original x and y. 
     prev_x = 0
-    last_delta = last_delta / 3600.0
     if start_from_zero:
         new_x = [0]
         new_y = [0]
