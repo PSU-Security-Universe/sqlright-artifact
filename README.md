@@ -255,6 +255,7 @@ Our paper presents `SQLRight`, a tool that combines coverage-based guidance, val
 
 *Session 5* contains the instructions to evalute `Contribution of Validity` (*Section 5.4* in the paper). It includes the steps to generate *Figure 7*, *Figure 9* and *Table 4* in the paper. It consumes about `1956` CPU hours. 
 
+All the fuzzing processes in this artifact can be run in parallel, except for the bisecting and plotting scripts that require the fuzzing processes to finish first. However, when running multiple fuzzing processes on the user machine, make sure the different processes are being bind to different CPU cores, by using a different `--start-core` and `--num-concurrent` flags. Except for `SQLancer` and bisecting runtimes, for these two, the `--start-core` and `--num-concurrent` flags are not required. 
 
 <br/><br/>
 ## 2.  Build the Docker Images
@@ -1772,6 +1773,13 @@ python3 count_false_positives.py
 <br/><br/>
 <br/><br/>
 # End of the Artifact Evaluation Instructions
+
+To clean up all the Docker cache after finishing the Artifact, run the following command:
+
+```bash
+# Well, make sure to keep your own Docker Images and Containers. :-)
+sudo docker system prune --all
+```
 
 We hereby thank all the reviewers for putting in the hard work to reproduce the results we presented in the paper. 
 
