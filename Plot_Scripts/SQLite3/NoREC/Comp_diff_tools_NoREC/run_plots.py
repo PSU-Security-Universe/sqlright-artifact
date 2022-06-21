@@ -10,4 +10,4 @@ for cur_py in all_py:
         cwd = os.getcwd()
     )
     p.wait()
-print("Finished")
+print("\n\nFinished")

@@ -83,14 +83,14 @@ def plot_with_style(x, y, style_id = 0, markevery=100):
 def plot_sql_bugs(file_dir, markevery, line_style):
 
     if not os.path.isdir(file_dir):
-        print("Warning: Bug folder %s not exists. " % (file_dir))
+        print("\n\n\nError: Bug folder %s not exists. Did you run the Bisecting script? \n\n\n" % (file_dir))
         exit(1)
 
     file_dir = os.path.join(file_dir, "time.txt")
 
     # If the time.txt file not exists. Treat it as no bugs. 
     if not os.path.isfile(file_dir):
-        print("time.txt file: %s not exists.  It could due to no active True Positive bugs being found after bisecting and filtering. Or the bisecting algorithm is not called. " % (file_dir))
+        #print("time.txt file: %s not exists.  It could due to no active True Positive bugs being found after bisecting and filtering. Or the bisecting algorithm is not called. " % (file_dir))
         time_l = list(np.arange(0, 72.2, 0.2))
         bug_num_l = [0] * len(time_l)
         plot_with_style(time_l, bug_num_l, style_id=line_style, markevery=markevery)
@@ -156,7 +156,7 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
-            print("For file: %s, too few entries are available. Skipped. " % (cur_file_name))
+            print("Warning: For file: %s, too few entries are available. Skipped. " % (cur_file_name))
             continue
         cur_file_fd = cur_file_fd['unix_time'][last_idx] - cur_file_fd['unix_time'][0]
         if cur_file_fd > latest_time:
@@ -365,7 +365,7 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
-            print("For file: %s, too few entries are available. Skipped. " % (cur_file_name))
+            print("Warning: For file: %s, too few entries are available. Skipped. " % (cur_file_name))
             continue
         cur_file_fd = cur_file_fd['unix_time'][last_idx] - cur_file_fd['unix_time'][0]
         if cur_file_fd > latest_time:
@@ -520,7 +520,7 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
         cur_file_fd = pd.read_csv(os.path.join(file_dir, cur_file_name), error_bad_lines=False)
         last_idx = cur_file_fd['unix_time'].size - 1
         if last_idx < 10:
-            print("For file: %s, too few entries are available. Skipped. " % (cur_file_name))
+            print("Warning: For file: %s, too few entries are available. Skipped. " % (cur_file_name))
             continue
         cur_file_fd = cur_file_fd['unix_time'][last_idx] - cur_file_fd['unix_time'][0]
         if cur_file_fd > latest_time:

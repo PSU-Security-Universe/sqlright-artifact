@@ -5,10 +5,10 @@ import shutil
 # copy function
 def copy_sqlright_contents_in_dir(src:str, dest:str):
     if not os.path.exists(src):
-        print("The %s folder doesn't exist. Please run the fuzzing first, and then invoke this plot function." % (src))
+        print("\n\n\nError: The %s folder doesn't exist. Please run the fuzzing first, and then invoke this plot function. \n\n\n" % (src))
         exit(5)
     if not os.path.exists(dest):
-        print("The copy dest: %s folder doesn't exist. Creating the folder %s." % (dest, dest))
+        print("\n\n\nThe copy dest: %s folder doesn't exist. Creating the folder %s. \n\n\n" % (dest, dest))
         os.mkdir(dest)
 
     i = 0
@@ -25,9 +25,10 @@ def copy_sqlright_contents_in_dir(src:str, dest:str):
 
 def copy_sqlancer_contents_in_dir(src:str, config_name: str, dest:str):
     if not os.path.exists(src):
-        print("The %s folder doesn't exist. Please run the fuzzing first, and then invoke this plot function." % (src))
+        print("\n\n\nError: The %s folder doesn't exist. Please run the fuzzing first, and then invoke this plot function. \n\n\n" % (src))
+        exit(5)
     if not os.path.exists(dest):
-        print("The copy dest: %s folder doesn't exist. Creating the folder %s." % (dest, dest))
+        print("Warning: The copy dest: %s folder doesn't exist. Creating the folder %s. " % (dest, dest))
         os.mkdir(dest)
 
     i = 0
