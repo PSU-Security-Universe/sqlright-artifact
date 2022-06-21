@@ -207,7 +207,7 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
     map_size_avg = [x * 262 / 100 for x in map_size_avg]
     
     if is_downsampling:
-        time_avg, map_size_avg = sample_plots(time_avg, map_size_avg, latest_time, True)
+        time_avg, map_size_avg = sample_plots(time_avg, map_size_avg, time_avg[-1], True)
     
     plot_with_style(time_avg, map_size_avg, style_id=line_style, markevery=markevery)
     return
@@ -413,7 +413,7 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
         corr_rate_avg.append(cur_curr_rate)
     
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, latest_time)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
     
 
     corr_rate_avg = [x*100 for x in corr_rate_avg]
@@ -576,7 +576,7 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
         corr_rate_avg[i] = corr_rate_avg[i] / time_avg[i]
 
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, latest_time)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
 
     # plt.plot(time_avg, corr_rate_avg, linestyle = (0, (3, 1, 1, 1, 1, 1)), marker = 'o', markevery=100, linewidth=4.0, markersize=14)
     plot_with_style(time_avg, corr_rate_avg, style_id=line_style, markevery=markevery)
@@ -605,7 +605,6 @@ def sample_bug_num(x, y, last_delta=None, start_from_zero = False):
 def sample_plots(x, y, last_delta = None, start_from_zero = False):
     j = 1 # idx for original x and y. 
     prev_x = 0
-    last_delta = last_delta / 3600.0
     if start_from_zero:
         new_x = [0]
         new_y = [0]
