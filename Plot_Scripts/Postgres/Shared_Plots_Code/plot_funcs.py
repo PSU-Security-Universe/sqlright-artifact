@@ -113,7 +113,8 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
             file_name = os.path.join(file_dir, cur_file_name)
 
     if file_name == "":
-        print("Error: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. " % (cur_file_name))
+        print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
+        exit(1)
 
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -160,7 +161,7 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
             map_size_avg.append(map_size_avg[-1])
 
     if is_downsampling:
-        time_avg, map_size_avg = sample_plots(time_avg, map_size_avg, True)
+        time_avg, map_size_avg = sample_plots(time_avg, map_size_avg, time_avg[-1], True)
     
     plot_with_style(time_avg, map_size_avg, style_id = line_style, markevery = markevery)
     return
@@ -220,7 +221,7 @@ def plot_sqlancer_mapsize(file_name, markevery=2600, line_style = 2, is_downsamp
     map_size_avg = [x * 262 / 100 for x in map_size_avg]
     
     if is_downsampling:
-        time_avg, map_size_avg = sample_plots(time_avg, map_size_avg, True)
+        time_avg, map_size_avg = sample_plots(time_avg, map_size_avg, time_avg[-1], True)
     
     plot_with_style(time_avg, map_size_avg, linestyle = line_style,markersize=markevery)
 
@@ -289,7 +290,7 @@ def plot_sqlancer_correct_rate(file_name, markevery=2600, line_style = 2, is_dow
             corr_rate_avg.append(corr_rate_avg[-1])
     
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
 
     corr_rate_avg = [x*100 for x in corr_rate_avg]
 
@@ -328,7 +329,8 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
             file_name = os.path.join(file_dir, cur_file_name)
 
     if file_name == "":
-        print("Error: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. " % (cur_file_name))
+        print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
+        exit(1)
     
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -374,7 +376,7 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
             corr_rate_avg.append(corr_rate_avg[-1])
     
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
     
     plot_with_style(time_avg, corr_rate_avg, style_id=line_style, markevery=markevery)
 
@@ -454,7 +456,7 @@ def plot_sqlancer_corr_over_time(file_name, markevery=2600, line_style = 2, is_d
         corr_rate_avg.append(corr_rate_avg[-1])
 
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
 
     corr_rate_avg = [x*100 for x in corr_rate_avg]
     
@@ -492,7 +494,8 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
             file_name = os.path.join(file_dir, cur_file_name)
 
     if file_name == "":
-        print("Error: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. " % (cur_file_name))
+        print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
+        exit(1)
 
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -559,7 +562,7 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
             corr_rate_avg.append(corr_rate_avg[-1])
 
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
 
     if "SQLRight_with_squ_valid" in file_name:
         time_avg = [x-0.5 for x in time_avg]
@@ -582,8 +585,9 @@ def plot_sql_corr_over_time_default_all_zeros(markevery, line_style, is_downsamp
     plot_with_style(time_avg, corr_rate_avg, style_id=line_style, markevery=markevery)
 
 
-def sample_bug_num(x, y, start_from_zero = False):
+def sample_bug_num(x, y, last_delta = None, start_from_zero = False):
     j = 1 # idx for original x and y. 
+    last_delta = last_delta / 3600.0
     if start_from_zero:
         new_x = [0]
         new_y = [0]
@@ -591,6 +595,8 @@ def sample_bug_num(x, y, start_from_zero = False):
         new_x = [x[0]]
         new_y = [y[0]]
     for i in np.arange(0, 72.2, 0.2):
+        if last_delta is not None and last_delta <= 20.0 and i > last_delta:
+            break
         while j < len(x) and i > x[j]:
             new_x.append(x[j])
             new_y.append(y[j])
@@ -599,9 +605,10 @@ def sample_bug_num(x, y, start_from_zero = False):
         new_y.append(new_y[-1])
     return new_x, new_y
 
-def sample_plots(x, y, start_from_zero = False):
+def sample_plots(x, y, last_delta = None, start_from_zero = False):
     j = 1 # idx for original x and y. 
     prev_x = 0
+    last_delta = last_delta / 3600.0
     if start_from_zero:
         new_x = [0]
         new_y = [0]
@@ -610,6 +617,8 @@ def sample_plots(x, y, start_from_zero = False):
         new_y = [y[0]]
     for i in np.arange(0, 72.2, 0.2):
         is_continue = False
+        if last_delta is not None and last_delta <= 20.0 and i > last_delta:
+            break
         while j < len(x) and (i + 0.2) < x[j]:
             new_x.append(i)
             

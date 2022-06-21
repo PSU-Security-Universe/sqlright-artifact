@@ -208,7 +208,7 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
     map_size_avg = [x * 262 / 100 for x in map_size_avg]
 
     if is_downsampling:
-        time_avg, map_size_avg = sample_plots(time_avg, map_size_avg, True)
+        time_avg, map_size_avg = sample_plots(time_avg, map_size_avg, time_avg[-1], True)
     
     plot_with_style(time_avg, map_size_avg, style_id=line_style, markevery=markevery)
     return
@@ -268,7 +268,7 @@ def plot_sqlancer_mapsize(file_name, markevery=2600, line_style = 2, is_downsamp
     map_size_avg = [x * 262 / 100 for x in map_size_avg]
     
     if is_downsampling:
-        time_avg, map_size_avg = sample_plots(time_avg, map_size_avg, True)
+        time_avg, map_size_avg = sample_plots(time_avg, map_size_avg, time_avg[-1], True)
 
     plot_with_style(time_avg, map_size_avg, style_id=2, markevery=markevery)
 
@@ -334,7 +334,7 @@ def plot_sqlancer_correct_rate(file_name, markevery=2600, line_style = 2, is_dow
         corr_rate_avg.append(cur_curr_rate)
 
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
 
     corr_rate_avg = [x for x in corr_rate_avg]
 
@@ -348,7 +348,7 @@ def plot_sqlancer_default_correct_rate(markevery=30, line_style = 2, is_downsamp
         time_avg.append(i)
         corr_rate_avg.append(99)
 
-    time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg)
+    time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
 
     plot_with_style(time_avg, corr_rate_avg, style_id=line_style, markevery=markevery)
 
@@ -426,7 +426,7 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
     #     plt.plot(all_time_delta[i], all_corr_rate[i], alpha = 0.3)
     
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
 
     corr_rate_avg = [x for x in corr_rate_avg]
     
@@ -529,7 +529,7 @@ def plot_sqlancer_corr_over_time(file_dir, markevery=2600, line_style = 2, is_do
         corr_rate_avg[i] = corr_rate_avg[i] / time_avg[i]
     
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
     
     plot_with_style(time_avg, corr_rate_avg, style_id=2, markevery=markevery)
 
@@ -586,7 +586,7 @@ def plot_sqlancer_corr_over_time_2(file_name, markevery, line_style, is_downsamp
         corr_rate_avg[i] = corr_rate_avg[i] / time_avg[i]
 
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
 
     plot_with_style(time_avg, corr_rate_avg, style_id=line_style, markevery=markevery)
 
@@ -669,13 +669,14 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
         corr_rate_avg[i] = corr_rate_avg[i] / time_avg[i]
 
     if is_downsampling:
-        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg)
+        time_avg, corr_rate_avg = sample_plots(time_avg, corr_rate_avg, time_avg[-1])
 
     plot_with_style(time_avg, corr_rate_avg, style_id=line_style, markevery=markevery)
 
 
-def sample_bug_num(x, y, start_from_zero = False):
+def sample_bug_num(x, y, last_delta = None, start_from_zero = False):
     j = 1 # idx for original x and y. 
+    last_delta = last_delta / 3600.0
     if start_from_zero:
         new_x = [0]
         new_y = [0]
@@ -683,6 +684,8 @@ def sample_bug_num(x, y, start_from_zero = False):
         new_x = [x[0]]
         new_y = [y[0]]
     for i in np.arange(0, 72.2, 0.3):
+        if last_delta is not None and last_delta < 20.0 and i > last_delta:
+            break
         while j < len(x) and i > x[j]:
             new_x.append(x[j])
             new_y.append(y[j])
@@ -691,9 +694,10 @@ def sample_bug_num(x, y, start_from_zero = False):
         new_y.append(new_y[-1])
     return new_x, new_y
 
-def sample_plots(x, y, start_from_zero = False):
+def sample_plots(x, y, last_delta = None, start_from_zero = False):
     j = 1 # idx for original x and y. 
     prev_x = 0
+    last_delta = last_delta / 3600.0
     if start_from_zero:
         new_x = [0]
         new_y = [0]
@@ -701,6 +705,8 @@ def sample_plots(x, y, start_from_zero = False):
         new_x = [x[0]]
         new_y = [y[0]]
     for i in np.arange(0, 72.2, 0.2):
+        if last_delta is not None and last_delta < 20.0 and i > last_delta:
+            break
         is_continue = False
         while j < len(x) and (i + 0.2) < x[j]:
             new_x.append(i)
