@@ -18,6 +18,7 @@ Currently supported DBMS:
 <!--ts-->
   * [Getting Started](#getting-started)
     + [Operating System configuration and Source Code setup](#operating-system-configuration-and-source-code-setup)
+    + [Host system in VM](#host-system-in-vm)
     + [Troubleshooting](#troubleshooting)
   * [0. Artifact Expectations](#0-artifact-expectations)
   * [1. Artifact Overview](#1-artifact-overview)
@@ -121,12 +122,17 @@ Currently supported DBMS:
 
 All of the experiments are evaluated on a `x86-64` CPU with `Ubuntu 20.04 LTS` operating system. We recommend to reserve `>= 20` cores of CPUs, `>= 600GB` of memory and `>= 1.5TB` hard drive storage (preferably SSDs) for the evaluations. All the experiments are evaluated in Docker envs. We recommend to use Docker with version `>= 20.10.16` to reproduce the results. Before the start of the evaluations, we firstly need to configure a few system settings on the host operating system. 
 
+Basic Dependencies. 
+
 ```bash
-# Basic Dependencies. 
 # Open the terminal app from the Ubuntu host system, if you are using a Ubuntu Desktop distribution. 
 sudo apt-get install -y build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc
 sudo apt-get install -y libpq-dev
 ```
+
+Operating System configurations. 
+
+**Warning**: If you are running your `Ubuntu` "host" system inside an Virtual Machine, i.e., VMware Workstation, VMware Fusion, VirtualBox, Parallel Desktop etc, the `Disable On-demand CPU scaling` step in the following script could fail. User can continue their evaluation even if this specific setup step fails on their machine. But we generally don't recommend to run the evaluations inside any Virtual Machines, it could cause some other unexpected errors on the evaluation process. Check [Host system in VM](#host-system-in-vm) for more details. 
 
 ```bash
 # System Configurations. 
@@ -224,6 +230,16 @@ git clone https://github.com/PSU-Security-Universe/sqlright-artifact.git
 # If you are using Zenodo as the hosted download platform, you should download the sqlright-artifact file from the link inside the website. 
 ```
 
+### Host system in VM
+
+We generally don't recommend running the this Artifact Evaluation inside a Virtual Machine, e.g., VMware Workstation, VMware Fusion, VirtualBox, Parallel Desktop etc. However, if an VM is the only choice, make sure you check the following:
+
+- Make sure you allocate enough CPU cores, memory space and hard disk space to your virtual environment. The recommended of the VM spec is the same as the host machine spec: `>= 20` cores of CPUs, `>= 600GB` of memory and `>= 1.5TB` hard drive storage (preferably SSDs).
+
+- Make sure when you call any fuzzing command in the instructions, the `--start-core + --num-concurrent` number won't exceed the total number of CPU cores you assigned to the Virtual Machine. 
+
+- If one of the experiments fail inside the system that is hosted by Virtual Machine, please consider to redo the experiments in a native environment. 
+
 ### Troubleshooting
 
 - If the Docker Image building process failed or stuck at some steps for a couple hours, consider to clean the Docker environments. The following command will clean up the Docker cache, and we can rebuild another Docker Images from scratch. 
@@ -232,7 +248,9 @@ git clone https://github.com/PSU-Security-Universe/sqlright-artifact.git
 sudo docker system prune --all
 ```
 
-- If any fuzzing processes failed to launch, immediately return errors, or never output any results while running, please check whether the `System Configuration` has been setup correctly. Specifically, please repeat the steps of `Disable On-demand CPU scaling` and `Avoid having crashes being misinterpreted as hangs` before retrying the fuzzing scripts. 
+- If any fuzzing processes failed to launch, immediately return errors, or never output any results while running; Or if the `Plotting Scripts` failed to read/write from the `Results` files:
+    - Please check whether the `System Configuration` has been setup correctly. Specifically, please repeat the steps of `Disable On-demand CPU scaling` and `Avoid having crashes being misinterpreted as hangs` before retrying the fuzzing scripts. 
+    - Please check the `--start-core` and `--num-concurrent` flags you passed into the fuzzing command, and make sure `--start-core + --num-concurrent` won't exceed the total number of CPU cores you have on your machine. (This is a very common mistake that causes evaluation failure. )
 
 <br/><br/>
 ## 0. Artifact Expectations
