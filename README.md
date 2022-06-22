@@ -218,7 +218,10 @@ At last, go to the path where you want to download the `SQLRight` source code:
 
 ```bash
 cd ~ # Assuming the home directory
-git clone https://github.com/PSU-Security-Universe/sqlright-artifact.git  # TODO: May refer to other link if we are using Zenodo. 
+# Assuming you are pulling the source code from the Github reporsitory. 
+git clone https://github.com/PSU-Security-Universe/sqlright-artifact.git 
+
+# If you are using Zenodo as the hosted download platform, you should download the sqlright-artifact file from the link inside the website. 
 ```
 
 ### Troubleshooting
