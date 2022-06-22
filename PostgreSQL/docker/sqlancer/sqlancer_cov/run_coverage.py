@@ -121,6 +121,10 @@ while True:
             cur_shm_str = shm_env_list[idx]
             cur_postgre_data_dir_str = os.path.join(postgres_root_dir, "data_all/data_" + str(idx))
 
+            modi_env = dict()
+            modi_env["AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES"] = "1"
+            modi_env["AFL_SKIP_CPUFREQ"] = "1"
+
             postgre_command = "__AFL_SHM_ID=" + cur_shm_str +  " ./bin/postgres -D " + cur_postgre_data_dir_str + " & "
             print("PostgreS PID: " + str(cur_postgre_pid) + " crashed. ")
             print("Restarting postgres command: " + fuzzing_command, end="\n\n")
@@ -130,7 +134,8 @@ while True:
                                 shell=False,
                                 stderr=subprocess.DEVNULL,
                                 stdout=subprocess.DEVNULL,
-                                stdin=subprocess.DEVNULL
+                                stdin=subprocess.DEVNULL,
+                                env=modi_env
                                 )
             all_postgres_p_list.insert(idx, p)
     

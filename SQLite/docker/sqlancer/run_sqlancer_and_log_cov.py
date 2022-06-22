@@ -63,6 +63,10 @@ p = subprocess.Popen([sqlancer_command],
 
 time.sleep(5)
 
+modi_env = dict()
+modi_env["AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES"] = "1"
+modi_env["AFL_SKIP_CPUFREQ"] = "1"
+
 #run coverage logger. 
 cov_command = "./afl-fuzz -i ./inputs/ " \
              + " -o " + output_dir_str \
@@ -74,7 +78,8 @@ p = subprocess.Popen([cov_command],
                      shell = True,
                      stderr = subprocess.DEVNULL,
                      stdout = subprocess.DEVNULL,
-                     stdin = subprocess.DEVNULL
+                     stdin = subprocess.DEVNULL,
+                     env = modi_env
                     )
 
 print("Finished launching the sqlancer and the afl-fuzz. ")
