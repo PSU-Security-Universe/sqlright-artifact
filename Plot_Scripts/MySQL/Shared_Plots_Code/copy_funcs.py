@@ -35,7 +35,7 @@ def copy_sqlright_contents_in_dir(src:str, dest:str):
         #exit(1)
     bug_time_src = os.path.join(bug_time_src, "time.txt")
     if not os.path.isfile(bug_time_src):
-        print("Warning: time.txt file from: %s not exists. Did you finish the bisecting algorithm? " % (bug_time_src))
+        print("\n\n\n Warning: time.txt file from: %s not exists. It could be due to the bisecting algorithm not run, or the bisecting bug number is None (a more possible reason). Double check whether the bisecting algorithm is called. \n\n\n" % (bug_time_src))
     else:
         shutil.copy(bug_time_src, os.path.join(dest, "time.txt"))
 
