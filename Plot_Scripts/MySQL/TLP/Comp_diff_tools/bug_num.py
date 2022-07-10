@@ -13,8 +13,8 @@ sys.path.insert(1, '../../Shared_Plots_Code')
 from plot_funcs import *
 
 plot_sql_bugs("../SQLRight_MySQL_TLP/", markevery = 30, line_style = 0)
-plot_sql_bugs("./squirrel/", markevery = 30, line_style = 1)
 plot_sql_bugs("./sqlancer/", markevery = 30, line_style = 2)
+plot_sql_bugs("./squirrel/", markevery = 30, line_style = 1)
 
 
 # plt.xlabel('Time (hour)', fontsize = 20)
@@ -22,7 +22,7 @@ plt.ylabel('Coverage (k)', fontsize = 20)
 
 plt.xlim(0, 72)
 
-plt.legend([r'SQLRight', r'Squirrel$_{+oracle}$', r'SQLancer'])
+plt.legend([r'SQLRight', r'SQLancer', r'Squirrel$_{+oracle}$'])
 
 x_major_locator=MultipleLocator(12)
 ax=plt.gca()

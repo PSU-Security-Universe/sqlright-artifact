@@ -15,17 +15,18 @@ from plot_funcs import *
 
 plot_sql_correct_rate("../SQLRight_MySQL_TLP/", markevery = 30, line_style = 0)
 
+plot_sqlancer_default_correct_rate()
+
 # Squirrel Oracle
 x = list(np.arange(0, 72.2, 0.2))
 y = [0] * len(x)
 plot_with_style(x, y, style_id = 1, markevery=30)
 
-plot_sqlancer_default_correct_rate()
 
 plt.xlim(0, 72)
 # plt.ylim(-1, 105)
 
-plt.legend([r'SQLRight', r'Squirrel$_{+oracle}$', r'SQLancer'])
+plt.legend([r'SQLRight', r'SQLancer', r'Squirrel$_{+oracle}$'])
 
 x_major_locator=MultipleLocator(12)
 ax=plt.gca()
