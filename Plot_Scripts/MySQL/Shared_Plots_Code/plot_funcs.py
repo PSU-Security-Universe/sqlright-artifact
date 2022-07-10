@@ -85,7 +85,8 @@ def plot_sql_bugs(file_dir, markevery, line_style):
 
     if not os.path.isdir(file_dir):
         print("Warning: Bug folder %s not exists. It could due to no active True Positive bugs being found. Or the bisecting algorithm is not called. " % (file_dir))
-        exit(1)
+        return
+        # exit(1)
 
     file_dir = os.path.join(file_dir, "time.txt")
 
@@ -167,7 +168,8 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
 
     if file_name == "":
         print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
-        exit(1)
+        return
+        # exit(1)
 
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -387,7 +389,8 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
 
     if file_name == "":
         print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
-        exit(1)
+        return
+        # exit(1)
     
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -467,7 +470,8 @@ def plot_sqlancer_corr_over_time(file_dir, markevery=2600, line_style = 2, is_do
 
     if file_name == "":
         print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
-        exit(1)
+        return
+        # exit(1)
     
     for i in range(1):
         file = open(file_name)
@@ -626,7 +630,8 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
 
     if file_name == "":
         print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
-        exit(1)
+        return
+        # exit(1)
 
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)

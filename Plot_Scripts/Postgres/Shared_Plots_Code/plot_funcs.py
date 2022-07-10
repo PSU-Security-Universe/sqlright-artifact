@@ -114,7 +114,8 @@ def plot_sql_mapsize(file_dir, markevery, line_style, is_downsampling = True):
 
     if file_name == "":
         print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
-        exit(1)
+        return
+        # exit(1)
 
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -330,7 +331,8 @@ def plot_sql_correct_rate(file_dir, markevery, line_style, is_downsampling = Tru
 
     if file_name == "":
         print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
-        exit(1)
+        return
+        # exit(1)
     
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
@@ -495,7 +497,8 @@ def plot_sql_corr_over_time(file_dir, markevery, line_style, is_downsampling = T
 
     if file_name == "":
         print("\n\n\nError: Cannot find plot_data_* file in dir %s, or all plot_data_* files are being skipped. Did you finish all the fuzzing and bisecting scripts? \n\n\n" % (cur_file_name))
-        exit(1)
+        return
+        # exit(1)
 
     for i in [0]:
         file = pd.read_csv(file_name, error_bad_lines=False)
