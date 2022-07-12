@@ -118,3 +118,7 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     time.sleep(5)
 
 print("Finished launching the fuzzing. Now monitor the postgres process. ")
+
+while True:
+    # Dead-loop
+    time.sleep(100)
