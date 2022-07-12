@@ -58,6 +58,9 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     # Prepare for env shared by the fuzzer and postgres. 
     cur_port_num = port_starting_num + cur_inst_id
 
+    fuzzer_output_log = os.path.join(cur_output_dir_str, "output.txt")
+    fuzzer_output_log = open(fuzzer_output_log, 'w', errors='ignore')
+
     # Start running the SQLRight fuzzer. 
     fuzzing_command = "AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 ./afl-fuzz -t 2000 -m 2000 " \
                         + " -I " + sqlancer_output_dir \
@@ -72,8 +75,8 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
                         [fuzzing_command],
                         cwd=os.getcwd(),
                         shell=True,
-                        stderr=subprocess.DEVNULL,
-                        stdout=subprocess.DEVNULL,
+                        stderr=fuzzer_output_log,
+                        stdout=fuzzer_output_log,
                         stdin=subprocess.DEVNULL
                         )
     all_fuzzing_p_list.append(p)

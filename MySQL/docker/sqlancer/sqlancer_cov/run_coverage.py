@@ -59,6 +59,9 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
     cur_port_num = port_starting_num + cur_inst_id
     socket_path = "/tmp/mysql_" + str(cur_inst_id) + ".sock"
 
+    fuzzer_output_log = os.path.join(cur_output_dir_str, "output.txt")
+    fuzzer_output_log = open(fuzzer_output_log, 'w', errors='ignore')
+
     modi_env = dict()
     modi_env["AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES"] = "1"
     modi_env["AFL_SKIP_CPUFREQ"] = "1"
@@ -78,8 +81,8 @@ for cur_inst_id in range(starting_core_id, starting_core_id + parallel_num, 1):
                         [fuzzing_command],
                         cwd=os.getcwd(),
                         shell=True,
-                        stderr=subprocess.DEVNULL,
-                        stdout=subprocess.DEVNULL,
+                        stderr=fuzzer_output_log,
+                        stdout=fuzzer_output_log,
                         stdin=subprocess.DEVNULL,
                         env=modi_env
                         )

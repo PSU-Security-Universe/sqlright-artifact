@@ -67,6 +67,9 @@ modi_env = dict()
 modi_env["AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES"] = "1"
 modi_env["AFL_SKIP_CPUFREQ"] = "1"
 
+fuzzer_output_log = os.path.join(output_dir_str, "output.txt")
+fuzzer_output_log = open(fuzzer_output_log, 'w', errors='ignore')
+
 #run coverage logger. 
 cov_command = "./afl-fuzz -i ./inputs/ " \
              + " -o " + output_dir_str \
@@ -76,8 +79,8 @@ print("Runnning cov command: %s" % (cov_command))
 p = subprocess.Popen([cov_command],
                      cwd = new_cov_dir,
                      shell = True,
-                     stderr = subprocess.DEVNULL,
-                     stdout = subprocess.DEVNULL,
+                     stderr = fuzzer_output_log,
+                     stdout = fuzzer_output_log,
                      stdin = subprocess.DEVNULL,
                      env = modi_env
                     )
