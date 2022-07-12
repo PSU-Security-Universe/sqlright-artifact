@@ -67,8 +67,12 @@ modi_env = dict()
 modi_env["AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES"] = "1"
 modi_env["AFL_SKIP_CPUFREQ"] = "1"
 
-fuzzer_output_log = os.path.join(output_dir_str, "output.txt")
+if not os.path.isdir(os.path.join(new_cov_dir, output_dir_str)):
+    os.mkdir(os.path.join(new_cov_dir, output_dir_str))
+
+fuzzer_output_log = os.path.join(new_cov_dir, output_dir_str, "output.txt")
 fuzzer_output_log = open(fuzzer_output_log, 'w', errors='ignore')
+
 
 #run coverage logger. 
 cov_command = "./afl-fuzz -i ./inputs/ " \
