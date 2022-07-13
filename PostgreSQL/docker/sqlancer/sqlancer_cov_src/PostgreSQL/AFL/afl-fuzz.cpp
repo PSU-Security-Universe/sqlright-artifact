@@ -7809,6 +7809,12 @@ int main(int argc, char **argv)
     if (stop_soon){
       break;
     }
+
+    if ( !filesystem::exists(sqlancer_query_path)) {
+        std::cerr << "SQLancer is not ready yet. sqlancer_query_path not existed yet. \n";
+        sleep(5);
+        continue;
+    }
     
     for (const auto & entry : std::filesystem::directory_iterator(sqlancer_query_path)){
       if (stop_soon){
