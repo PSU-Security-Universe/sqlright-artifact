@@ -20,7 +20,9 @@ SCRIPT_EXEC=$(cat << EOF
 cd /home/mysql/mysql-server/bld/
 cp -r data_all/ori_data data_all/data_100
 
-./bin/mysqld --basedir=./ --datadir=./data_all/data_100/ --socket=/tmp/mysql_sqlancer.sock &
+mkdir -p /home/mysql/sqlancer/sqlancer/target/logs
+
+./bin/mysqld --basedir=./ --datadir=./data_all/data_100/ --socket=/tmp/mysql_sqlancer.sock &> /home/mysql/sqlancer/sqlancer/target/logs/mysql_output.txt &
 sleep 5
 
 ./bin/mysql -u root -e "CREATE USER 'sqlancer'@'localhost' IDENTIFIED BY 'sqlancer'; GRANT ALL PRIVILEGES ON * . * TO 'sqlancer'@'localhost';" --socket=/tmp/mysql_sqlancer.sock
